@@ -1,0 +1,171 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true"
+    CodeBehind="TeacherMaster.master.cs"
+    Inherits="LMS_Project.Teacher.TeacherMaster" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Teacher Dashboard</title>
+
+    <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
+
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../assets/icons/fontawesome/css/all.min.css" rel="stylesheet" />
+    <link href="../assets/css/style.css" rel="stylesheet" />
+
+    <style>
+        #main-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            position: fixed;
+            background: #fff;
+            border-right: 3px solid #28a745;
+            padding-top: 20px;
+        }
+
+        .content-wrapper {
+            margin-left: 240px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8f9fa;
+        }
+
+        .header {
+            height: 70px;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 0 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .content-body {
+            flex: 1;
+            padding: 80px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px 20px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background: #28a745;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+<form id="form1" runat="server">
+<asp:ScriptManager ID="ScriptManager1" runat="server" />
+
+<div id="main-wrapper">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h4 class="text-center text-success fw-bold">Arrgees LMS</h4>
+        <hr />
+
+        <a href="TeacherDashboard.aspx">
+            <i class="fa-solid fa-house me-2"></i> Dashboard
+        </a>
+
+        <a href="TeacherCourses.aspx">
+            <i class="fa-solid fa-book-open me-2"></i> My Subjects
+        </a>
+
+        <a href="MyStudents.aspx">
+            <i class="fa-solid fa-users me-2"></i> My Students
+        </a>
+
+        <a href="TeacherAssignment.aspx">
+            <i class="fa-solid fa-upload me-2"></i> Assignment
+        </a>
+
+        <a href="CourseVideos.aspx">
+            <i class="fa-solid fa-video me-2"></i> Course Videos
+        </a>
+        <a href="../Default.aspx" class="text-danger">
+            <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+        </a>
+    </div>
+
+    <!-- CONTENT WRAPPER -->
+    <div class="content-wrapper">
+
+        <!-- HEADER -->
+        <div class="header">
+
+            <h5 class="mb-0">Teacher Dashboard</h5>
+            <a href="TeacherCalendar.aspx">
+    <i class="fa-solid fa-calendar me-2"></i> Calendar
+</a>
+            <!-- PROFILE DROPDOWN -->
+            <div class="dropdown">
+                <a class="d-flex align-items-center text-decoration-none dropdown-toggle"
+                   href="#"
+                   data-bs-toggle="dropdown">
+
+                    <div class="user-avatar bg-success text-white rounded-circle me-2">
+                        <asp:Label ID="lblInitial" runat="server" Text="T" />
+                    </div>
+
+                    <div>
+                        <small class="text-muted d-block">Teacher</small>
+                        <asp:Label ID="lblTeacherName" runat="server" CssClass="fw-bold" />
+                    </div>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" href="TeacherProfile.aspx">
+                            <i class="fa-solid fa-user me-2"></i> Profile
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li>
+                        <a class="dropdown-item text-danger" href="../Default.aspx">
+                            <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- PAGE CONTENT -->
+        <div class="content-body">
+            <asp:ContentPlaceHolder ID="ContentPlaceHolder2" runat="server" />
+        </div>
+
+    </div>
+
+</div>
+
+<script src="../assets/js/bootstrap.bundle.min.js"></script>
+
+</form>
+</body>
+</html>
