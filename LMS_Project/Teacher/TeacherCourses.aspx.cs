@@ -32,8 +32,11 @@ namespace LMS_Project.Teacher
 
             SqlCommand cmd = new SqlCommand(@"
 SELECT 
+    S.SubjectId,
     S.SubjectName,
-    SEC.SectionName,
+    ISNULL(S.SubjectCode, '') AS SubjectCode,
+    ISNULL(S.Duration, '')    AS Duration,
+    ISNULL(SEC.SectionName, '') AS SectionName,
     ASY.SessionName
 
 FROM SubjectFaculty SF
@@ -41,7 +44,7 @@ FROM SubjectFaculty SF
 INNER JOIN Subjects S 
     ON SF.SubjectId = S.SubjectId
 
-INNER JOIN Sections SEC 
+LEFT JOIN Sections SEC 
     ON SF.SectionId = SEC.SectionId
 
 INNER JOIN AcademicSessions ASY 
@@ -50,7 +53,7 @@ INNER JOIN AcademicSessions ASY
 WHERE SF.TeacherId = @UserId
 AND SF.InstituteId = @InstituteId
 AND SF.SessionId = @SessionId
-AND ISNULL(SF.IsActive,1) = 1
+AND ISNULL(SF.IsActive, 1) = 1
 ");
 
             cmd.Parameters.AddWithValue("@UserId", teacherUserId);
@@ -63,6 +66,7 @@ AND ISNULL(SF.IsActive,1) = 1
             {
                 rptCourses.DataSource = dt;
                 rptCourses.DataBind();
+                lblSubjectCount.Text = dt.Rows.Count.ToString(); // ← ADD THIS LINE
 
                 pnlCourses.Visible = true;
                 pnlEmpty.Visible = false;

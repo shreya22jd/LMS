@@ -27,13 +27,22 @@ namespace LearningManagementSystem.Teacher
             int instituteId = Convert.ToInt32(Session["InstituteId"]);
 
             DataTable dt = bl.GetSubmissionsByAssignment(
-                assignmentId,
-                societyId,
-                instituteId
-            );
+                assignmentId, societyId, instituteId);
 
-            gvSubmissions.DataSource = dt;
-            gvSubmissions.DataBind();
+            if (dt.Rows.Count > 0)
+            {
+                gvSubmissions.DataSource = dt;
+                gvSubmissions.DataBind();
+                lblSubmissionCount.Text = dt.Rows.Count.ToString();
+                gvSubmissions.Visible = true;
+                pnlEmpty.Visible = false;
+            }
+            else
+            {
+                gvSubmissions.Visible = false;
+                pnlEmpty.Visible = true;
+                lblSubmissionCount.Text = "0";
+            }
         }
         protected void gvSubmissions_RowEditing(object sender, GridViewEditEventArgs e)
         {

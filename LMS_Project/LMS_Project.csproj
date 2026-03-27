@@ -160,6 +160,7 @@
     <Content Include="Student\Results.aspx" />
     <Content Include="Student\StudentCalendar.aspx" />
     <Content Include="Student\StudyMaterial.aspx" />
+    <Content Include="Student\UserHelp.aspx" />
     <Content Include="SuperAdmin\AddInstitute.aspx" />
     <Content Include="SuperAdmin\AddSociety.aspx" />
     <Content Include="SuperAdmin\Dashboard.aspx" />
@@ -168,6 +169,7 @@
     <Content Include="Teacher\TeacherCalendar.aspx" />
     <Content Include="Teacher\TeacherCourses.aspx" />
     <Content Include="Teacher\TeacherDashboard.aspx" />
+    <Content Include="Teacher\TeacherHelp.aspx" />
     <Content Include="Teacher\TeacherProfile.aspx" />
     <Content Include="Teacher\ViewSubmissions.aspx" />
     <Content Include="Uploads\InstituteLogos\4cdae9c2-5673-4538-8241-78abd22e46e9.jpg" />
@@ -326,12 +328,26 @@
     <Compile Include="Student\StudentCalendar.aspx.designer.cs">
       <DependentUpon>StudentCalendar.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Student\UserHelp.aspx.cs">
+      <DependentUpon>UserHelp.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Student\UserHelp.aspx.designer.cs">
+      <DependentUpon>UserHelp.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Teacher\TeacherCalendar.aspx.cs">
       <DependentUpon>TeacherCalendar.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Teacher\TeacherCalendar.aspx.designer.cs">
       <DependentUpon>TeacherCalendar.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Teacher\TeacherHelp.aspx.cs">
+      <DependentUpon>TeacherHelp.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Teacher\TeacherHelp.aspx.designer.cs">
+      <DependentUpon>TeacherHelp.aspx</DependentUpon>
     </Compile>
     <Compile Include="Teacher\TeacherProfile.aspx.cs">
       <DependentUpon>TeacherProfile.aspx</DependentUpon>
