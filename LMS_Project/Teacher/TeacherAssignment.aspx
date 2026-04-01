@@ -252,7 +252,7 @@ textarea.form-control-custom { resize: vertical; min-height: 100px; }
 <asp:Panel ID="pnlSuccess" runat="server" Visible="false">
     <div class="alert-success-custom">
         <i class="fas fa-check-circle"></i>
-        Assignment created successfully!
+        <asp:Label ID="lblSuccessMessage" runat="server" />
     </div>
 </asp:Panel>
 
@@ -265,9 +265,22 @@ textarea.form-control-custom { resize: vertical; min-height: 100px; }
     <div class="row g-3">
 
         <div class="col-md-6">
-            <label class="form-label-custom">Subject</label>
-            <asp:DropDownList ID="ddlSubject" runat="server" CssClass="form-control-custom" />
-        </div>
+    <label class="form-label-custom">Subject</label>
+    <asp:DropDownList 
+        ID="ddlSubject" 
+        runat="server" 
+        CssClass="form-control-custom"
+        AutoPostBack="true"
+        OnSelectedIndexChanged="ddlSubject_SelectedIndexChanged" />
+</div>
+
+<div class="col-md-6">
+    <label class="form-label-custom">Chapter (Optional)</label>
+    <asp:DropDownList 
+        ID="ddlChapter" 
+        runat="server" 
+        CssClass="form-control-custom" />
+</div>
 
         <div class="col-md-6">
             <label class="form-label-custom">Title</label>
@@ -294,8 +307,10 @@ textarea.form-control-custom { resize: vertical; min-height: 100px; }
         </div>
 
        <div class="col-md-4">
-    <label class="form-label-custom">Assignment File (Optional)</label>
-    <div class="file-upload-wrap" onclick="document.getElementById('fuAssignment').click()">
+<label class="form-label-custom">
+        Assignment File <span style="color:red">*</span>
+    </label>
+           <div class="file-upload-wrap" onclick="document.getElementById('fuAssignment').click()">
         <i class="fas fa-cloud-upload-alt"></i>
         <span id="fileLabel">Click to upload a file</span>
         <asp:FileUpload ID="fuAssignment" runat="server"
@@ -327,7 +342,8 @@ textarea.form-control-custom { resize: vertical; min-height: 100px; }
 
 <asp:Panel ID="pnlAssignments" runat="server">
     <div class="row g-3">
-        <asp:Repeater ID="rptAssignments" runat="server">
+        <asp:Repeater ID="rptAssignments" runat="server" 
+    OnItemCommand="rptAssignments_ItemCommand">
             <ItemTemplate>
                 <div class="col-md-6 col-lg-4">
                     <div class="assignment-card">
@@ -375,6 +391,13 @@ textarea.form-control-custom { resize: vertical; min-height: 100px; }
                                 CssClass="btn-action btn-view">
                                 <i class="fas fa-eye"></i> Submissions
                             </asp:HyperLink>
+                            <asp:LinkButton runat="server"
+    CommandName="DeleteAssignment"
+    CommandArgument='<%# Eval("AssignmentId") %>'
+    CssClass="btn-action"
+    OnClientClick="return confirm('Are you sure you want to delete this assignment?');">
+    <i class="fas fa-trash"></i> Delete
+</asp:LinkButton>
                         </div>
 
                     </div>
