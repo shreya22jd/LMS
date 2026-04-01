@@ -23,15 +23,24 @@ namespace LearningManagementSystem.Admin
 
             if (!IsPostBack)
             {
+                if (ViewState["ShowInactive"] == null)
+                    ShowInactive = false;
+
                 LoadStreams();
-                LoadStudyLevels();   // ADD
-                LoadSemesters();     // ADD
+                LoadStudyLevels();
+                LoadSemesters();
                 LoadSections();
                 LoadEditDropdowns();
-                LoadStudents();
             }
-        }
 
+            // ✅ ALWAYS LOAD DATA
+            ReloadEverything();
+        }
+        private void BindStudents()
+        {
+            string status = ShowInactive ? "0" : "1"; // 1=Active, 0=Inactive
+            LoadStudents(txtSearch.Text.Trim(), status);
+        }
         private void LoadStudents(string search = "", string status = "All")
         {
             int instituteId = Convert.ToInt32(Session["InstituteId"]);
@@ -179,6 +188,30 @@ namespace LearningManagementSystem.Admin
                 ShowMsg("Bulk Upload Failed: " + ex.Message, false);
             }
         }
+        public bool ShowInactive
+        {
+            get { return ViewState["ShowInactive"] != null && (bool)ViewState["ShowInactive"]; }
+            set { ViewState["ShowInactive"] = value; }
+        }
+        protected void ToggleView_Click(object sender, EventArgs e)
+        {
+            ShowInactive = !ShowInactive;
+
+            btnToggleView.Text = ShowInactive ? "👁 View Active" : "👁 View Inactive";
+
+            ReloadEverything();   // 🔥 FIX
+        }
+
+        public DataTable StreamCourseStats;
+
+        private void LoadStreamCourseStats()
+        {
+            int instituteId = Convert.ToInt32(Session["InstituteId"]);
+            StreamCourseStats = bl.GetStudentStatsByStreamCourse(instituteId);
+
+            rptStats.DataSource = StreamCourseStats;
+            rptStats.DataBind();
+        }
 
         // ================= SAVE =================
 
@@ -188,6 +221,29 @@ namespace LearningManagementSystem.Admin
             {
                 int societyId = Convert.ToInt32(Session["SocietyId"]);
                 int instituteId = Convert.ToInt32(Session["InstituteId"]);
+
+                DateTime dob = Convert.ToDateTime(txtDOB.Text);
+                int age = DateTime.Now.Year - dob.Year;
+
+                if (ddlStudyLevel.SelectedItem.Text.Contains("Engineering") && age < 16)
+                {
+                    ShowMsg("Invalid Age for Engineering Course!", false);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(txtUsername.Text) ||
+                    string.IsNullOrWhiteSpace(txtEmail.Text) ||
+                    string.IsNullOrWhiteSpace(txtFullName.Text))
+                {
+                    ShowMsg("Required fields missing!", false);
+                    return;
+                }
+
+                if (!txtEmail.Text.Contains("@"))
+                {
+                    ShowMsg("Invalid Email!", false);
+                    return;
+                }
 
                 bl.InsertStudent(
                      societyId,
@@ -207,7 +263,7 @@ namespace LearningManagementSystem.Admin
                  );
 
                 ShowMsg("Student Registered Successfully!", true);
-                LoadStudents();
+                BindStudents();
             }
             catch (Exception ex)
             {
@@ -216,7 +272,12 @@ namespace LearningManagementSystem.Admin
         }
 
         // ================= UPDATE =================
-
+        private void ReloadEverything()
+        {
+            BindStudents();
+            LoadStats();
+            LoadStreamCourseStats();
+        }
         protected void btnUpdate_Click(object sender, EventArgs e)
         {
             try
@@ -227,17 +288,55 @@ namespace LearningManagementSystem.Admin
                     userId,
                     txtEmailEdit.Text.Trim(),
                     txtFullNameEdit.Text.Trim(),
-                    txtContactEdit.Text.Trim()
+                    txtContactEdit.Text.Trim(),
+                    txtRollNumberEdit.Text.Trim(),
+                    string.IsNullOrEmpty(ddlStreamEdit.SelectedValue) ? (int?)null : Convert.ToInt32(ddlStreamEdit.SelectedValue),
+                    string.IsNullOrEmpty(txtCourseEdit.SelectedValue) ? (int?)null : Convert.ToInt32(txtCourseEdit.SelectedValue),
+                    string.IsNullOrEmpty(ddlStudyLevelEdit.SelectedValue) ? (int?)null : Convert.ToInt32(ddlStudyLevelEdit.SelectedValue),
+                    string.IsNullOrEmpty(ddlSemesterEdit.SelectedValue) ? (int?)null : Convert.ToInt32(ddlSemesterEdit.SelectedValue),
+                    string.IsNullOrEmpty(txtSecctionEdit.SelectedValue) ? (int?)null : Convert.ToInt32(txtSecctionEdit.SelectedValue)
                 );
 
                 ShowMsg("Student Updated Successfully!", true);
-                LoadStudents();
+                ReloadEverything();
             }
             catch (Exception ex)
             {
                 ShowMsg(ex.Message, false);
             }
         }
+
+        public int TotalStudents = 0;
+        public int ActiveStudents = 0;
+        public int InactiveStudents = 0;
+        public int NewStudents = 0;
+
+        private void LoadStats()
+        {
+            DataLayer dl = new DataLayer();
+
+            SqlCommand cmd = new SqlCommand(@"
+        SELECT 
+            COUNT(*) Total,
+            SUM(CASE WHEN IsActive = 1 THEN 1 ELSE 0 END) AS Active,
+            SUM(CASE WHEN IsActive = 0 THEN 1 ELSE 0 END) AS Inactive,
+            SUM(CASE WHEN MONTH(CreatedOn)=MONTH(GETDATE()) THEN 1 ELSE 0 END) NewStudents
+        FROM Users WHERE RoleId = (SELECT RoleId FROM Roles WHERE RoleName='Student')
+        AND InstituteId=@I");
+
+            cmd.Parameters.AddWithValue("@I", Session["InstituteId"]);
+
+            DataTable dt = dl.GetDataTable(cmd);
+
+            if (dt.Rows.Count > 0)
+            {
+                TotalStudents = Convert.ToInt32(dt.Rows[0]["Total"]);
+                ActiveStudents = Convert.ToInt32(dt.Rows[0]["Active"]);
+                InactiveStudents = Convert.ToInt32(dt.Rows[0]["Inactive"]);
+                NewStudents = Convert.ToInt32(dt.Rows[0]["NewStudents"]);
+            }
+        }
+
         // ================= STREAM CHANGE =================
         protected void ddlDepartment_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -257,6 +356,8 @@ namespace LearningManagementSystem.Admin
             ddlCourse.DataValueField = "CourseId";
             ddlCourse.DataBind();
             ddlCourse.Items.Insert(0, new ListItem("-- Optional Course --", ""));
+
+            ScriptManager.RegisterStartupScript(this, GetType(), "keepModal", "keepModalOpen();", true);
         }
 
         private void LoadStudyLevels()
@@ -286,10 +387,21 @@ namespace LearningManagementSystem.Admin
         private void LoadEditDropdowns()
         {
             DataLayer dl = new DataLayer();
+            int instituteId = Convert.ToInt32(Session["InstituteId"]);
 
-            // Load Courses
+            // ================= STREAM =================
+            SqlCommand cmdStream = new SqlCommand("SELECT StreamId, StreamName FROM Streams WHERE InstituteId=@I");
+            cmdStream.Parameters.AddWithValue("@I", instituteId);
+
+            ddlStreamEdit.DataSource = dl.GetDataTable(cmdStream);
+            ddlStreamEdit.DataTextField = "StreamName";
+            ddlStreamEdit.DataValueField = "StreamId";
+            ddlStreamEdit.DataBind();
+            ddlStreamEdit.Items.Insert(0, new ListItem("-- Select Stream --", ""));
+
+            // ================= COURSE =================
             SqlCommand cmdCourse = new SqlCommand("SELECT CourseId, CourseName FROM Courses WHERE InstituteId=@I");
-            cmdCourse.Parameters.AddWithValue("@I", Session["InstituteId"]);
+            cmdCourse.Parameters.AddWithValue("@I", instituteId);
 
             txtCourseEdit.DataSource = dl.GetDataTable(cmdCourse);
             txtCourseEdit.DataTextField = "CourseName";
@@ -297,9 +409,29 @@ namespace LearningManagementSystem.Admin
             txtCourseEdit.DataBind();
             txtCourseEdit.Items.Insert(0, new ListItem("-- Optional Course --", ""));
 
-            // Load Sections
+            // ================= STUDY LEVEL =================
+            SqlCommand cmdLevel = new SqlCommand("SELECT LevelId, LevelName FROM StudyLevels WHERE InstituteId=@I");
+            cmdLevel.Parameters.AddWithValue("@I", instituteId);
+
+            ddlStudyLevelEdit.DataSource = dl.GetDataTable(cmdLevel);
+            ddlStudyLevelEdit.DataTextField = "LevelName";
+            ddlStudyLevelEdit.DataValueField = "LevelId";
+            ddlStudyLevelEdit.DataBind();
+            ddlStudyLevelEdit.Items.Insert(0, new ListItem("-- Optional Class --", ""));
+
+            // ================= SEMESTER =================
+            SqlCommand cmdSem = new SqlCommand("SELECT SemesterId, SemesterName FROM Semesters WHERE InstituteId=@I");
+            cmdSem.Parameters.AddWithValue("@I", instituteId);
+
+            ddlSemesterEdit.DataSource = dl.GetDataTable(cmdSem);
+            ddlSemesterEdit.DataTextField = "SemesterName";
+            ddlSemesterEdit.DataValueField = "SemesterId";
+            ddlSemesterEdit.DataBind();
+            ddlSemesterEdit.Items.Insert(0, new ListItem("-- Optional Semester --", ""));
+
+            // ================= SECTION =================
             SqlCommand cmdSection = new SqlCommand("SELECT SectionId, SectionName FROM Sections WHERE InstituteId=@I");
-            cmdSection.Parameters.AddWithValue("@I", Session["InstituteId"]);
+            cmdSection.Parameters.AddWithValue("@I", instituteId);
 
             txtSecctionEdit.DataSource = dl.GetDataTable(cmdSection);
             txtSecctionEdit.DataTextField = "SectionName";
@@ -307,6 +439,7 @@ namespace LearningManagementSystem.Admin
             txtSecctionEdit.DataBind();
             txtSecctionEdit.Items.Insert(0, new ListItem("-- Optional Section --", ""));
         }
+
         // ================= GRID COMMAND =================
 
         protected void gvStudents_RowCommand(object sender, GridViewCommandEventArgs e)
@@ -324,28 +457,46 @@ namespace LearningManagementSystem.Admin
             {
                 DataRow dr = bl.GetStudentById(userId);
 
+                LoadEditDropdowns();
+
                 if (dr != null)
                 {
                     hfStudentUserId.Value = userId.ToString();
+                    txtUsernameEdit.Text = dr["Username"].ToString();
                     txtEmailEdit.Text = dr["Email"].ToString();
                     txtFullNameEdit.Text = dr["FullName"].ToString();
                     txtContactEdit.Text = dr["ContactNo"].ToString();
+                    txtRollNumberEdit.Text = dr["RollNumber"].ToString();
 
-                    ScriptManager.RegisterStartupScript(this, GetType(), "edit", "showEditModal();", true);
+                    ddlGenderEdit.SelectedValue = dr["Gender"].ToString();
+                    txtDOBEdit.Text = Convert.ToDateTime(dr["DOB"]).ToString("yyyy-MM-dd");
+
+                    ddlStreamEdit.SelectedValue = dr["StreamId"] == DBNull.Value ? "" : dr["StreamId"].ToString();
+                    txtCourseEdit.SelectedValue = dr["CourseId"] == DBNull.Value ? "" : dr["CourseId"].ToString();
+                    ddlStudyLevelEdit.SelectedValue = dr["LevelId"] == DBNull.Value ? "" : dr["LevelId"].ToString();
+                    ddlSemesterEdit.SelectedValue = dr["SemesterId"] == DBNull.Value ? "" : dr["SemesterId"].ToString();
+                    txtSecctionEdit.SelectedValue = dr["SectionId"] == DBNull.Value ? "" : dr["SectionId"].ToString();
+
+                    ScriptManager.RegisterStartupScript(this, GetType(), "edit", "setTimeout(showEditModal, 100);", true);
                 }
-            }
-            else if (e.CommandName == "Toggle")
-            {
-                bl.ToggleStudent(userId);
-                LoadStudents();
             }
             else if (e.CommandName == "DeleteRow")
             {
                 bl.DeleteStudent(userId);
-                LoadStudents();
+                ReloadEverything(); // 🔥 FIX
             }
         }
 
+
+
+
+        [System.Web.Services.WebMethod]
+        public static string ToggleStudentAjax(int userId)
+        {
+            StudentBL bl = new StudentBL();
+            bool isActive = bl.ToggleStudent(userId);
+            return isActive ? "1" : "0";
+        }
         // ================= FILTER =================
 
         protected void btnFilter_Click(object sender, EventArgs e)
@@ -394,5 +545,7 @@ namespace LearningManagementSystem.Admin
             lblMsg.Text = msg;
             lblMsg.CssClass = success ? "alert alert-success d-block" : "alert alert-danger d-block";
         }
+
+
     }
 }

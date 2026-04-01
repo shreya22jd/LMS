@@ -218,7 +218,7 @@
                 <tbody>
                     <asp:Repeater ID="rptStudents" runat="server">
                         <ItemTemplate>
-                            <tr>
+                           <tr style="cursor:pointer;" onclick="location.href='MyStudentDetails.aspx?UserId=<%# Eval("UserId") %>'">
                                 <td style="color:#b0bec5; font-size:12px;">
                                     <%# Container.ItemIndex + 1 %>
                                 </td>

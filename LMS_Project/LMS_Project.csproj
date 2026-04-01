@@ -164,6 +164,7 @@
     <Content Include="SuperAdmin\AddInstitute.aspx" />
     <Content Include="SuperAdmin\AddSociety.aspx" />
     <Content Include="SuperAdmin\Dashboard.aspx" />
+    <Content Include="Teacher\MyStudentDetails.aspx" />
     <Content Include="Teacher\MyStudents.aspx" />
     <Content Include="Teacher\TeacherAssignment.aspx" />
     <Content Include="Teacher\TeacherCalendar.aspx" />
@@ -318,9 +319,12 @@
     <Compile Include="App_Code\Masters\BL\AssignSubjectFacultyBL.cs" />
     <Compile Include="App_Code\Masters\BL\CalendarBL.cs" />
     <Compile Include="App_Code\Masters\BL\HelpBL.cs" />
+    <Compile Include="App_Code\Masters\BL\StudentDetailsBL.cs" />
+    <Compile Include="App_Code\Masters\BL\TeacherStudentDetailsBL.cs" />
     <Compile Include="App_Code\Masters\GC\AssignmentGC.cs" />
     <Compile Include="App_Code\Masters\GC\CalendarGC.cs" />
     <Compile Include="App_Code\Masters\GC\HelpGC.cs" />
+    <Compile Include="App_Code\Masters\GC\TeacherStudentGC.cs" />
     <Compile Include="Student\StudentCalendar.aspx.cs">
       <DependentUpon>StudentCalendar.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -334,6 +338,13 @@
     </Compile>
     <Compile Include="Student\UserHelp.aspx.designer.cs">
       <DependentUpon>UserHelp.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Teacher\MyStudentDetails.aspx.cs">
+      <DependentUpon>MyStudentDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Teacher\MyStudentDetails.aspx.designer.cs">
+      <DependentUpon>MyStudentDetails.aspx</DependentUpon>
     </Compile>
     <Compile Include="Teacher\TeacherCalendar.aspx.cs">
       <DependentUpon>TeacherCalendar.aspx</DependentUpon>

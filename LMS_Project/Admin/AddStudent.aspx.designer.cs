@@ -42,40 +42,22 @@ namespace LearningManagementSystem.Admin
         protected global::System.Web.UI.WebControls.TextBox txtSearch;
 
         /// <summary>
-        /// btnFilter control.
+        /// btnToggleView control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnFilter;
+        protected global::System.Web.UI.WebControls.LinkButton btnToggleView;
 
         /// <summary>
-        /// lnkAll control.
+        /// rptStats control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton lnkAll;
-
-        /// <summary>
-        /// lnkActive control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton lnkActive;
-
-        /// <summary>
-        /// lnkInactive control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton lnkInactive;
+        protected global::System.Web.UI.WebControls.Repeater rptStats;
 
         /// <summary>
         /// gvStudents control.
@@ -204,6 +186,15 @@ namespace LearningManagementSystem.Admin
         protected global::System.Web.UI.WebControls.Button btnSave;
 
         /// <summary>
+        /// ddlStreamEdit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlStreamEdit;
+
+        /// <summary>
         /// txtCourseEdit control.
         /// </summary>
         /// <remarks>
@@ -211,6 +202,24 @@ namespace LearningManagementSystem.Admin
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList txtCourseEdit;
+
+        /// <summary>
+        /// ddlStudyLevelEdit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlStudyLevelEdit;
+
+        /// <summary>
+        /// ddlSemesterEdit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlSemesterEdit;
 
         /// <summary>
         /// txtSecctionEdit control.
@@ -222,22 +231,13 @@ namespace LearningManagementSystem.Admin
         protected global::System.Web.UI.WebControls.DropDownList txtSecctionEdit;
 
         /// <summary>
-        /// txtFullNameEdit control.
+        /// txtUsernameEdit control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtFullNameEdit;
-
-        /// <summary>
-        /// txtContactEdit control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtContactEdit;
+        protected global::System.Web.UI.WebControls.TextBox txtUsernameEdit;
 
         /// <summary>
         /// txtEmailEdit control.
@@ -249,6 +249,15 @@ namespace LearningManagementSystem.Admin
         protected global::System.Web.UI.WebControls.TextBox txtEmailEdit;
 
         /// <summary>
+        /// txtFullNameEdit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtFullNameEdit;
+
+        /// <summary>
         /// txtRollNumberEdit control.
         /// </summary>
         /// <remarks>
@@ -256,6 +265,33 @@ namespace LearningManagementSystem.Admin
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtRollNumberEdit;
+
+        /// <summary>
+        /// ddlGenderEdit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlGenderEdit;
+
+        /// <summary>
+        /// txtDOBEdit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtDOBEdit;
+
+        /// <summary>
+        /// txtContactEdit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtContactEdit;
 
         /// <summary>
         /// btnUpdate control.
