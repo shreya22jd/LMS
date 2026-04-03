@@ -1,17 +1,19 @@
 ﻿<%@ Page Title="Help & Support" Language="C#" MasterPageFile="~/Teacher/TeacherMaster.master"
     AutoEventWireup="true" CodeBehind="TeacherHelp.aspx.cs"
     Inherits="LMS_Project.Teacher.TeacherHelp" %>
+
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder2" runat="server">
 
 <style>
 .help-wrap { max-width:750px; margin:0 auto; }
 
+/* ── Ask Card ── */
 .ask-card {
     background:#fff; border-radius:10px;
     border:1px solid #e0e0e0; padding:24px;
     margin-bottom:24px;
 }
-.ask-card h6 { font-weight:700; color:#2e7d32; margin-bottom:16px; }
+.ask-card h6 { font-weight:700; color:#1976d2; margin-bottom:16px; }
 
 .ask-card textarea {
     width:100%; border:1px solid #ccc; border-radius:8px;
@@ -19,30 +21,33 @@
     min-height:100px; font-family:inherit; outline:none;
     transition:.2s; box-sizing:border-box;
 }
-.ask-card textarea:focus { border-color:#43a047; }
+.ask-card textarea:focus { border-color:#2196f3; }
 
+/* Button */
 .btn-ask {
-    background:#2e7d32; color:#fff; border:none;
+    background:#1976d2; color:#fff; border:none;
     border-radius:8px; padding:10px 24px;
     font-size:14px; cursor:pointer; margin-top:10px;
     transition:.2s;
 }
-.btn-ask:hover { background:#1b5e20; }
+.btn-ask:hover { background:#0d47a1; }
 
-/* Thread list */
+/* ── Thread list ── */
 .thread-card {
     background:#fff; border-radius:10px;
     border:1px solid #e0e0e0; margin-bottom:16px;
     overflow:hidden;
 }
 .thread-header {
-    padding:12px 16px; background:#f9f9f9;
+    padding:12px 16px; background:#f5f9ff;
     border-bottom:1px solid #eee;
     display:flex; justify-content:space-between;
     align-items:center;
 }
+
+/* Status */
 .thread-status-replied {
-    background:#e8f5e9; color:#2e7d32;
+    background:#e3f2fd; color:#1976d2;
     border-radius:12px; padding:2px 10px;
     font-size:11px; font-weight:600;
 }
@@ -51,28 +56,41 @@
     border-radius:12px; padding:2px 10px;
     font-size:11px; font-weight:600;
 }
+
+/* Body */
 .thread-body { padding:14px 16px; }
 .thread-question {
     font-size:14px; color:#333;
     margin-bottom:10px;
 }
+
+/* Reply */
 .thread-reply {
-    background:#e8f5e9; border-left:3px solid #2e7d32;
+    background:#e3f2fd; border-left:3px solid #1976d2;
     padding:10px 14px; border-radius:6px;
-    font-size:13px; color:#2e7d32; margin-top:8px;
+    font-size:13px; color:#0d47a1; margin-top:8px;
 }
 .thread-reply .reply-label {
-    font-size:11px; color:#888; margin-bottom:4px;
+    font-size:11px; color:#666; margin-bottom:4px;
 }
-.thread-time { font-size:11px; color:#aaa; }
 
+.thread-time { font-size:11px; color:#999; }
+
+/* Alerts */
 .help-alert {
     padding:10px 16px; border-radius:6px;
     margin-bottom:14px; font-size:13px; display:none;
 }
-.help-alert.success { background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7; display:block; }
-.help-alert.error   { background:#ffebee; color:#c62828; border:1px solid #ef9a9a; display:block; }
+.help-alert.success {
+    background:#e3f2fd; color:#1976d2;
+    border:1px solid #90caf9; display:block;
+}
+.help-alert.error {
+    background:#ffebee; color:#c62828;
+    border:1px solid #ef9a9a; display:block;
+}
 
+/* Empty */
 .empty-state {
     text-align:center; padding:40px; color:#bbb;
 }
@@ -81,9 +99,10 @@
 
 <div class="help-wrap">
 
+    <!-- HEADER -->
     <div class="d-flex align-items-center mb-3">
-        <i class="fas fa-headset me-2 fs-5" style="color:#2e7d32;"></i>
-        <h5 class="mb-0 fw-bold" style="color:#2e7d32;">Help &amp; Support</h5>
+        <i class="fas fa-headset me-2 fs-5" style="color:#1976d2;"></i>
+        <h5 class="mb-0 fw-bold" style="color:#1976d2;">Help &amp; Support</h5>
     </div>
 
     <!-- Alert -->
@@ -109,40 +128,39 @@
         </div>
     </asp:Panel>
 
-   <asp:Repeater ID="rptThreads" runat="server">
-    <ItemTemplate>
-        <div class="thread-card">
-            <div class="thread-header">
-                <span class="thread-time">
-                    <i class="far fa-clock me-1"></i>
-                    <%# ((DateTime)Eval("AskedOn")).ToString("dd MMM yyyy, hh:mm tt") %>
-                </span>
-                <%# (bool)Eval("HasReply")
-                    ? "<span class='thread-status-replied'><i class='fas fa-check-circle me-1'></i>Replied</span>"
-                    : "<span class='thread-status-pending'><i class='fas fa-clock me-1'></i>Pending</span>" %>
-            </div>
-            <div class="thread-body">
-                <div class="thread-question">
-                    <strong>You:</strong> <%# Server.HtmlEncode(Eval("Question").ToString()) %>
+    <asp:Repeater ID="rptThreads" runat="server">
+        <ItemTemplate>
+            <div class="thread-card">
+                <div class="thread-header">
+                    <span class="thread-time">
+                        <i class="far fa-clock me-1"></i>
+                        <%# ((DateTime)Eval("AskedOn")).ToString("dd MMM yyyy, hh:mm tt") %>
+                    </span>
+                    <%# (bool)Eval("HasReply")
+                        ? "<span class='thread-status-replied'><i class='fas fa-check-circle me-1'></i>Replied</span>"
+                        : "<span class='thread-status-pending'><i class='fas fa-clock me-1'></i>Pending</span>" %>
                 </div>
 
-                <%-- If NOT replied: show waiting message --%>
-                <%# !(bool)Eval("HasReply")
-                    ? "<div class='thread-time mt-2' style='color:#e65100;'><i class='fas fa-hourglass-half me-1'></i>Waiting for admin reply…</div>"
-                    : "" %>
+                <div class="thread-body">
+                    <div class="thread-question">
+                        <strong>You:</strong> <%# Server.HtmlEncode(Eval("Question").ToString()) %>
+                    </div>
 
-                <%-- If replied: show reply box --%>
-                <%# (bool)Eval("HasReply")
-                    ? "<div class='thread-reply'><div class='reply-label'><i class='fas fa-reply me-1'></i>Admin replied · "
-                      + (Eval("RepliedOn") != DBNull.Value ? Convert.ToDateTime(Eval("RepliedOn")).ToString("dd MMM yyyy, hh:mm tt") : "")
-                      + "</div>"
-                      + Server.HtmlEncode(Eval("ReplyText") == null ? "" : Eval("ReplyText").ToString())
-                      + "</div>"
-                    : "" %>
+                    <%# !(bool)Eval("HasReply")
+                        ? "<div class='thread-time mt-2' style='color:#e65100;'><i class='fas fa-hourglass-half me-1'></i>Waiting for admin reply…</div>"
+                        : "" %>
+
+                    <%# (bool)Eval("HasReply")
+                        ? "<div class='thread-reply'><div class='reply-label'><i class='fas fa-reply me-1'></i>Admin replied · "
+                          + (Eval("RepliedOn") != DBNull.Value ? Convert.ToDateTime(Eval("RepliedOn")).ToString("dd MMM yyyy, hh:mm tt") : "")
+                          + "</div>"
+                          + Server.HtmlEncode(Eval("ReplyText") == null ? "" : Eval("ReplyText").ToString())
+                          + "</div>"
+                        : "" %>
+                </div>
             </div>
-        </div>
-    </ItemTemplate>
-</asp:Repeater>
+        </ItemTemplate>
+    </asp:Repeater>
 
 </div>
 

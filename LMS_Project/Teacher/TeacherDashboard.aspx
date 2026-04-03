@@ -9,8 +9,7 @@
 
 /* ── Welcome Banner ── */
 .welcome-banner {
-    background: linear-gradient(135deg, #2e7d32 0%, #388e3c 60%, #66bb6a 100%);
-    border-radius: 16px;
+background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    border-radius: 16px;
     padding: 28px 32px;
     color: #fff;
     margin-bottom: 24px;
@@ -82,18 +81,17 @@
     margin-top: 3px;
 }
 
-.card-green   { background: #e8f5e9; }
-.card-teal    { background: #e0f2f1; }
-.card-lime    { background: #f9fbe7; }
+.card-green   { background: #e3f2fd; }
+.card-teal    { background: #e1f5fe; }
+.card-lime    { background: #f3f8ff; }
 .card-orange  { background: #fff3e0; }
-.card-purple  { background: #f3e5f5; }
+.card-purple  { background: #ede7f6; }
 
-.icon-green   { background: #2e7d32; color: #fff; }
-.icon-teal    { background: #00796b; color: #fff; }
-.icon-lime    { background: #558b2f; color: #fff; }
-.icon-orange  { background: #f57c00; color: #fff; }
-.icon-purple  { background: #7b1fa2; color: #fff; }
-
+.icon-green   { background: #1565c0; color: #fff; }
+.icon-teal    { background: #0288d1; color: #fff; }
+.icon-lime    { background: #1976d2; color: #fff; }
+.icon-orange  { background: #ef6c00; color: #fff; }
+.icon-purple  { background: #5e35b1; color: #fff; }
 /* ── Section headers ── */
 .section-header {
     display: flex; align-items: center;
@@ -118,7 +116,7 @@
     padding: 18px;
     height: 100%;
     transition: transform .2s, box-shadow .2s;
-    border-left: 4px solid #388e3c;
+    border-left: 4px solid #1976d2;
     background: #fff;
 }
 .subject-card:hover {
@@ -127,7 +125,7 @@
 }
 .subject-card .subject-code {
     font-size: 11px; font-weight: 700;
-    color: #388e3c;
+    color: #1976d2;
     text-transform: uppercase;
     letter-spacing: .5px;
     margin-bottom: 4px;
@@ -147,31 +145,31 @@
     display: inline-block;
     margin-top: 12px;
     padding: 5px 16px;
-    background: #e8f5e9;
-    color: #2e7d32;
+    background: #e3f2fd;
+    color: #1565c0;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
     text-decoration: none;
     transition: background .2s;
 }
-.subject-card .btn-view:hover { background: #2e7d32; color: #fff; }
+.subject-card .btn-view:hover { background: #1565c0; color: #fff; }
 
 /* ── Student rows ── */
 .student-row {
     display: flex; align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid #f0f7f2;
+    border-bottom: 1px solid #e3f2fd;
     gap: 12px;
 }
 .student-row:last-child { border-bottom: none; }
 .student-row .s-avatar {
     width: 38px; height: 38px;
     border-radius: 50%;
-    background: #e8f5e9;
+    background: #e3f2fd;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
-    color: #2e7d32; font-size: 15px; font-weight: 700;
+    color: #1565c0; font-size: 15px; font-weight: 700;
 }
 .student-row .s-name { font-size: 13px; font-weight: 600; color: #263238; }
 .student-row .s-sub  { font-size: 11px; color: #90a4ae; }
@@ -186,17 +184,17 @@
 .assignment-row {
     display: flex; align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid #f0f7f2;
+    border-bottom: 1px solid #e3f2fd;
     gap: 12px;
 }
 .assignment-row:last-child { border-bottom: none; }
 .assignment-row .a-icon {
     width: 38px; height: 38px;
     border-radius: 10px;
-    background: #e8f5e9;
+    background: #e3f2fd;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
-    color: #2e7d32; font-size: 16px;
+    color: #1565c0; font-size: 16px;
 }
 .assignment-row .a-title { font-size: 13px; font-weight: 600; color: #263238; }
 .assignment-row .a-sub   { font-size: 11px; color: #90a4ae; }
@@ -209,7 +207,7 @@
 
 /* ── Status badges ── */
 .badge-active {
-    background: #e8f5e9; color: #2e7d32;
+    background: #e3f2fd; color: #1565c0;
     padding: 3px 10px; border-radius: 10px;
     font-size: 11px; font-weight: 700;
 }
@@ -235,11 +233,11 @@
     text-decoration: none;
 }
 .quick-action i { font-size: 22px; }
-.qa-green  { background: #e8f5e9; color: #2e7d32; }
-.qa-teal   { background: #e0f2f1; color: #00796b; }
-.qa-orange { background: #fff3e0; color: #e65100; }
-.qa-purple { background: #f3e5f5; color: #7b1fa2; }
-
+/* ── Quick Actions ── */
+.qa-green  { background: #e3f2fd; color: #1565c0; }
+.qa-teal   { background: #e1f5fe; color: #0288d1; }
+.qa-orange { background: #fff3e0; color: #ef6c00; }
+.qa-purple { background: #ede7f6; color: #5e35b1; }
 /* ── White panel card ── */
 .panel-card {
     background: #fff;
@@ -255,8 +253,9 @@
     padding: 30px 10px;
     color: #90a4ae;
 }
-.empty-state i { font-size: 36px; margin-bottom: 8px; display: block; }
+.empty-state i { font-size: 36px; margin-bottom: 8px; display: block;  color: #90caf9; }
 .empty-state p { font-size: 13px; margin: 0; }
+
 
 </style>
 </asp:Content>
