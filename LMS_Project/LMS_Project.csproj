@@ -167,6 +167,7 @@
     <Content Include="Teacher\MyStudentDetails.aspx" />
     <Content Include="Teacher\MyStudents.aspx" />
     <Content Include="Teacher\TeacherAssignment.aspx" />
+    <Content Include="Teacher\TeacherAttendance.aspx" />
     <Content Include="Teacher\TeacherCalendar.aspx" />
     <Content Include="Teacher\TeacherCourses.aspx" />
     <Content Include="Teacher\TeacherDashboard.aspx" />
@@ -317,11 +318,14 @@
     <Compile Include="App_Code\Masters\BL\AssignmentBL.cs" />
     <Compile Include="App_Code\Masters\BL\AssignStudentSubjectBL.cs" />
     <Compile Include="App_Code\Masters\BL\AssignSubjectFacultyBL.cs" />
+    <Compile Include="App_Code\Masters\BL\Attendancebl.cs" />
     <Compile Include="App_Code\Masters\BL\CalendarBL.cs" />
     <Compile Include="App_Code\Masters\BL\HelpBL.cs" />
     <Compile Include="App_Code\Masters\BL\StudentDetailsBL.cs" />
+    <Compile Include="App_Code\Masters\BL\TeacherDashboardBL.cs" />
     <Compile Include="App_Code\Masters\BL\TeacherStudentDetailsBL.cs" />
     <Compile Include="App_Code\Masters\GC\AssignmentGC.cs" />
+    <Compile Include="App_Code\Masters\GC\Attendancegc.cs" />
     <Compile Include="App_Code\Masters\GC\CalendarGC.cs" />
     <Compile Include="App_Code\Masters\GC\HelpGC.cs" />
     <Compile Include="App_Code\Masters\GC\TeacherStudentGC.cs" />
@@ -345,6 +349,13 @@
     </Compile>
     <Compile Include="Teacher\MyStudentDetails.aspx.designer.cs">
       <DependentUpon>MyStudentDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Teacher\TeacherAttendance.aspx.cs">
+      <DependentUpon>TeacherAttendance.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Teacher\TeacherAttendance.aspx.designer.cs">
+      <DependentUpon>TeacherAttendance.aspx</DependentUpon>
     </Compile>
     <Compile Include="Teacher\TeacherCalendar.aspx.cs">
       <DependentUpon>TeacherCalendar.aspx</DependentUpon>
