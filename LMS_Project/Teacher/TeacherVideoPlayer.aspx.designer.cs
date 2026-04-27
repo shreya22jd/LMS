@@ -7,12 +7,21 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace LearningManagementSystem.Admin
+namespace LMS_Project.Teacher
 {
 
 
-    public partial class VideoPlayer
+    public partial class TeacherVideoPlayer
     {
+
+        /// <summary>
+        /// hfVideoId control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfVideoId;
 
         /// <summary>
         /// videoPlayer control.

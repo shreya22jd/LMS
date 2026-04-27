@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace LearningManagementSystem.Admin
+namespace LMS_Project.Teacher
 {
 
 

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Data;
-using System.Net.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-namespace LearningManagementSystem.Admin
+namespace LMS_Project.Teacher
 {
     public partial class Subjects : BasePage
     {

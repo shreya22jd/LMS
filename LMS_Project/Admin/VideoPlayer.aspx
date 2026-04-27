@@ -1,846 +1,320 @@
-﻿<%@ Page Title="Video Player" Language="C#" MasterPageFile="~/Admin/AdminMaster.master"
-    AutoEventWireup="true"
-    CodeBehind="VideoPlayer.aspx.cs"
-    Inherits="LearningManagementSystem.Admin.VideoPlayer" %>
+﻿<%@ Page Title="Admin Video Player" Language="C#" MasterPageFile="~/Admin/AdminMaster.master" AutoEventWireup="true" CodeBehind="VideoPlayer.aspx.cs" Inherits="LearningManagementSystem.Admin.VideoPlayer" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder2" runat="server">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
-        .video-container {
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-        }
+        :root { --primary: #6366f1; --bg: #f8fafc; --glass: rgba(255, 255, 255, 0.9); }
+        body { background: var(--bg); font-family: 'Inter', sans-serif; color: #1e293b; }
 
-        video::cue {
-            background: rgba(0,0,0,0.7);
-            color: #fff;
-            font-size: 16px;
-            padding: 3px 6px;
-        }
+        /* Modern Glass Cards */
+        .glass-card { background: var(--glass); backdrop-filter: blur(10px); border-radius: 16px; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); margin-bottom: 20px; transition: 0.3s; }
+        
+        /* BACK BUTTON */
+        .back-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; text-decoration: none; color: #64748b; font-weight: 600; transition: 0.2s; }
+        .back-nav:hover { color: var(--primary); }
 
-        .sidebar-scroll {
-            max-height: 600px;
-            overflow-y: auto;
-        }
+        /* VIDEO PLAYER & SKIP */
+        .video-wrapper { position: relative; border-radius: 16px; overflow: hidden; background: #000; }
+        .main-video { width: 100%; height: 450px; cursor: pointer; }
 
-        .instructor-card {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
+        .yt-skip { 
+            position: absolute; top: 50%; transform: translateY(-50%); 
+            width: 70px; height: 70px; border-radius: 50%; 
+            background: rgba(0,0,0,0.5); color: white; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            cursor: pointer; opacity: 0; transition: .3s; z-index: 5; pointer-events: none;
         }
-
-        .instructor-img {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .timestamp-link {
-            cursor: pointer;
-            color: #007bff;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .yt-skip{
-            position:absolute;
-            top:50%;
-            transform:translateY(-50%);
-            width:90px;
-            height:90px;
-            border-radius:50%;
-            background:rgba(0,0,0,0.6);
-            color:white;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            font-size:18px;
-            cursor:pointer;
-            opacity:0;
-            transition:opacity 0.3s;
-        }
-
-        .yt-left{ left:20px; }
-        .yt-right{ right:20px; }
+        .yt-left { left: 10%; } .yt-right { right: 10%; }
+        .video-wrapper:hover .yt-skip { opacity: 1; pointer-events: auto; }
+        .yt-skip i { font-size: 1.5rem; }
+        .yt-skip span { font-size: 0.7rem; font-weight: bold; }
 
         .video-container.show-controls .yt-skip{
             opacity:1;
         }
 
-        .video-menu{
-            position:absolute;
-            top:15px;
-            right:15px;
-            background:#222;
-            border-radius:6px;
-            display:none;
-        }
+        /* TOPICS TOGGLE */
+        #topicSection { display: none; margin-top: 15px; padding: 15px; background: #f1f5f9; border-radius: 12px; }
+        
+        /* RATING */
+        .star-active { color: #fbbf24; }
+        .star-inactive { color: #cbd5e1; }
+        /* Floating Settings */
+        .video-overlay-controls { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 10; }
+        .control-btn { background: rgba(0,0,0,0.5); color: white; border: none; padding: 10px; border-radius: 50%; cursor: pointer; backdrop-filter: blur(4px); }
+        .settings-dropdown { position: absolute; top: 60px; right: 15px; width: 220px; padding: 15px; display: none; z-index: 100; }
 
-        .video-menu button{
-            background:none;
-            border:none;
-            color:white;
-            padding:10px 15px;
-            cursor:pointer;
-        }
+        /* YouTube Style Comments */
+        .comment-header { font-size: 1.2rem; font-weight: 800; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .comment-item { display: flex; gap: 15px; padding: 15px 0; border-bottom: 1px solid #f1f5f9; animation: fadeInUp 0.5s ease forwards; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .comment-content b { font-size: 0.9rem; color: #334155; }
+        .comment-actions { font-size: 0.75rem; color: #64748b; margin-top: 5px; display: flex; gap: 15px; cursor: pointer; }
 
-        .video-top-icons{
-            position:absolute;
-            top:10px;
-            right:15px;
-            display:flex;
-            gap:15px;
-            }
+        /* Toggle Switches */
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
-            .video-icon{
-            color:white;
-            font-size:20px;
-            cursor:pointer;
-            background:rgba(0,0,0,0.6);
-            padding:8px;
-            border-radius:50%;
-            }
+        /* Interactive Progress Bar */
+        .progress-container { height: 8px; background: #e2e8f0; border-radius: 10px; overflow: hidden; margin-top: 10px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #6366f1, #a855f7); width: 0%; transition: width 1s ease; }
 
-            .video-icon:hover{
-            background:rgba(0,0,0,0.8);
-            }
+        /* Playlist Highlight */
+        .playlist-item { padding: 12px; display: flex; gap: 10px; cursor: pointer; border-radius: 12px; transition: 0.2s; }
+        .playlist-item:hover { background: #f1f5f9; }
+        .playlist-active { background: #eef2ff !important; border-left: 4px solid var(--primary); }
 
-            .video-menu{
-            position:absolute;
-            top:45px;
-            right:10px;
-            background:#222;
-            border-radius:6px;
-            display:none;
-            }
-
-            .video-menu button{
-            background:none;
-            border:none;
-            color:white;
-            padding:10px 15px;
-            width:150px;
-            text-align:left;
-            }
-
-            .settings-panel{
-            position:absolute;
-            top:80px;
-            right:10px;
-            background:#222;
-            color:white;
-            padding:15px;
-            border-radius:6px;
-            display:none;
-            font-size:14px;
-            }
-
-            .settings-panel label{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:6px;
-            }
-
-            .settings-panel hr{
-border-color:#444;
-}
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 
-
-    <div class="container-fluid mt-3">
-
-        <div class="row mb-3">
-            <div class="col-12">
-
-                <div class="d-flex align-items-center mb-4">
-
-                    <a href="SubjectDetails.aspx" class="btn btn-outline-secondary me-3">
-                        <i class="fa-solid fa-arrow-left"></i>
-                    </a>
-
-                    <h2 class="fw-bold" id="lblVideoTitle" runat="server"></h2>
-
-                </div>
-
-                <p class="text-muted">
-                    Subject:
-                    <span id="lblSubject" runat="server">General</span>
-                    | Instructor:
-                    <span id="lblInstructorTop" runat="server"></span>
-                </p>
-
-            </div>
-        </div>
-
+    <div class="container-fluid py-4">
+        <a href="javascript:history.back()" class="back-nav">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
 
         <div class="row">
-
             <div class="col-lg-8">
+                <div class="video-wrapper">
+                     <video id="videoPlayer" runat="server" controls width="100%" height="450" class="main-video"></video>
+ 
+                     <div id="skipLeft" class="yt-skip yt-left">⏪ 10</div>
+                     <div id="skipRight" class="yt-skip yt-right">10 ⏩</div>
 
-               <div class="video-container shadow">
-
-                <video
-                id="videoPlayerControl"
-                runat="server"
-                width="100%"
-                height="480"
-                controls
-                preload="metadata"
-                controlslist="nodownload noremoteplayback"
-                disablepictureinpicture>
-
-                <source id="videoSource" runat="server" type="video/mp4" />
-
-                <track kind="subtitles" label="English" srclang="en" src="../Captions/english.vtt" default>
-
-                </video>
-
-
-                <!-- Skip overlays -->
-
-                <div id="skipLeft" class="yt-skip yt-left">
-                <i class="fa-solid fa-rotate-left"></i> 10
-                </div>
-
-                <div id="skipRight" class="yt-skip yt-right">
-                10 <i class="fa-solid fa-rotate-right"></i>
-                </div>
-
-
-                <!-- Screenshot icon -->
-
-                <div class="video-top-icons">
-
-                <i
-                class="fa-solid fa-camera video-icon"
-                title="Screenshot"
-                onclick="takeScreenshot()">
-                </i>
-
-                <i
-                class="fa-solid fa-gear video-icon"
-                title="Settings"
-                onclick="toggleSettings()">
-                </i>
-
-                </div>
-
-
-
-
-                <!-- Settings panel -->
-
-                <div id="settingsPanel" class="settings-panel">
-
-                <div class="mb-2 fw-bold">Playback Settings</div>
-
-                <label class="d-block">
-                Loop Video
-                <input type="radio" name="loopVideo" value="on">
-                </label>
-
-                <label class="d-block">
-                Loop Video Off
-                <input type="radio" name="loopVideo" value="off" checked>
-                </label>
-
-                <hr>
-
-                <label class="d-block">
-                Auto Next Video
-                <input type="radio" name="autoNext" value="on">
-                </label>
-
-                <label class="d-block">
-                Auto Next Off
-                <input type="radio" name="autoNext" value="off" checked>
-                </label>
-
-                </div>
-        </div>
-
-
-                <canvas id="canvas" style="display: none;"></canvas>
-                <div class="card shadow mt-3 p-3">
-
-                <div class="d-flex justify-content-between align-items-center">
-
-                <h5 class="fw-bold mb-0">
-                <i class="fa-solid fa-robot text-primary"></i>
-                AI Video Summary
-                </h5>
-
-               <button 
-                type="button"
-                class="btn btn-sm btn-outline-primary"
-                onclick="generateSummary()">
-                Generate
-                </button> 
-
-                </div>
-
-                <div id="aiSummary" class="mt-3 text-muted">
-
-                Click "Generate" to create AI summary.
-
-                </div>
-
-                </div>
-
-                <div class="card shadow mt-3 p-3">
-
-                    <h5 class="fw-bold">
-                    <i class="fa-solid fa-robot text-success"></i>
-                    Ask AI about this lecture
-                    </h5>
-
-                    <div class="input-group mt-2">
-
-                    <input id="aiQuestion"
-                    class="form-control"
-                    placeholder="Ask a doubt about the lecture">
-
-                    <button class="btn btn-success"
-                    onclick="askAI()">
-                    Ask
-                    </button>
-
+                    <div class="video-overlay-controls">
+                        <button type="button" class="control-btn" title="Screenshot" onclick="takeShot()"><i class="fas fa-camera"></i></button>
+                        <button type="button" class="control-btn" title="Settings" onclick="$('#settingsPanel').fadeToggle()"><i class="fas fa-cog"></i></button>
                     </div>
 
-                    <div id="aiAnswer" class="mt-3"></div>
-
-                 </div>
-
-                <div class="card shadow mt-3 p-3">
-
-                    <h5 class="fw-bold">
-                    <i class="fa-solid fa-robot text-success"></i>
-                    Get Quiz from AI
-                    </h5>    
-
-                    <button 
-                    type="button"
-                    class="btn btn-sm btn-outline-success"
-                    onclick="generateQuiz()">
-                    Generate Quiz
-                    </button>
-
-                    <div id="aiQuiz" class="mt-3"></div>
-
-                 </div>
-
-                <div class="card shadow mt-3 p-3">
-
-                    <h5 class="fw-bold">
-                    <i class="fa-solid fa-robot text-success"></i>
-                    Get Notes from AI
-                    </h5>    
-
-                    <button 
-                    type="button"
-                    class="btn btn-sm btn-outline-warning"
-                    onclick="generateNotes()">
-                    Generate Notes
-                    </button>
-
-                    <div id="aiNotes" class="mt-3"></div>
-
-                 </div>
-
-                
-
-                <div class="card shadow mt-3 p-3">
-
-                    <ul class="nav nav-tabs" id="myTab">
-
-                        <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#desc">Description</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#notes">Smart Notes</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#doubts">Doubts</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#comments">Comments</a>
-                        </li>
-
-                        <li id="liEngagement" runat="server" class="nav-item">
-                            <a class="nav-link text-danger" data-bs-toggle="tab" href="#engagement">Admin: Progress</a>
-                        </li>
-
-                    </ul>
-
-
-                    <div class="tab-content p-3">
-
-                        <div id="desc" class="tab-pane fade show active">
-
-                            <p id="lblDescription" runat="server"></p>
-
-                            <div class="instructor-card">
-
-                                <img src="../Uploads/avatar.png" class="instructor-img" />
-
-                                <h6 id="lblInstructorName" runat="server"></h6>
-
-                            </div>
-
+                    <div id="settingsPanel" class="glass-card settings-dropdown">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span><i class="fas fa-sync me-2"></i> Loop</span>
+                            <label class="switch"><input type="checkbox" id="chkLoop"><span class="slider"></span></label>
                         </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-forward-step me-2"></i> Auto Next</span>
+                            <label class="switch"><input type="checkbox" id="chkAutoNext"><span class="slider"></span></label>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="glass-card p-4 mt-3">
+                    <h2 class="fw-bold mb-1" id="lblVideoTitle" runat="server"></h2>
+                    <div class="d-flex justify-content-between align-items-center text-muted small">
+                        <span><span id="liveViews" runat="server">0</span> views • <span id="lblUploadDate" runat="server"></span></span>
+                        <div id="dynamicRating" runat="server"></div>
+                    </div>
+                    <hr />
+                    <div id="descBox">
+                        <p id="lblDesc" runat="server" class="mb-0 text-secondary" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;"></p>
+                        <div id="topicSection">
+                            <h6 class="fw-bold"><i class="fas fa-list-ul me-2"></i>Video Topics</h6>
 
-                        <div id="notes" class="tab-pane fade">
-
-                            <div class="input-group mb-2">
-
-                                <asp:TextBox
-                                    ID="txtNote"
-                                    runat="server"
-                                    CssClass="form-control"
-                                    placeholder="Note at current time..."></asp:TextBox>
-
-                                <asp:Button
-                                    ID="btnSaveNote"
-                                    runat="server"
-                                    Text="Save"
-                                    CssClass="btn btn-primary"
-                                    OnClick="btnSaveNote_Click" />
-
-                            </div>
-
-
-                            <asp:Repeater ID="rptNotes" runat="server">
-
+                            <asp:Repeater ID="rptTopics" runat="server">
                                 <ItemTemplate>
-
-                                    <div class="mb-2">
-
-                                        <a
-                                            class="timestamp-link"
-                                            onclick="jumpTo(<%# Eval("TimeStampSeconds") %>)">⏱ <%# Eval("TimeStampSeconds") %>s
-
-                                        </a>
-
-                                        :
-
-                                        <%# Eval("NoteText") %>
-                                    </div>
-
+                                    <div>⏱ <%# Eval("StartTime") %> - <%# Eval("TopicTitle") %></div>
                                 </ItemTemplate>
-
                             </asp:Repeater>
-
                         </div>
-
-
-                        <div id="doubts" class="tab-pane fade">
-
-                            <div class="input-group mb-2">
-
-                                <asp:TextBox
-                                    ID="txtDoubt"
-                                    runat="server"
-                                    CssClass="form-control"
-                                    placeholder="Pin a doubt..."></asp:TextBox>
-
-                                <asp:Button
-                                    ID="btnDoubt"
-                                    runat="server"
-                                    Text="Pin"
-                                    CssClass="btn btn-warning"
-                                    OnClick="btnDoubt_Click" />
-
-                            </div>
-
-                        </div>
-
-
-                        <div id="comments" class="tab-pane fade">
-
-                            <asp:TextBox
-                                ID="txtComment"
-                                runat="server"
-                                CssClass="form-control"
-                                TextMode="MultiLine"
-                                Rows="2"></asp:TextBox>
-
-                            <asp:Button
-                                ID="btnComment"
-                                runat="server"
-                                Text="Post Comment"
-                                CssClass="btn btn-success mt-2"
-                                OnClick="btnComment_Click" />
-
-                        </div>
-
-
-                        <div id="engagement" class="tab-pane fade">
-
-                            <table class="table">
-
-                                <thead>
-
-                                    <tr>
-                                        <th>Student</th>
-                                        <th>Progress</th>
-                                        <th>Status</th>
-                                    </tr>
-
-                                </thead>
-
-                                <tbody id="engagementBody" runat="server"></tbody>
-
-                            </table>
-
-                        </div>
-
+                        <button type="button" id="btnToggleDesc" class="btn btn-link p-0 small fw-bold mt-2">Show More</button>
+                        
                     </div>
-
                 </div>
 
-            </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="glass-card p-3 text-center">
+                            <div class="text-muted small uppercase">Comments</div>
+                            <h3 class="fw-bold text-primary" id="lblCommentsCount" runat="server">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="glass-card p-3">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>Overall Student Progress</span>
+                                <span id="progressText" runat="server">0%</span>
+                            </div>
+                            <div class="progress-container"><div id="progressBar" runat="server" class="progress-fill"></div></div>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="glass-card p-4">
+                    <div class="comment-header"><i class="fas fa-comments"></i> Discussion</div>
+                    <div class="d-flex gap-3 mb-4">
+                        <div class="avatar">U</div>
+                        <div class="flex-grow-1">
+                            <input type="text" id="txtComment" class="form-control border-0 border-bottom rounded-0 px-0" placeholder="Add a public comment...">
+                            <div class="d-flex justify-content-end mt-2">
+                                <button type="button" class="btn btn-primary btn-sm rounded-pill px-4" onclick="postComment()">Comment</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="commentContainer">
+                        <!-- COMMENTS -->
+                        <div class="card-glass mt-4 p-3">
+                            <h5>Comments</h5>
+
+                            <asp:Repeater ID="rptComments" runat="server">
+                                <ItemTemplate>
+                                    <div class="mb-2">
+                                        <b><%# Eval("Username") %></b> : <%# Eval("Comment") %>
+                                        <asp:Button runat="server"
+                                            CommandArgument='<%# Eval("CommentId") %>'
+                                            OnCommand="DeleteComment"
+                                            CssClass="btn btn-sm btn-danger float-end"
+                                            Text="Delete"/>
+                                    </div>
+                                </ItemTemplate>
+                            </asp:Repeater>
+                        </div>
+                        </div>
+                </div>
+            </div>
 
             <div class="col-lg-4">
-
-                <div class="card shadow sidebar-scroll">
-
-                    <div class="card-header fw-bold">
-                        Video Topics
+                <div class="glass-card overflow-hidden">
+                    <div class="p-3 bg-light fw-bold border-bottom d-flex justify-content-between">
+                        <span>Course Playlist</span>
+                        <span class="badge bg-primary rounded-pill">Admin View</span>
                     </div>
-
-                    <div class="list-group list-group-flush">
-
-                        <asp:Repeater ID="rptTopics" runat="server">
-
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        <asp:Repeater ID="rptPlaylist" runat="server">
                             <ItemTemplate>
-
-                                <div
-                                    class="list-group-item d-flex justify-content-between"
-                                    onclick="jumpToText('<%# Eval("StartTime") %>')"
-                                    style="cursor: pointer">
-
-                                    <%# Eval("TopicTitle") %>
-
-                                    <span class="badge bg-secondary">
-
-                                        <%# Eval("StartTime") %>
-
-                                    </span>
-
+                                <div class='playlist-item <%# Convert.ToInt32(Eval("VideoId")) == VideoId ? "playlist-active" : "" %>' 
+                                     onclick="window.location.href='VideoPlayer.aspx?VideoId=<%# Eval("VideoId") %>'">
+                                    <div style="width:100px; height:60px; background:#e2e8f0; border-radius:8px; flex-shrink:0; position:relative;">
+                                        <i class="fas fa-play position-absolute top-50 start-50 translate-middle text-muted"></i>
+                                    </div>
+                                    <div>
+                                        <div class="small fw-bold text-dark"><%# Eval("Title") %></div>
+                                        <div class="x-small text-muted"><%# DataBinder.Eval(Container.DataItem, "Duration") ?? "00:00" %></div>
+                                    </div>
                                 </div>
-
                             </ItemTemplate>
-
                         </asp:Repeater>
-
                     </div>
-
                 </div>
 
+                <div class="d-flex gap-2 mb-4">
+                    <asp:LinkButton ID="btnPrev" runat="server" CssClass="btn btn-white border flex-fill rounded-pill shadow-sm" OnClick="btnPrev_Click"><i class="fas fa-chevron-left me-2"></i>Previous</asp:LinkButton>
+                    <asp:LinkButton ID="btnNext" runat="server" CssClass="btn btn-primary flex-fill rounded-pill shadow-lg" OnClick="btnNext_Click">Next<i class="fas fa-chevron-right ms-2"></i></asp:LinkButton>
+                </div>
+
+                <div class="glass-card p-3">
+                    <h6 class="fw-bold mb-3"><i class="fas fa-users me-2"></i>Student Engagement</h6>
+                    <div id="engagementLive" runat="server">
+                        </div>
+                </div>
             </div>
-
         </div>
-
     </div>
 
-
-    <asp:HiddenField ID="hfTime" runat="server" />
-    <asp:HiddenField ID="hfVideoId" runat="server" />
-    <asp:HiddenField ID="hfVideoName" runat="server" />
-
-
     <script>
-        var v = document.getElementById("<%= videoPlayerControl.ClientID %>");
-        var container = document.querySelector(".video-container");
+               
+        const v = document.getElementById('<%= videoPlayer.ClientID %>');
+        const vId = '<%= VideoId %>';
 
-        var videoId = document.getElementById("<%= hfVideoId.ClientID %>").value;
+        /* Resume */
+        window.onload = function () {
+            let t = localStorage.getItem("video-" + vId);
+            if (t) v.currentTime = t;
+        }
 
-        /* caption */
-        /* Force caption ON at start */
+        /* Save */
+        v.ontimeupdate = function () {
+            localStorage.setItem("video-" + vId, v.currentTime);
+        }
 
-        window.addEventListener("load", function () {
+        // Skip logic
+        $('#skipLeft').click(() => { v.currentTime -= 10; });
+        $('#skipRight').click(() => { v.currentTime += 10; });
 
-            if (v.textTracks.length > 0) {
-
-                v.textTracks[0].mode = "showing";
-
+        // Show More/Less Logic
+        $('#btnToggleDesc').click(function () {
+            const isHidden = $('#topicSection').is(':hidden');
+            if (isHidden) {
+                $('#topicSection').slideDown();
+                $(this).text('Show Less');
+            } else {
+                $('#topicSection').slideUp();
+                $(this).text('Show More');
             }
-
         });
 
-/* Resume */
-
-window.onload=function(){
-
-var savedTime=localStorage.getItem("video-"+videoId);
-
-if(savedTime){
-v.currentTime=savedTime;
-}
-
-}
-
-/* Save progress */
-
-v.ontimeupdate=function(){
-
-            document.getElementById("<%= hfTime.ClientID %>").value =
-                Math.floor(v.currentTime);
-
-            localStorage.setItem("video-" + videoId, v.currentTime);
-
+        /* Controls */
+        v.onclick = () => {
+            document.querySelector(".video-wrapper").classList.add("show-controls");
+            setTimeout(() => document.querySelector(".video-wrapper").classList.remove("show-controls"), 1500);
         }
 
-        /* Smooth Skip */
+        // 1. SYNCED CONTROLS (Loop vs Auto-Next)
+        const chkLoop = document.getElementById('chkLoop');
+        const chkAutoNext = document.getElementById('chkAutoNext');
 
-        document.getElementById("skipLeft").onclick = function () {
+        chkLoop.onchange = function () {
+            if (this.checked) { chkAutoNext.checked = false; v.loop = true; }
+            else { v.loop = false; }
+        };
 
-            v.currentTime = Math.max(0, v.currentTime - 10);
+        chkAutoNext.onchange = function () {
+            if (this.checked) { chkLoop.checked = false; v.loop = false; }
+        };
 
+        v.onended = () => { if (chkAutoNext.checked) $('#<%= btnNext.ClientID %>')[0].click(); };
+
+        // 2. AJAX LIVE COMMENTS
+        function postComment() {
+            let msg = $('#txtComment').val();
+            if (!msg) return;
+            $.ajax({
+                type: "POST",
+                url: "VideoPlayer.aspx/AddComment",
+                data: JSON.stringify({ vid: vId, msg: msg }),
+                contentType: "application/json; charset=utf-8",
+                success: function () { $('#txtComment').val(''); loadComments(); }
+            });
         }
 
-        document.getElementById("skipRight").onclick = function () {
-
-            v.currentTime = Math.min(v.duration, v.currentTime + 10);
-
-        }
-
-        /* Show controls like YouTube */
-
-        v.addEventListener("click", function () {
-
-            container.classList.add("show-controls");
-
-            setTimeout(function () {
-
-                container.classList.remove("show-controls");
-
-            }, 1500)
-
-        })
-
-        /* Screenshot */
-
-        function takeScreenshot() {
-
-            var canvas = document.getElementById("canvas");
-
-            canvas.width = v.videoWidth;
-            canvas.height = v.videoHeight;
-
-            var ctx = canvas.getContext("2d");
-
-            ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
-
-            var image = canvas.toDataURL("image/png");
-
-            var a = document.createElement("a");
-
-            a.href = image;
-            a.download = "video-screenshot.png";
-
-            a.click();
-
-        }
-
-        /* Menu */
-
-        function toggleSettings() {
-
-            var p = document.getElementById("settingsPanel");
-
-            p.style.display = p.style.display == "block" ? "none" : "block";
-
-        }
-
-        /* LOOP VIDEO */
-
-        document.querySelectorAll('input[name="loopVideo"]').forEach(r => {
-
-            r.addEventListener("change", function () {
-
-                if (this.value == "on") {
-
-                    v.loop = true;
-
-                    /* turn auto-next OFF */
-
-                    document.querySelector('input[name="autoNext"][value="off"]').checked = true;
-
+        function loadComments() {
+            $.ajax({
+                type: "POST",
+                url: "VideoPlayer.aspx/GetComments",
+                data: JSON.stringify({ vid: vId }),
+                contentType: "application/json; charset=utf-8",
+                success: function (r) {
+                    let data = JSON.parse(r.d);
+                    let h = '';
+                    data.forEach(c => {
+                        h += `<div class="comment-item">
+                                <div class="avatar">${c.Username.charAt(0)}</div>
+                                <div class="comment-content">
+                                    <b>${c.Username}</b> <span class="text-muted ms-2 small">Just now</span>
+                                    <div class="mt-1">${c.Comment}</div>
+                                    <div class="comment-actions"><span><i class="far fa-thumbs-up"></i> Like</span> <span>REPLY</span></div>
+                                </div>
+                              </div>`;
+                    });
+                    $('#commentContainer').html(h);
+                    $('#<%= lblCommentsCount.ClientID %>').text(data.length);
                 }
-
-                else {
-
-                    v.loop = false;
-
-                }
-
-            })
-
-        })
-
-        /* AUTO NEXT */
-
-        document.querySelectorAll('input[name="autoNext"]').forEach(r => {
-
-            r.addEventListener("change", function () {
-
-                if (this.value == "on") {
-
-                    /* turn loop OFF */
-
-                    document.querySelector('input[name="loopVideo"][value="off"]').checked = true;
-
-                    v.loop = false;
-
-                }
-
-            })
-
-        })
-
-        /* CAPTION CONTROL */
-
-        document.querySelectorAll('input[name="caption"]').forEach(r => {
-
-            r.addEventListener("change", function () {
-
-                var tracks = v.textTracks;
-
-                for (let i = 0; i < tracks.length; i++) {
-
-                    tracks[i].mode = this.value == "on" ? "showing" : "hidden";
-
-                }
-
-            })
-
-        })
-
-        document.getElementById("settingsPanel").addEventListener("click", function (e) {
-            e.stopPropagation();
-        });
-
-        /* VIDEO END LOGIC */
-
-        v.addEventListener("ended", function () {
-
-            var autoNext = document.querySelector('input[name="autoNext"]:checked').value;
-
-            var loop = document.querySelector('input[name="loopVideo"]:checked').value;
-
-            if (autoNext == "on") {
-
-                window.location.href = "NextVideo.aspx";
-
-            }
-
-            /* if both off do nothing */
-
-        })
-
-        /* Close settings when clicking video */
-
-        v.addEventListener("click", function () {
-
-            var panel = document.getElementById("settingsPanel");
-
-            if (panel.style.display == "block") {
-                panel.style.display = "none";
-            }
-
-        });
-
-        async function generateSummary() {
-
-            var box = document.getElementById("aiSummary");
-
-            var videoName =
-                document.getElementById("<%= hfVideoName.ClientID %>").value;
-
-            box.innerHTML = "Generating AI summary...";
-
-            let res = await fetch(
-                "http://localhost:8000/generate-summary?video_name=" + encodeURIComponent(videoName),
-                { method: "POST" }
-            );
-
-            let data = await res.json();
-
-            if (data.error) {
-                box.innerHTML = data.error;
-                return;
-            }
-
-            box.innerHTML = "<pre>" + data.summary + "</pre>";
+            });
         }
 
-        async function generateQuiz() {
-
-            var videoName =
-                document.getElementById("<%= hfVideoName.ClientID %>").value;
-
-            let res = await fetch(
-                "http://localhost:8000/generate-quiz?video_name=" + encodeURIComponent(videoName),
-                { method: "POST" }
-            );
-
-            let data = await res.json();
-
-            document.getElementById("aiQuiz").innerHTML =
-                "<h6>AI Quiz</h6><pre>" + data.quiz + "</pre>";
+        function takeShot() {
+            let c = document.createElement("canvas");
+            c.width = v.videoWidth; c.height = v.videoHeight;
+            c.getContext("2d").drawImage(v, 0, 0);
+            let a = document.createElement("a");
+            a.href = c.toDataURL(); a.download = "Capture.png"; a.click();
         }
 
-        async function generateNotes() {
-
-            var videoName =
-                document.getElementById("<%= hfVideoName.ClientID %>").value;
-
-            let res = await fetch(
-                "http://localhost:8000/generate-notes?video_name=" + encodeURIComponent(videoName),
-                { method: "POST" }
-            );
-
-            let data = await res.json();
-
-            document.getElementById("aiNotes").innerHTML =
-                "<h6>AI Notes</h6><pre>" + data.notes + "</pre>";
-        }
-
-        async function askAI() {
-
-            var q = document.getElementById("aiQuestion").value;
-
-            var videoName =
-                document.getElementById("<%= hfVideoName.ClientID %>").value;
-
-            document.getElementById("aiAnswer").innerHTML = "Thinking...";
-
-            let res = await fetch(
-                "http://localhost:8000/ask-ai?video_name=" +
-                encodeURIComponent(videoName) +
-                "&question=" +
-                encodeURIComponent(q),
-                { method: "POST" }
-            );
-
-            let data = await res.json();
-
-            document.getElementById("aiAnswer").innerHTML =
-                "<pre>" + data.answer + "</pre>";
-        }
-
+        $(document).ready(loadComments);
     </script>
-
 </asp:Content>
-

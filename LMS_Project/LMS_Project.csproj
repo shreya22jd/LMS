@@ -50,6 +50,9 @@
       <HintPath>..\packages\ExcelDataReader.DataSet.3.8.0\lib\net462\ExcelDataReader.DataSet.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
@@ -166,6 +169,8 @@
     <Content Include="SuperAdmin\Dashboard.aspx" />
     <Content Include="Teacher\MyStudentDetails.aspx" />
     <Content Include="Teacher\MyStudents.aspx" />
+    <Content Include="Teacher\SubjectDetails.aspx" />
+    <Content Include="Teacher\Subjects.aspx" />
     <Content Include="Teacher\TeacherAssignment.aspx" />
     <Content Include="Teacher\TeacherAttendance.aspx" />
     <Content Include="Teacher\TeacherCalendar.aspx" />
@@ -173,6 +178,7 @@
     <Content Include="Teacher\TeacherDashboard.aspx" />
     <Content Include="Teacher\TeacherHelp.aspx" />
     <Content Include="Teacher\TeacherProfile.aspx" />
+    <Content Include="Teacher\TeacherVideoPlayer.aspx" />
     <Content Include="Teacher\ViewSubmissions.aspx" />
     <Content Include="Uploads\InstituteLogos\4cdae9c2-5673-4538-8241-78abd22e46e9.jpg" />
     <Content Include="Uploads\Videos\C# Basic Fundamentals.mp4" />
@@ -319,6 +325,9 @@
     <Compile Include="App_Code\Masters\BL\AssignStudentSubjectBL.cs" />
     <Compile Include="App_Code\Masters\BL\AssignSubjectFacultyBL.cs" />
     <Compile Include="App_Code\Masters\BL\Attendancebl.cs" />
+    <Compile Include="App_Code\Masters\BL\BasePage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="App_Code\Masters\BL\CalendarBL.cs" />
     <Compile Include="App_Code\Masters\BL\HelpBL.cs" />
     <Compile Include="App_Code\Masters\BL\StudentDetailsBL.cs" />
@@ -350,6 +359,20 @@
     <Compile Include="Teacher\MyStudentDetails.aspx.designer.cs">
       <DependentUpon>MyStudentDetails.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Teacher\SubjectDetails.aspx.cs">
+      <DependentUpon>SubjectDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Teacher\SubjectDetails.aspx.designer.cs">
+      <DependentUpon>SubjectDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Teacher\Subjects.aspx.cs">
+      <DependentUpon>Subjects.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Teacher\Subjects.aspx.designer.cs">
+      <DependentUpon>Subjects.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Teacher\TeacherAttendance.aspx.cs">
       <DependentUpon>TeacherAttendance.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -377,6 +400,13 @@
     </Compile>
     <Compile Include="Teacher\TeacherProfile.aspx.designer.cs">
       <DependentUpon>TeacherProfile.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Teacher\TeacherVideoPlayer.aspx.cs">
+      <DependentUpon>TeacherVideoPlayer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Teacher\TeacherVideoPlayer.aspx.designer.cs">
+      <DependentUpon>TeacherVideoPlayer.aspx</DependentUpon>
     </Compile>
     <Compile Include="Teacher\ViewSubmissions.aspx.cs">
       <DependentUpon>ViewSubmissions.aspx</DependentUpon>

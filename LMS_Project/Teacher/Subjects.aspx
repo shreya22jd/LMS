@@ -1,9 +1,9 @@
-﻿<%@ Page Title="Admin | Subject Management" Language="C#" MasterPageFile="~/Admin/AdminMaster.master" AutoEventWireup="true" CodeBehind="Subjects.aspx.cs" Inherits="LearningManagementSystem.Admin.Subjects" %>
+﻿<%@ Page Title="Admin | Subject Management" Language="C#" MasterPageFile="~/Teacher/TeacherMaster.master" AutoEventWireup="true" CodeBehind="Subjects.aspx.cs" Inherits="LMS_Project.Teacher.Subjects" %>
 
-<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+<asp:Content ID="headContent" ContentPlaceHolderID="head" runat="server">
 </asp:Content>
 
-<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder2" runat="server">
+<asp:Content ID="bodyContent" ContentPlaceHolderID="ContentPlaceHolder2" runat="server">
     <style>
         /* ===== PAGE HEADER (Results style) ===== */
         body {

@@ -1,6 +1,6 @@
-﻿<%@ Page Title="Subject Details" Language="C#" MasterPageFile="~/Admin/AdminMaster.master" AutoEventWireup="true" CodeBehind="SubjectDetails.aspx.cs" Inherits="LearningManagementSystem.Admin.SubjectDetails" %>
+﻿<%@ Page Title="Subject Details" Language="C#" MasterPageFile="~/Teacher/TeacherMaster.master" AutoEventWireup="true" CodeBehind="SubjectDetails.aspx.cs" Inherits="LMS_Project.Teacher.SubjectDetails" %>
 
-<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder2" runat="server">
+<asp:Content ID="bodyContent" ContentPlaceHolderID="ContentPlaceHolder2" runat="server">
     <asp:HiddenField ID="hfSubjectId" runat="server" />
 <asp:HiddenField ID="hfChapterId" runat="server" />
 <asp:Label ID="lblMsg" runat="server" CssClass="alert d-block mt-3" Visible="false"></asp:Label>
@@ -214,7 +214,7 @@
                                                 <ItemTemplate>
                                                     <div class="d-flex justify-content-between align-items-center p-2 border-bottom hover-bg">
                                                         <span><i class="fa-regular fa-circle-play me-2 text-danger"></i><%# Eval("Title") %></span>
-                                                        <a href='VideoPlayer.aspx?VideoId=<%# Eval("VideoId") %>' class="btn btn-outline-danger btn-sm">Watch Now</a>
+                                                        <a href='TeacherVideoPlayer.aspx?VideoId=<%# Eval("VideoId") %>' class="btn btn-outline-danger btn-sm">Watch Now</a>
                                                     </div>
                                                 </ItemTemplate>
                                             </asp:Repeater>

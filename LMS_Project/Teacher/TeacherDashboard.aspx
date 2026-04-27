@@ -238,6 +238,26 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
 .qa-teal   { background: #e1f5fe; color: #0288d1; }
 .qa-orange { background: #fff3e0; color: #ef6c00; }
 .qa-purple { background: #ede7f6; color: #5e35b1; }
+.qa-lime {background: #f3f8ff; color: #1976d2 }
+ .quick-actions-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.qa-item {
+    width: calc(20% - 10px); /* 5 items per row */
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .qa-item { width: calc(33.33% - 10px); } /* 3 per row */
+}
+
+@media (max-width: 576px) {
+    .qa-item { width: calc(50% - 10px); } /* 2 per row */
+}
+
 /* ── White panel card ── */
 .panel-card {
     background: #fff;
@@ -329,33 +349,38 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
 </div>
 
 <%-- ══ QUICK ACTIONS ══ --%>
-<%-- ══ QUICK ACTIONS ══ --%>
 <div class="row g-3 mb-4">
     <div class="col-12">
         <div class="panel-card">
             <div class="section-header">
                 <h6><i class="fas fa-bolt me-2"></i>Quick Actions</h6>
             </div>
-            <div class="row g-2">
-                <div class="col-6 col-md-3">
+            <div class="quick-actions-container">
+                <div class="qa-item">
                     <a href="TeacherAssignment.aspx" class="quick-action qa-green">
                         <i class="fas fa-upload"></i>
                         Upload Assignment
                     </a>
                 </div>
-                <div class="col-6 col-md-3">
+                <div class="qa-item">
                     <a href="TeacherAttendance.aspx" class="quick-action qa-teal">
                         <i class="fas fa-clipboard-check"></i>
                         Attendance
                     </a>
                 </div>
-                <div class="col-6 col-md-3">
+                <div class="qa-item">
+    <a href="Subjects.aspx" class="quick-action qa-lime">
+        <i class="fas fa-video"></i>
+        Course Videos
+    </a>
+</div>
+                <div class="qa-item">
                     <a href="MyStudents.aspx" class="quick-action qa-purple">
                         <i class="fas fa-users"></i>
                         View My Students
                     </a>
                 </div>
-                <div class="col-6 col-md-3">
+                <div class="qa-item">
                     <a href="TeacherCalendar.aspx" class="quick-action qa-orange">
                         <i class="fas fa-calendar-alt"></i>
                         Open Calendar

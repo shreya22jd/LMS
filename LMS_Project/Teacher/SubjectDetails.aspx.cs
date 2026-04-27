@@ -5,13 +5,12 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-namespace LearningManagementSystem.Admin
+namespace LMS_Project.Teacher
 {
     public partial class SubjectDetails : BasePage
     {
         SubjectDetailsBL bl = new SubjectDetailsBL();
 
-        int UserId => UserId;
 
         protected void Page_Load(object sender, EventArgs e)
         {

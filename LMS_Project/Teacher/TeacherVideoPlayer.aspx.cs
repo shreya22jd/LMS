@@ -1,14 +1,17 @@
-﻿using Newtonsoft.Json;
+﻿using LearningManagementSystem.Admin;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Web;
 using System.Web.Services;
+using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Xml.Linq;
 
-namespace LearningManagementSystem.Admin
+namespace LMS_Project.Teacher
 {
-    public partial class VideoPlayer : BasePage
+    public partial class TeacherVideoPlayer : BasePage
     {
         VideoPlayerBL bl = new VideoPlayerBL();
 
@@ -17,6 +20,7 @@ namespace LearningManagementSystem.Admin
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            hfVideoId.Value = VideoId.ToString();
 
             try
             {
@@ -138,25 +142,33 @@ namespace LearningManagementSystem.Admin
 
         // AJAX METHODS FOR LIVE UPDATE
         [WebMethod]
-        public static string GetComments(int vid, int SessionId)
+        public static void AddComment(int vid, string msg)
         {
-            VideoPlayerBL bl = new VideoPlayerBL();
-            return JsonConvert.SerializeObject(bl.GetComments(vid, SessionId));
-        }
+            if (vid <= 0)
+                throw new Exception("Invalid VideoId");
 
-        [WebMethod]
-        public static void AddComment(int vid, int SessionId, string msg)
-        {
             VideoPlayerBL bl = new VideoPlayerBL();
 
+            int sessionId = Convert.ToInt32(HttpContext.Current.Session["CurrentSessionId"]);
             int userId = Convert.ToInt32(HttpContext.Current.Session["UserId"]);
             int societyId = Convert.ToInt32(HttpContext.Current.Session["SocietyId"]);
             int instituteId = Convert.ToInt32(HttpContext.Current.Session["InstituteId"]);
 
-            bl.SaveComment(vid, SessionId, userId, msg, societyId, instituteId);
+            bl.SaveComment(vid, sessionId, userId, msg, societyId, instituteId);
         }
 
-        protected void btnNext_Click(object sender, EventArgs e) => Response.Redirect("VideoPlayer.aspx?VideoId=" + bl.GetNextVideo(VideoId, SessionId));
-        protected void btnPrev_Click(object sender, EventArgs e) => Response.Redirect("VideoPlayer.aspx?VideoId=" + bl.GetPrevVideo(VideoId, SessionId));
+        [WebMethod]
+        public static string GetComments(int vid)
+        {
+            VideoPlayerBL bl = new VideoPlayerBL();
+
+            int sessionId = Convert.ToInt32(HttpContext.Current.Session["CurrentSessionId"]);
+
+            return JsonConvert.SerializeObject(bl.GetComments(vid, sessionId));
+        }
+    
+
+        protected void btnNext_Click(object sender, EventArgs e) => Response.Redirect("TeacherVideoPlayer.aspx?VideoId=" + bl.GetNextVideo(VideoId, SessionId));
+        protected void btnPrev_Click(object sender, EventArgs e) => Response.Redirect("TeacherVideoPlayer.aspx?VideoId=" + bl.GetPrevVideo(VideoId, SessionId));
     }
 }

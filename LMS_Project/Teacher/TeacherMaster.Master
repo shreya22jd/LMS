@@ -252,7 +252,12 @@ body {
                 <span>My Students</span>
             </a>
         </li>
-
+        <li>
+    <a href="Subjects.aspx" class="sidebar-link">
+        <i class="fas fa-video sidebar-icon"></i>
+        <span>Course Videos</span>
+    </a>
+</li>
        <li class="sidebar-section-label">Attendance</li>
 <li>
     <a href="TeacherAttendance.aspx" class="sidebar-link">
