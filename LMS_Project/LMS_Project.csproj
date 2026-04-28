@@ -352,6 +352,9 @@
     <Compile Include="Student\UserHelp.aspx.designer.cs">
       <DependentUpon>UserHelp.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Teacher\GetStudentMarks.ashx.cs">
+      <DependentUpon>GetStudentMarks.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Teacher\MyStudentDetails.aspx.cs">
       <DependentUpon>MyStudentDetails.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -628,6 +631,7 @@
     <Content Include="SuperAdmin\SuperAdminMaster.Master" />
     <Content Include="Teacher\TeacherMaster.Master" />
     <Content Include="Parent\ParentMaster.Master" />
+    <Content Include="Teacher\GetStudentMarks.ashx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
