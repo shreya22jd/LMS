@@ -632,5 +632,610 @@ namespace LearningManagementSystem.BL
             cmd.Parameters.AddWithValue("@SessionId", sessionId);
             return dl.GetDataTable(cmd);
         }
+        // ══════════════════════════════════════════════════════════════
+        // ADD THESE METHODS to TeacherDashboardBL.cs
+        // ══════════════════════════════════════════════════════════════
+
+        // ════════════════════════════════════════════════════════════
+        // COMPARISON ANALYTICS — SECTION vs SECTION
+        // ════════════════════════════════════════════════════════════
+//        public DataTable GetSectionCompareData(int teacherId, int instituteId, int sessionId)
+//        {
+//            SqlCommand cmd = new SqlCommand(@"
+//SELECT
+//    ISNULL(sec.SectionName, 'No Section')        AS SectionName,
+//    COUNT(DISTINCT ass.UserId)                    AS TotalStudents,
+
+//    ISNULL(
+//        CAST(ROUND(
+//            AVG(CAST(asub.MarksObtained AS FLOAT))
+//        , 1) AS DECIMAL(5,1))
+//    , 0)                                          AS AvgMarks,
+
+//    ISNULL(
+//        CAST(ROUND(
+//            100.0
+//            * SUM(CASE WHEN att.Status = 'Present' THEN 1.0 ELSE 0 END)
+//            / NULLIF(COUNT(att.AttendanceId), 0)
+//        , 1) AS DECIMAL(5,1))
+//    , 0)                                          AS AttendancePct,
+
+//    ISNULL(SUM(vv.ViewCount), 0)                  AS VideoViews
+
+//FROM SubjectFaculty              SF
+
+//JOIN AssignStudentSubject         ass
+//     ON  ass.SubjectId   = SF.SubjectId
+//     AND ass.SessionId   = SF.SessionId
+//     AND ass.InstituteId = SF.InstituteId
+
+//LEFT JOIN StudentAcademicDetails  sad
+//     ON  sad.UserId      = ass.UserId
+
+//LEFT JOIN Sections                sec
+//     ON  sec.SectionId   = sad.SectionId
+
+//LEFT JOIN AssignmentSubmissions   asub
+//     ON  asub.StudentId   = ass.UserId
+//     AND asub.InstituteId = SF.InstituteId
+//     AND asub.MarksObtained IS NOT NULL
+
+//LEFT JOIN Attendance              att
+//     ON  att.UserId      = ass.UserId
+//     AND att.SubjectId   = SF.SubjectId
+//     AND att.SessionId   = SF.SessionId
+//     AND att.InstituteId = SF.InstituteId
+
+//LEFT JOIN (
+//    SELECT   vv2.UserId,
+//             COUNT(*)   AS ViewCount
+//    FROM     VideoViews vv2
+//    WHERE    vv2.InstituteId = @InstituteId
+//      AND    vv2.SessionId   = @SessionId
+//    GROUP BY vv2.UserId
+//) vv ON vv.UserId = ass.UserId
+
+//WHERE  SF.TeacherId   = @TeacherId
+//  AND  SF.InstituteId = @InstituteId
+//  AND  SF.SessionId   = @SessionId
+//  AND  ISNULL(SF.IsActive, 1) = 1
+
+//GROUP BY
+//    sec.SectionName          -- NULL allowed; ISNULL only in SELECT
+
+//ORDER BY AvgMarks DESC
+//");
+
+//            cmd.Parameters.AddWithValue("@TeacherId", teacherId);
+//            cmd.Parameters.AddWithValue("@InstituteId", instituteId);
+//            cmd.Parameters.AddWithValue("@SessionId", sessionId);
+//            return dl.GetDataTable(cmd);
+//        }
+
+        // ════════════════════════════════════════════════════════════
+        // COMPARISON ANALYTICS — SUBJECT vs SUBJECT
+        // ════════════════════════════════════════════════════════════
+//        public DataTable GetSubjectCompareData(int teacherId, int instituteId, int sessionId)
+//        {
+//            SqlCommand cmd = new SqlCommand(@"
+//SELECT
+//    S.SubjectId,
+//    S.SubjectName,
+//    COUNT(DISTINCT ass.UserId)               AS TotalStudents,
+
+//    ISNULL(
+//        CAST(ROUND(
+//            AVG(CAST(asub.MarksObtained AS FLOAT))
+//        , 1) AS DECIMAL(5,1))
+//    , 0)                                     AS AvgMarks,
+
+//    ISNULL(
+//        CAST(ROUND(
+//            100.0
+//            * SUM(CASE WHEN att.Status = 'Present' THEN 1.0 ELSE 0 END)
+//            / NULLIF(COUNT(att.AttendanceId), 0)
+//        , 1) AS DECIMAL(5,1))
+//    , 0)                                     AS AttendancePct,
+
+//    ISNULL((
+//        SELECT COUNT(*)
+//        FROM   VideoViews  vv
+//        JOIN   Videos      v   ON v.VideoId    = vv.VideoId
+//        JOIN   Chapters    ch  ON ch.ChapterId = v.ChapterId
+//        WHERE  ch.SubjectId   = S.SubjectId
+//          AND  vv.InstituteId = @InstituteId
+//          AND  vv.SessionId   = @SessionId
+//    ), 0)                                    AS VideoViews
+
+//FROM SubjectFaculty              SF
+//JOIN Subjects                    S
+//     ON  S.SubjectId   = SF.SubjectId
+
+//JOIN AssignStudentSubject         ass
+//     ON  ass.SubjectId   = SF.SubjectId
+//     AND ass.SessionId   = SF.SessionId
+//     AND ass.InstituteId = SF.InstituteId
+
+//LEFT JOIN AssignmentSubmissions   asub
+//     ON  asub.StudentId   = ass.UserId
+//     AND asub.InstituteId = SF.InstituteId
+//     AND asub.MarksObtained IS NOT NULL
+//LEFT JOIN Assignments             a
+//     ON  a.AssignmentId  = asub.AssignmentId
+//     AND a.SubjectId     = SF.SubjectId
+
+//LEFT JOIN Attendance              att
+//     ON  att.UserId      = ass.UserId
+//     AND att.SubjectId   = SF.SubjectId
+//     AND att.SessionId   = SF.SessionId
+//     AND att.InstituteId = SF.InstituteId
+
+//WHERE  SF.TeacherId   = @TeacherId
+//  AND  SF.InstituteId = @InstituteId
+//  AND  SF.SessionId   = @SessionId
+//  AND  ISNULL(SF.IsActive, 1) = 1
+
+//GROUP BY S.SubjectId, S.SubjectName
+//ORDER BY AvgMarks DESC
+//");
+
+//            cmd.Parameters.AddWithValue("@TeacherId", teacherId);
+//            cmd.Parameters.AddWithValue("@InstituteId", instituteId);
+//            cmd.Parameters.AddWithValue("@SessionId", sessionId);
+//            return dl.GetDataTable(cmd);
+//        }
+
+        // ════════════════════════════════════════════════════════════
+        // JSON SERIALISER — works for both section & subject
+        // ════════════════════════════════════════════════════════════
+        public string GetCompareJson(DataTable dt, string nameField)
+        {
+            var list = new List<object>();
+            foreach (DataRow row in dt.Rows)
+            {
+                double avgMarks = 0, attendPct = 0;
+                int videoViews = 0;
+                double.TryParse(row["AvgMarks"]?.ToString(), out avgMarks);
+                double.TryParse(row["AttendancePct"]?.ToString(), out attendPct);
+                int.TryParse(row["VideoViews"]?.ToString(), out videoViews);
+
+                list.Add(new
+                {
+                    SectionName = dt.Columns.Contains("SectionName") ? row["SectionName"].ToString() : "",
+                    SubjectName = dt.Columns.Contains("SubjectName") ? row["SubjectName"].ToString() : "",
+                    AvgMarks = Math.Round(avgMarks, 1),
+                    AttendancePct = Math.Round(attendPct, 1),
+                    VideoViews = videoViews
+                });
+            }
+            return new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(list);
+        }
+
+        // ════════════════════════════════════════════════════════════
+        // AUTO-INSIGHT GENERATORS
+        // ════════════════════════════════════════════════════════════
+        public DataTable GenerateSectionInsights(DataTable dt)
+        {
+            DataTable result = BuildInsightTable();
+            if (dt == null || dt.Rows.Count < 2) return result;
+
+            double maxM = double.MinValue, minM = double.MaxValue;
+            double maxA = double.MinValue, minA = double.MaxValue;
+            string bestM = "", worstA = "", bestA = "";
+
+            foreach (DataRow row in dt.Rows)
+            {
+                double m = 0, a = 0;
+                double.TryParse(row["AvgMarks"]?.ToString(), out m);
+                double.TryParse(row["AttendancePct"]?.ToString(), out a);
+                string name = row["SectionName"].ToString();
+
+                if (m > maxM) { maxM = m; bestM = name; }
+                if (m < minM) { minM = m; }
+                if (a > maxA) { maxA = a; bestA = name; }
+                if (a < minA) { minA = a; worstA = name; }
+            }
+
+            if (!string.IsNullOrEmpty(bestM))
+                result.Rows.Add(bestM + " leads in avg marks (" + maxM + ")", "good", "fa-trophy");
+
+            if (!string.IsNullOrEmpty(worstA) && minA < 60)
+                result.Rows.Add(worstA + " needs attendance attention (" + minA + "%)", "warn", "fa-exclamation-triangle");
+
+            if (!string.IsNullOrEmpty(bestA))
+                result.Rows.Add(bestA + " has the best attendance (" + maxA + "%)", "good", "fa-clipboard-check");
+
+            return result;
+        }
+
+        public DataTable GenerateSubjectInsights(DataTable dt)
+        {
+            DataTable result = BuildInsightTable();
+            if (dt == null || dt.Rows.Count < 2) return result;
+
+            double maxM = double.MinValue, minM = double.MaxValue;
+            double maxA = double.MinValue;
+            int maxV = 0;
+            string bestM = "", worstM = "", bestA = "", mostWatched = "";
+
+            foreach (DataRow row in dt.Rows)
+            {
+                double m = 0, a = 0; int v = 0;
+                double.TryParse(row["AvgMarks"]?.ToString(), out m);
+                double.TryParse(row["AttendancePct"]?.ToString(), out a);
+                int.TryParse(row["VideoViews"]?.ToString(), out v);
+                string name = row["SubjectName"].ToString();
+
+                if (m > maxM) { maxM = m; bestM = name; }
+                if (m < minM) { minM = m; worstM = name; }
+                if (a > maxA) { maxA = a; bestA = name; }
+                if (v > maxV) { maxV = v; mostWatched = name; }
+            }
+
+            if (!string.IsNullOrEmpty(bestM))
+                result.Rows.Add(bestM + " has highest avg marks (" + maxM + ")", "good", "fa-star");
+
+            if (!string.IsNullOrEmpty(worstM) && worstM != bestM && minM < 40)
+                result.Rows.Add(worstM + " avg marks are low (" + minM + ") — review needed", "warn", "fa-exclamation-triangle");
+
+            if (!string.IsNullOrEmpty(bestA))
+                result.Rows.Add(bestA + " leads in attendance (" + maxA + "%)", "good", "fa-clipboard-check");
+
+            if (!string.IsNullOrEmpty(mostWatched) && maxV > 0)
+                result.Rows.Add(mostWatched + " is most engaged (" + maxV + " views)", "good", "fa-play-circle");
+
+            return result;
+        }
+
+        // ── Private helpers ──────────────────────────────────────────
+        private DataTable BuildInsightTable()
+        {
+            DataTable t = new DataTable();
+            t.Columns.Add("Message");
+            t.Columns.Add("CssClass");
+            t.Columns.Add("Icon");
+            return t;
+        }
+        // ════════════════════════════════════════════════════════════
+        // CONTENT ENGAGEMENT METHODS (CORRECTED - removed ViewCount column)
+        // ════════════════════════════════════════════════════════════
+
+        public DataTable GetEngagementKPIs(int teacherId, int instituteId, int sessionId, int subjectId)
+        {
+            SqlCommand cmd = new SqlCommand(@"
+        SELECT
+            ISNULL(COUNT(DISTINCT vv.ViewId), 0) AS TotalViews,
+            ISNULL(
+                CAST(ROUND(
+                    AVG(CAST(vwp.WatchedPercent AS FLOAT))
+                , 1) AS DECIMAL(5,1))
+            , 0) AS AvgWatchPercent,
+            ISNULL((
+                SELECT TOP 1 v.Title
+                FROM VideoViews vv2
+                JOIN Videos v ON v.VideoId = vv2.VideoId
+                JOIN Chapters ch ON ch.ChapterId = v.ChapterId
+                WHERE vv2.InstituteId = @InstituteId
+                  AND vv2.SessionId = @SessionId
+                  AND v.IsActive = 1
+                  AND (@SubjectId = 0 OR ch.SubjectId = @SubjectId)
+                GROUP BY v.Title
+                ORDER BY COUNT(*) DESC
+            ), '-') AS MostViewedVideo,
+            ISNULL((
+                SELECT TOP 1 COUNT(*)
+                FROM VideoViews vv2
+                JOIN Videos v ON v.VideoId = vv2.VideoId
+                JOIN Chapters ch ON ch.ChapterId = v.ChapterId
+                WHERE vv2.InstituteId = @InstituteId
+                  AND vv2.SessionId = @SessionId
+                  AND v.IsActive = 1
+                  AND (@SubjectId = 0 OR ch.SubjectId = @SubjectId)
+                GROUP BY v.Title
+                ORDER BY COUNT(*) DESC
+            ), 0) AS MostViewedCount,
+            COUNT(DISTINCT v.VideoId) AS TotalVideos,
+            '+0%' AS ViewsTrend
+        FROM Videos v
+        JOIN Chapters ch ON ch.ChapterId = v.ChapterId
+        LEFT JOIN VideoViews vv ON vv.VideoId = v.VideoId
+            AND vv.InstituteId = @InstituteId
+            AND vv.SessionId = @SessionId
+        LEFT JOIN VideoWatchProgress vwp ON vwp.VideoId = v.VideoId
+            AND vwp.InstituteId = @InstituteId
+            AND vwp.SessionId = @SessionId
+        WHERE v.InstituteId = @InstituteId
+          AND v.SessionId = @SessionId
+          AND v.IsActive = 1
+          AND (@SubjectId = 0 OR ch.SubjectId = @SubjectId)
+    ");
+
+            cmd.Parameters.AddWithValue("@TeacherId", teacherId);
+            cmd.Parameters.AddWithValue("@InstituteId", instituteId);
+            cmd.Parameters.AddWithValue("@SessionId", sessionId);
+            cmd.Parameters.AddWithValue("@SubjectId", subjectId);
+            return dl.GetDataTable(cmd);
+        }
+
+        public DataTable GetVideoEngagementData(int teacherId, int instituteId, int sessionId, int subjectId)
+        {
+            SqlCommand cmd = new SqlCommand(@"
+        SELECT TOP 10
+            v.Title AS VideoName,
+            ISNULL(
+                CAST(ROUND(
+                    AVG(CAST(vwp.WatchedPercent AS FLOAT))
+                , 1) AS DECIMAL(5,1))
+            , 0) AS WatchPercent,
+            ISNULL(COUNT(DISTINCT vv.ViewId), 0) AS ViewCount
+        FROM Videos v
+        JOIN Chapters ch ON ch.ChapterId = v.ChapterId
+        LEFT JOIN VideoViews vv ON vv.VideoId = v.VideoId
+            AND vv.InstituteId = @InstituteId
+            AND vv.SessionId = @SessionId
+        LEFT JOIN VideoWatchProgress vwp ON vwp.VideoId = v.VideoId
+            AND vwp.InstituteId = @InstituteId
+            AND vwp.SessionId = @SessionId
+        WHERE v.InstituteId = @InstituteId
+          AND v.SessionId = @SessionId
+          AND v.IsActive = 1
+          AND (@SubjectId = 0 OR ch.SubjectId = @SubjectId)
+        GROUP BY v.Title, v.VideoId
+        ORDER BY AVG(CAST(vwp.WatchedPercent AS FLOAT)) DESC
+    ");
+
+            cmd.Parameters.AddWithValue("@TeacherId", teacherId);
+            cmd.Parameters.AddWithValue("@InstituteId", instituteId);
+            cmd.Parameters.AddWithValue("@SessionId", sessionId);
+            cmd.Parameters.AddWithValue("@SubjectId", subjectId);
+            return dl.GetDataTable(cmd);
+        }
+
+        public string GetEngagementChartJson(DataTable dt)
+        {
+            var list = new List<object>();
+            foreach (DataRow row in dt.Rows)
+            {
+                list.Add(new
+                {
+                    VideoName = row["VideoName"].ToString(),
+                    WatchPercent = Convert.ToDouble(row["WatchPercent"]),
+                    ViewCount = Convert.ToInt32(row["ViewCount"])
+                });
+            }
+            return new JavaScriptSerializer().Serialize(list);
+        }
+
+        public DataTable GetTopVideos(int teacherId, int instituteId, int sessionId, int subjectId)
+        {
+            SqlCommand cmd = new SqlCommand(@"
+        SELECT TOP 5
+            v.VideoId,
+            v.Title,
+            ISNULL(COUNT(DISTINCT vv.ViewId), 0) AS ViewCount,
+            ISNULL(
+                CAST(ROUND(
+                    AVG(CAST(vwp.WatchedPercent AS FLOAT))
+                , 1) AS DECIMAL(5,1))
+            , 0) AS WatchPercent
+        FROM Videos v
+        JOIN Chapters ch ON ch.ChapterId = v.ChapterId
+        LEFT JOIN VideoViews vv ON vv.VideoId = v.VideoId
+            AND vv.InstituteId = @InstituteId
+            AND vv.SessionId = @SessionId
+        LEFT JOIN VideoWatchProgress vwp ON vwp.VideoId = v.VideoId
+            AND vwp.InstituteId = @InstituteId
+            AND vwp.SessionId = @SessionId
+        WHERE v.InstituteId = @InstituteId
+          AND v.SessionId = @SessionId
+          AND v.IsActive = 1
+          AND (@SubjectId = 0 OR ch.SubjectId = @SubjectId)
+        GROUP BY v.VideoId, v.Title
+        ORDER BY COUNT(DISTINCT vv.ViewId) DESC
+    ");
+
+            cmd.Parameters.AddWithValue("@TeacherId", teacherId);
+            cmd.Parameters.AddWithValue("@InstituteId", instituteId);
+            cmd.Parameters.AddWithValue("@SessionId", sessionId);
+            cmd.Parameters.AddWithValue("@SubjectId", subjectId);
+            return dl.GetDataTable(cmd);
+        }
+
+        public DataTable GetLowPerformingVideos(int teacherId, int instituteId, int sessionId, int subjectId)
+        {
+            SqlCommand cmd = new SqlCommand(@"
+        SELECT TOP 5
+            v.VideoId,
+            v.Title,
+            ISNULL(COUNT(DISTINCT vv.ViewId), 0) AS ViewCount,
+            ISNULL(
+                CAST(ROUND(
+                    AVG(CAST(vwp.WatchedPercent AS FLOAT))
+                , 1) AS DECIMAL(5,1))
+            , 0) AS WatchPercent
+        FROM Videos v
+        JOIN Chapters ch ON ch.ChapterId = v.ChapterId
+        LEFT JOIN VideoViews vv ON vv.VideoId = v.VideoId
+            AND vv.InstituteId = @InstituteId
+            AND vv.SessionId = @SessionId
+        LEFT JOIN VideoWatchProgress vwp ON vwp.VideoId = v.VideoId
+            AND vwp.InstituteId = @InstituteId
+            AND vwp.SessionId = @SessionId
+        WHERE v.InstituteId = @InstituteId
+          AND v.SessionId = @SessionId
+          AND v.IsActive = 1
+          AND (@SubjectId = 0 OR ch.SubjectId = @SubjectId)
+        GROUP BY v.VideoId, v.Title
+        HAVING COUNT(DISTINCT vv.ViewId) > 0
+        ORDER BY AVG(CAST(vwp.WatchedPercent AS FLOAT)) ASC
+    ");
+
+            cmd.Parameters.AddWithValue("@TeacherId", teacherId);
+            cmd.Parameters.AddWithValue("@InstituteId", instituteId);
+            cmd.Parameters.AddWithValue("@SessionId", sessionId);
+            cmd.Parameters.AddWithValue("@SubjectId", subjectId);
+            return dl.GetDataTable(cmd);
+        }
+
+        public DataTable GetWatchTimeLeaders(int teacherId, int instituteId, int sessionId, int subjectId)
+        {
+            SqlCommand cmd = new SqlCommand(@"
+        SELECT TOP 5
+            up.FullName AS StudentName,
+            ISNULL(SUM(vwp.WatchedSeconds), 0) AS TotalWatchSeconds,
+            ISNULL(
+                CAST(ROUND(
+                    AVG(CAST(vwp.WatchedPercent AS FLOAT))
+                , 1) AS DECIMAL(5,1))
+            , 0) AS AvgWatchPercent
+        FROM VideoWatchProgress vwp
+        JOIN Videos v ON v.VideoId = vwp.VideoId
+        JOIN Chapters ch ON ch.ChapterId = v.ChapterId
+        JOIN UserProfile up ON up.UserId = vwp.UserId
+        WHERE vwp.InstituteId = @InstituteId
+          AND vwp.SessionId = @SessionId
+          AND v.IsActive = 1
+          AND (@SubjectId = 0 OR ch.SubjectId = @SubjectId)
+        GROUP BY up.FullName
+        ORDER BY SUM(vwp.WatchedSeconds) DESC
+    ");
+
+            cmd.Parameters.AddWithValue("@TeacherId", teacherId);
+            cmd.Parameters.AddWithValue("@InstituteId", instituteId);
+            cmd.Parameters.AddWithValue("@SessionId", sessionId);
+            cmd.Parameters.AddWithValue("@SubjectId", subjectId);
+            return dl.GetDataTable(cmd);
+        }
+        // ════════════════════════════════════════════════════════════
+        // SECTION COMPARE DATA (FIXED - using COUNT of VideoViews)
+        // ════════════════════════════════════════════════════════════
+        public DataTable GetSectionCompareData(int teacherId, int instituteId, int sessionId)
+        {
+            SqlCommand cmd = new SqlCommand(@"
+        SELECT
+            ISNULL(sec.SectionName, 'No Section') AS SectionName,
+            COUNT(DISTINCT ass.UserId) AS TotalStudents,
+            ISNULL(
+                CAST(ROUND(
+                    AVG(CAST(asub.MarksObtained AS FLOAT))
+                , 1) AS DECIMAL(5,1))
+            , 0) AS AvgMarks,
+            ISNULL(
+                CAST(ROUND(
+                    100.0
+                    * SUM(CASE WHEN att.Status = 'Present' THEN 1.0 ELSE 0 END)
+                    / NULLIF(COUNT(att.AttendanceId), 0)
+                , 1) AS DECIMAL(5,1))
+            , 0) AS AttendancePct,
+            ISNULL(COUNT(DISTINCT vv.ViewId), 0) AS VideoViews
+        FROM SubjectFaculty SF
+        JOIN AssignStudentSubject ass
+            ON ass.SubjectId = SF.SubjectId
+            AND ass.SessionId = SF.SessionId
+            AND ass.InstituteId = SF.InstituteId
+        LEFT JOIN StudentAcademicDetails sad
+            ON sad.UserId = ass.UserId
+            AND sad.SessionId = @SessionId
+        LEFT JOIN Sections sec
+            ON sec.SectionId = sad.SectionId
+            AND sec.SessionId = @SessionId
+        LEFT JOIN AssignmentSubmissions asub
+            ON asub.StudentId = ass.UserId
+            AND asub.AssignmentId IN (
+                SELECT a.AssignmentId 
+                FROM Assignments a 
+                WHERE a.SubjectId = SF.SubjectId
+                AND a.SessionId = SF.SessionId
+                AND a.InstituteId = SF.InstituteId
+            )
+            AND asub.InstituteId = SF.InstituteId
+            AND asub.SessionId = SF.SessionId
+            AND asub.MarksObtained IS NOT NULL
+        LEFT JOIN Attendance att
+            ON att.UserId = ass.UserId
+            AND att.SubjectId = SF.SubjectId
+            AND att.SessionId = SF.SessionId
+            AND att.InstituteId = SF.InstituteId
+        LEFT JOIN VideoViews vv
+            ON vv.UserId = ass.UserId
+            AND vv.InstituteId = SF.InstituteId
+            AND vv.SessionId = SF.SessionId
+        WHERE SF.TeacherId = @TeacherId
+          AND SF.InstituteId = @InstituteId
+          AND SF.SessionId = @SessionId
+          AND ISNULL(SF.IsActive, 1) = 1
+        GROUP BY sec.SectionName
+        ORDER BY AvgMarks DESC
+    ");
+
+            cmd.Parameters.AddWithValue("@TeacherId", teacherId);
+            cmd.Parameters.AddWithValue("@InstituteId", instituteId);
+            cmd.Parameters.AddWithValue("@SessionId", sessionId);
+            return dl.GetDataTable(cmd);
+        }
+
+        // ════════════════════════════════════════════════════════════
+        // SUBJECT COMPARE DATA (FIXED - using COUNT of VideoViews)
+        // ════════════════════════════════════════════════════════════
+        public DataTable GetSubjectCompareData(int teacherId, int instituteId, int sessionId)
+        {
+            SqlCommand cmd = new SqlCommand(@"
+        SELECT
+            S.SubjectId,
+            S.SubjectName,
+            COUNT(DISTINCT ass.UserId) AS TotalStudents,
+            ISNULL(
+                CAST(ROUND(
+                    AVG(CAST(asub.MarksObtained AS FLOAT))
+                , 1) AS DECIMAL(5,1))
+            , 0) AS AvgMarks,
+            ISNULL(
+                CAST(ROUND(
+                    100.0
+                    * SUM(CASE WHEN att.Status = 'Present' THEN 1.0 ELSE 0 END)
+                    / NULLIF(COUNT(att.AttendanceId), 0)
+                , 1) AS DECIMAL(5,1))
+            , 0) AS AttendancePct,
+            ISNULL(COUNT(DISTINCT vv.ViewId), 0) AS VideoViews
+        FROM SubjectFaculty SF
+        JOIN Subjects S ON S.SubjectId = SF.SubjectId
+        JOIN AssignStudentSubject ass
+            ON ass.SubjectId = SF.SubjectId
+            AND ass.SessionId = SF.SessionId
+            AND ass.InstituteId = SF.InstituteId
+        LEFT JOIN AssignmentSubmissions asub
+            ON asub.StudentId = ass.UserId
+            AND asub.AssignmentId IN (
+                SELECT a.AssignmentId 
+                FROM Assignments a 
+                WHERE a.SubjectId = SF.SubjectId
+                AND a.SessionId = SF.SessionId
+                AND a.InstituteId = SF.InstituteId
+            )
+            AND asub.InstituteId = SF.InstituteId
+            AND asub.SessionId = SF.SessionId
+            AND asub.MarksObtained IS NOT NULL
+        LEFT JOIN Attendance att
+            ON att.UserId = ass.UserId
+            AND att.SubjectId = SF.SubjectId
+            AND att.SessionId = SF.SessionId
+            AND att.InstituteId = SF.InstituteId
+        LEFT JOIN VideoViews vv
+            ON vv.UserId = ass.UserId
+            AND vv.InstituteId = SF.InstituteId
+            AND vv.SessionId = SF.SessionId
+        WHERE SF.TeacherId = @TeacherId
+          AND SF.InstituteId = @InstituteId
+          AND SF.SessionId = @SessionId
+          AND ISNULL(SF.IsActive, 1) = 1
+        GROUP BY S.SubjectId, S.SubjectName
+        ORDER BY AvgMarks DESC
+    ");
+
+            cmd.Parameters.AddWithValue("@TeacherId", teacherId);
+            cmd.Parameters.AddWithValue("@InstituteId", instituteId);
+            cmd.Parameters.AddWithValue("@SessionId", sessionId);
+            return dl.GetDataTable(cmd);
+        }
     }
 }

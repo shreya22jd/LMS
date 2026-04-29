@@ -50,7 +50,11 @@ namespace LMS_Project.Teacher
             get => ViewState["SelAsgSubject"] != null ? (int)ViewState["SelAsgSubject"] : 0;
             set => ViewState["SelAsgSubject"] = value;
         }
-
+        private int SelEngagementSubjectId
+        {
+            get => ViewState["SelEngagementSubject"] != null ? (int)ViewState["SelEngagementSubject"] : 0;
+            set => ViewState["SelEngagementSubject"] = value;
+        }
         // ── Rank badge colors ────────────────────────────────────────
         public string GetRankColor(int index)
         {
@@ -70,6 +74,9 @@ namespace LMS_Project.Teacher
                 LoadAssignmentFilterDropdowns();
                 LoadRecentAssignments();
                 LoadStudentPerformance();
+                LoadComparisonAnalytics();
+                LoadEngagementFilterDropdowns();
+                LoadContentEngagement();
             }
         }
 
@@ -311,7 +318,185 @@ namespace LMS_Project.Teacher
 
             pnlPerfKPIs.Visible = dtKpi.Rows.Count > 0;
         }
+        private void LoadComparisonAnalytics()
+        {
+            int sessionId = Session["CurrentSessionId"] != null
+                            ? Convert.ToInt32(Session["CurrentSessionId"])
+                            : bl.GetCurrentSessionId(InstituteId);
 
+            // ── Section vs Section ─────────────────────────────────────
+            DataTable dtSec = bl.GetSectionCompareData(TeacherId, InstituteId, sessionId);
+            bool hasSec = dtSec != null && dtSec.Rows.Count > 0;
+
+            if (hasSec)
+            {
+                hfSecCompareData.Value = bl.GetCompareJson(dtSec, "SectionName");
+
+                lblCmpSecCount.Text = dtSec.Rows.Count.ToString();
+
+                // Best by marks
+                DataRow bestMarks = GetBestRow(dtSec, "AvgMarks");
+                lblCmpSecBest.Text = bestMarks != null
+                    ? bestMarks["SectionName"].ToString() + " (" + bestMarks["AvgMarks"] + ")"
+                    : "-";
+
+                // Best by attendance
+                DataRow bestAttend = GetBestRow(dtSec, "AttendancePct");
+                lblCmpSecAttend.Text = bestAttend != null
+                    ? bestAttend["SectionName"].ToString() + " (" + bestAttend["AttendancePct"] + "%)"
+                    : "-";
+
+                // Best by engagement
+                DataRow bestEngage = GetBestRow(dtSec, "VideoViews");
+                lblCmpSecEngage.Text = bestEngage != null
+                    ? bestEngage["SectionName"].ToString() + " (" + bestEngage["VideoViews"] + " views)"
+                    : "-";
+
+                // Auto-insights
+                var secInsights = bl.GenerateSectionInsights(dtSec);
+                rptSecInsights.DataSource = secInsights;
+                rptSecInsights.DataBind();
+
+                pnlSecInsights.Visible = secInsights.Rows.Count > 0;
+                pnlNoSecCompare.Visible = false;
+            }
+            else
+            {
+                pnlSecInsights.Visible = false;
+                pnlNoSecCompare.Visible = true;
+            }
+
+            // ── Subject vs Subject ─────────────────────────────────────
+            DataTable dtSub = bl.GetSubjectCompareData(TeacherId, InstituteId, sessionId);
+            bool hasSub = dtSub != null && dtSub.Rows.Count > 0;
+
+            if (hasSub)
+            {
+                hfSubCompareData.Value = bl.GetCompareJson(dtSub, "SubjectName");
+
+                lblCmpSubCount.Text = dtSub.Rows.Count.ToString();
+
+                DataRow subBestMarks = GetBestRow(dtSub, "AvgMarks");
+                lblCmpSubBest.Text = subBestMarks != null
+                    ? TruncateName(subBestMarks["SubjectName"].ToString(), 12) + " (" + subBestMarks["AvgMarks"] + ")"
+                    : "-";
+
+                DataRow subBestAttend = GetBestRow(dtSub, "AttendancePct");
+                lblCmpSubAttend.Text = subBestAttend != null
+                    ? TruncateName(subBestAttend["SubjectName"].ToString(), 12) + " (" + subBestAttend["AttendancePct"] + "%)"
+                    : "-";
+
+                DataRow subBestEngage = GetBestRow(dtSub, "VideoViews");
+                lblCmpSubEngage.Text = subBestEngage != null
+                    ? TruncateName(subBestEngage["SubjectName"].ToString(), 12) + " (" + subBestEngage["VideoViews"] + " views)"
+                    : "-";
+
+                var subInsights = bl.GenerateSubjectInsights(dtSub);
+                rptSubInsights.DataSource = subInsights;
+                rptSubInsights.DataBind();
+
+                pnlSubInsights.Visible = subInsights.Rows.Count > 0;
+                pnlNoSubCompare.Visible = false;
+            }
+            else
+            {
+                pnlSubInsights.Visible = false;
+                pnlNoSubCompare.Visible = true;
+            }
+        }
+
+        // ── Helpers ──────────────────────────────────────────────────
+        private DataRow GetBestRow(DataTable dt, string col)
+        {
+            if (dt == null || dt.Rows.Count == 0) return null;
+            DataRow best = null;
+            double maxVal = double.MinValue;
+            foreach (DataRow row in dt.Rows)
+            {
+                double val = 0;
+                double.TryParse(row[col]?.ToString(), out val);
+                if (val > maxVal) { maxVal = val; best = row; }
+            }
+            return best;
+        }
+        public string GetRankColorEngagement(int index)
+        {
+            string[] colors = { "#f9a825", "#90a4ae", "#a1887f", "#1565c0", "#388e3c" };
+            return index < colors.Length ? colors[index] : "#1565c0";
+        }
+
+        protected string FormatWatchTime(object seconds)
+        {
+            if (seconds == DBNull.Value || seconds == null) return "0 min";
+            int totalSecs = Convert.ToInt32(seconds);
+            int hours = totalSecs / 3600;
+            int minutes = (totalSecs % 3600) / 60;
+            if (hours > 0) return $"{hours}h {minutes}m";
+            return $"{minutes} min";
+        }
+
+        private void LoadEngagementFilterDropdowns()
+        {
+            ddlEngagementSubject.Items.Clear();
+            ddlEngagementSubject.Items.Add(new ListItem("All Subjects", "0"));
+            int sessionId = Session["CurrentSessionId"] != null
+                            ? Convert.ToInt32(Session["CurrentSessionId"])
+                            : bl.GetCurrentSessionId(InstituteId);
+            DataTable dt = bl.GetTeacherSubjectsForFilter(TeacherId, InstituteId, sessionId);
+            foreach (DataRow row in dt.Rows)
+                ddlEngagementSubject.Items.Add(
+                    new ListItem(row["SubjectName"].ToString(), row["SubjectId"].ToString()));
+        }
+
+        private void LoadContentEngagement()
+        {
+            int sessionId = Session["CurrentSessionId"] != null
+                            ? Convert.ToInt32(Session["CurrentSessionId"])
+                            : bl.GetCurrentSessionId(InstituteId);
+
+            DataTable dtKPIs = bl.GetEngagementKPIs(TeacherId, InstituteId, sessionId, SelEngagementSubjectId);
+            if (dtKPIs.Rows.Count > 0)
+            {
+                DataRow r = dtKPIs.Rows[0];
+                lblTotalViews.Text = r["TotalViews"].ToString();
+                lblAvgWatchPercent.Text = r["AvgWatchPercent"].ToString();
+                lblMostViewedVideo.Text = r["MostViewedVideo"].ToString();
+                lblMostViewedCount.Text = r["MostViewedCount"].ToString();
+                lblTotalVideosEngaged.Text = r["TotalVideos"].ToString();
+                lblViewsTrend.Text = r["ViewsTrend"].ToString();
+            }
+
+            DataTable dtChart = bl.GetVideoEngagementData(TeacherId, InstituteId, sessionId, SelEngagementSubjectId);
+            hfEngagementData.Value = bl.GetEngagementChartJson(dtChart);
+
+            DataTable dtTop = bl.GetTopVideos(TeacherId, InstituteId, sessionId, SelEngagementSubjectId);
+            bool hasTop = dtTop.Rows.Count > 0;
+            rptTopVideos.DataSource = dtTop;
+            rptTopVideos.DataBind();
+            pnlTopVideos.Visible = hasTop;
+            pnlNoTopVideos.Visible = !hasTop;
+
+            DataTable dtLow = bl.GetLowPerformingVideos(TeacherId, InstituteId, sessionId, SelEngagementSubjectId);
+            bool hasLow = dtLow.Rows.Count > 0;
+            rptLowVideos.DataSource = dtLow;
+            rptLowVideos.DataBind();
+            pnlLowVideos.Visible = hasLow;
+            pnlNoLowVideos.Visible = !hasLow;
+
+            DataTable dtLeaders = bl.GetWatchTimeLeaders(TeacherId, InstituteId, sessionId, SelEngagementSubjectId);
+            bool hasLeaders = dtLeaders.Rows.Count > 0;
+            rptWatchTimeLeaders.DataSource = dtLeaders;
+            rptWatchTimeLeaders.DataBind();
+            pnlWatchTimeLeaders.Visible = hasLeaders;
+            pnlNoWatchTimeLeaders.Visible = !hasLeaders;
+
+            pnlEngagementKPIs.Visible = dtKPIs.Rows.Count > 0;
+        }
+
+        private string TruncateName(string name, int maxLen)
+        {
+            return name.Length <= maxLen ? name : name.Substring(0, maxLen) + "…";
+        }
         // ── Postbacks ───────────────────────────────────────────────
         protected void ddlStudentSession_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -332,6 +517,16 @@ namespace LMS_Project.Teacher
         {
             SelAsgSubjectId = Convert.ToInt32(ddlAsgSubject.SelectedValue);
             LoadRecentAssignments();
+        }
+        protected void ddlEngagementSubject_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SelEngagementSubjectId = Convert.ToInt32(ddlEngagementSubject.SelectedValue);
+            LoadContentEngagement();
+        }
+
+        protected void ddlEngagementChartType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LoadContentEngagement();
         }
     }
 }

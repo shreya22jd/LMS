@@ -276,7 +276,111 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
 .empty-state i { font-size: 36px; margin-bottom: 8px; display: block;  color: #90caf9; }
 .empty-state p { font-size: 13px; margin: 0; }
 
-
+/* ── Comparison Analytics ── */
+.compare-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    background: #f0f4ff;
+    border-radius: 12px;
+    padding: 5px;
+}
+.compare-tab {
+    flex: 1;
+    padding: 9px 0;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    color: #78909c;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .3px;
+}
+.compare-tab.active {
+    background: #fff;
+    color: #1565c0;
+    box-shadow: 0 2px 8px rgba(21,101,192,.15);
+}
+.compare-tab i { margin-right: 5px; }
+ 
+.metric-toggle {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+.metric-btn {
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1.5px solid #e3f2fd;
+    background: transparent;
+    color: #78909c;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .18s;
+}
+.metric-btn.active { background: #1565c0; color: #fff; border-color: #1565c0; }
+.metric-btn.active.marks  { background: #2e7d32; border-color: #2e7d32; }
+.metric-btn.active.attend { background: #ef6c00; border-color: #ef6c00; }
+.metric-btn.active.engage { background: #5e35b1; border-color: #5e35b1; }
+ 
+.compare-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+}
+.compare-kpi {
+    border-radius: 10px;
+    padding: 11px 13px;
+    text-align: center;
+}
+.compare-kpi .ck-label {
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px;
+    margin-bottom: 3px;
+}
+.compare-kpi .ck-val {
+    font-size: 22px; font-weight: 800; line-height: 1;
+}
+.compare-kpi .ck-sub { font-size: 10px; margin-top: 2px; }
+ 
+.ck-blue   { background:#e3f2fd; }
+.ck-blue   .ck-label, .ck-blue   .ck-val { color:#1565c0; }
+.ck-blue   .ck-sub { color:#90a4ae; }
+ 
+.ck-green  { background:#e8f5e9; }
+.ck-green  .ck-label, .ck-green  .ck-val { color:#2e7d32; }
+.ck-green  .ck-sub { color:#90a4ae; }
+ 
+.ck-orange { background:#fff3e0; }
+.ck-orange .ck-label, .ck-orange .ck-val { color:#ef6c00; }
+.ck-orange .ck-sub { color:#90a4ae; }
+ 
+.ck-purple { background:#ede7f6; }
+.ck-purple .ck-label, .ck-purple .ck-val { color:#5e35b1; }
+.ck-purple .ck-sub { color:#90a4ae; }
+ 
+.insight-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #e3f2fd; color: #1565c0;
+    border-radius: 20px; padding: 5px 13px;
+    font-size: 11px; font-weight: 700;
+    margin: 3px 3px 3px 0;
+}
+.insight-chip.warn { background:#fff3e0; color:#ef6c00; }
+.insight-chip.good { background:#e8f5e9; color:#2e7d32; }
+/* ── Content Engagement Styles ── */
+.engagement-metric-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.engagement-metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
 </style>
 </asp:Content>
 
@@ -939,13 +1043,403 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
         </div>
     </div>
 </div>
+  <%-- ══ COMPARISON ANALYTICS SECTION ══ --%>
+<div class="row g-3 mt-2">
+    <div class="col-12">
+        <div class="panel-card">
+ 
+            <%-- Header --%>
+            <div class="section-header mb-2">
+                <h6><i class="fas fa-chart-bar me-2"></i>Comparison Analytics</h6>
+            </div>
+            <p style="font-size:12px;color:#90a4ae;margin:-6px 0 16px;">
+                Compare sections or subjects across attendance, marks, and engagement.
+            </p>
+ 
+            <%-- Tab switcher --%>
+            <div class="compare-tabs">
+                <button type="button" class="compare-tab active" id="tabSec" onclick="switchCompareTab('section'); return false;">
+                    <i class="fas fa-layer-group"></i>Section vs Section
+                </button>
+                <button type="button" class="compare-tab" id="tabSub" onclick="switchCompareTab('subject'); return false;">
+                    <i class="fas fa-book-open"></i>Subject vs Subject
+                </button>
+            </div>
+ 
+            <%-- Metric toggles --%>
+            <div class="metric-toggle">
+                <button type="button" class="metric-btn active marks" id="btnMarks" onclick="switchMetric('marks'); return false;">
+                    <i class="fas fa-star me-1"></i>Marks
+                </button>
+                <button type="button" class="metric-btn attend" id="btnAttend" onclick="switchMetric('attendance'); return false;">
+                    <i class="fas fa-clipboard-check me-1"></i>Attendance
+                </button>
+                <button type="button" class="metric-btn engage" id="btnEngage" onclick="switchMetric('engagement'); return false;">
+                    <i class="fas fa-play-circle me-1"></i>Engagement
+                </button>
+            </div>
+ 
+            <%-- ── SECTION vs SECTION panel ── --%>
+            <div id="pnlCompareSections">
+ 
+                <%-- KPI row --%>
+                <asp:HiddenField ID="hfSecCompareData" runat="server" ClientIDMode="Static" />
+ 
+                <div class="compare-kpi-grid" id="secKpiRow">
+                    <div class="compare-kpi ck-blue">
+                        <div class="ck-label">Sections</div>
+                        <div class="ck-val"><asp:Label ID="lblCmpSecCount" runat="server" Text="0" /></div>
+                        <div class="ck-sub">being compared</div>
+                    </div>
+                    <div class="compare-kpi ck-green">
+                        <div class="ck-label">Best Section</div>
+                        <div class="ck-val" style="font-size:16px;"><asp:Label ID="lblCmpSecBest" runat="server" Text="-" /></div>
+                        <div class="ck-sub">highest avg marks</div>
+                    </div>
+                    <div class="compare-kpi ck-orange">
+                        <div class="ck-label">Best Attendance</div>
+                        <div class="ck-val" style="font-size:16px;"><asp:Label ID="lblCmpSecAttend" runat="server" Text="-" /></div>
+                        <div class="ck-sub">% avg attendance</div>
+                    </div>
+                    <div class="compare-kpi ck-purple">
+                        <div class="ck-label">Most Engaged</div>
+                        <div class="ck-val" style="font-size:16px;"><asp:Label ID="lblCmpSecEngage" runat="server" Text="-" /></div>
+                        <div class="ck-sub">by video views</div>
+                    </div>
+                </div>
+ 
+                <%-- Auto-insights --%>
+                <asp:Panel ID="pnlSecInsights" runat="server">
+                    <div style="margin-bottom:14px;">
+                        <asp:Repeater ID="rptSecInsights" runat="server">
+                            <ItemTemplate>
+                                <span class="insight-chip <%# Eval("CssClass") %>">
+                                    <i class="fas <%# Eval("Icon") %>"></i>
+                                    <%# Eval("Message") %>
+                                </span>
+                            </ItemTemplate>
+                        </asp:Repeater>
+                    </div>
+                </asp:Panel>
+ 
+                <%-- Chart --%>
+                <div style="position:relative;height:300px;">
+                    <canvas id="secCompareChart"
+                            role="img"
+                            aria-label="Bar chart comparing sections across selected metric"></canvas>
+                </div>
+ 
+                <asp:Panel ID="pnlNoSecCompare" runat="server" Visible="false">
+                    <div class="empty-state">
+                        <i class="fas fa-layer-group"></i>
+                        <p>No section comparison data available yet.</p>
+                    </div>
+                </asp:Panel>
+ 
+            </div>
+ 
+            <%-- ── SUBJECT vs SUBJECT panel ── --%>
+            <div id="pnlCompareSubjects" style="display:none;"> 
+                <asp:HiddenField ID="hfSubCompareData" runat="server" ClientIDMode="Static" />
+ 
+                <div class="compare-kpi-grid" id="subKpiRow">
+                    <div class="compare-kpi ck-blue">
+                        <div class="ck-label">Subjects</div>
+                        <div class="ck-val"><asp:Label ID="lblCmpSubCount" runat="server" Text="0" /></div>
+                        <div class="ck-sub">being compared</div>
+                    </div>
+                    <div class="compare-kpi ck-green">
+                        <div class="ck-label">Best Subject</div>
+                        <div class="ck-val" style="font-size:14px;"><asp:Label ID="lblCmpSubBest" runat="server" Text="-" /></div>
+                        <div class="ck-sub">highest avg marks</div>
+                    </div>
+                    <div class="compare-kpi ck-orange">
+                        <div class="ck-label">Best Attendance</div>
+                        <div class="ck-val" style="font-size:14px;"><asp:Label ID="lblCmpSubAttend" runat="server" Text="-" /></div>
+                        <div class="ck-sub">% avg rate</div>
+                    </div>
+                    <div class="compare-kpi ck-purple">
+                        <div class="ck-label">Most Watched</div>
+                        <div class="ck-val" style="font-size:14px;"><asp:Label ID="lblCmpSubEngage" runat="server" Text="-" /></div>
+                        <div class="ck-sub">by video views</div>
+                    </div>
+                </div>
+ 
+                <asp:Panel ID="pnlSubInsights" runat="server">
+                    <div style="margin-bottom:14px;">
+                        <asp:Repeater ID="rptSubInsights" runat="server">
+                            <ItemTemplate>
+                                <span class="insight-chip <%# Eval("CssClass") %>">
+                                    <i class="fas <%# Eval("Icon") %>"></i>
+                                    <%# Eval("Message") %>
+                                </span>
+                            </ItemTemplate>
+                        </asp:Repeater>
+                    </div>
+                </asp:Panel>
+ 
+                <div style="position:relative;height:300px;">
+                    <canvas id="subCompareChart"
+                            role="img"
+                            aria-label="Bar chart comparing subjects across selected metric"></canvas>
+                </div>
+ 
+                <asp:Panel ID="pnlNoSubCompare" runat="server" Visible="false">
+                    <div class="empty-state">
+                        <i class="fas fa-book-open"></i>
+                        <p>No subject comparison data available yet.</p>
+                    </div>
+                </asp:Panel>
+ 
+            </div>
+ 
+        </div>
+    </div>
+</div>
+<%-- ══ CONTENT ENGAGEMENT SECTION ══ --%>
+<div class="row g-3 mt-2">
+    <div class="col-12">
+        <div class="panel-card">
+            <div class="section-header mb-2">
+                <h6><i class="fas fa-play-circle me-2"></i>Content Engagement Analytics</h6>
+                <a href="Subjects.aspx" style="color:#1976d2;">View all videos &rarr;</a>
+            </div>
+            <p style="font-size:12px;color:#90a4ae;margin:-6px 0 16px;">
+                Track video engagement metrics including views, watch time, and student progress.
+            </p>
 
+            <%-- Filter Row --%>
+            <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-filter" style="color:#78909c;"></i>
+                    <asp:DropDownList ID="ddlEngagementSubject" runat="server"
+                        CssClass="form-select form-select-sm" Style="width:180px;"
+                        AutoPostBack="true"
+                        OnSelectedIndexChanged="ddlEngagementSubject_SelectedIndexChanged">
+                    </asp:DropDownList>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-chart-line" style="color:#78909c;"></i>
+                    <asp:DropDownList ID="ddlEngagementChartType" runat="server"
+                        CssClass="form-select form-select-sm" Style="width:150px;"
+                        AutoPostBack="true"
+                        OnSelectedIndexChanged="ddlEngagementChartType_SelectedIndexChanged">
+                        <asp:ListItem Text="Bar Chart"      Value="bar"           Selected="True" />
+                        <asp:ListItem Text="Horizontal Bar" Value="horizontalBar" />
+                        <asp:ListItem Text="Pie Chart"      Value="pie" />
+                    </asp:DropDownList>
+                </div>
+            </div>
 
+            <%-- KPI Cards --%>
+            <asp:Panel ID="pnlEngagementKPIs" runat="server">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3 col-6">
+                        <div class="engagement-metric-card" style="background:linear-gradient(135deg,#e3f2fd,#bbdef5);border-radius:16px;padding:18px;text-align:center;">
+                            <i class="fas fa-eye" style="font-size:28px;color:#1565c0;margin-bottom:8px;display:inline-block;"></i>
+                            <div style="font-size:11px;font-weight:700;color:#1565c0;text-transform:uppercase;letter-spacing:.5px;">Total Views</div>
+                            <div style="font-size:32px;font-weight:800;color:#0d47a1;">
+                                <asp:Label ID="lblTotalViews" runat="server" Text="0" />
+                            </div>
+                            <div style="font-size:11px;color:#78909c;">
+                                <i class="fas fa-chart-line"></i>
+                                <asp:Label ID="lblViewsTrend" runat="server" Text="+0%" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="engagement-metric-card" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:16px;padding:18px;text-align:center;">
+                            <i class="fas fa-hourglass-half" style="font-size:28px;color:#2e7d32;margin-bottom:8px;display:inline-block;"></i>
+                            <div style="font-size:11px;font-weight:700;color:#2e7d32;text-transform:uppercase;letter-spacing:.5px;">Avg Watch %</div>
+                            <div style="font-size:32px;font-weight:800;color:#1b5e20;">
+                                <asp:Label ID="lblAvgWatchPercent" runat="server" Text="0" />%
+                            </div>
+                            <div style="font-size:11px;color:#78909c;">
+                                <i class="fas fa-clock"></i> average completion
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="engagement-metric-card" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);border-radius:16px;padding:18px;text-align:center;">
+                            <i class="fas fa-trophy" style="font-size:28px;color:#ef6c00;margin-bottom:8px;display:inline-block;"></i>
+                            <div style="font-size:11px;font-weight:700;color:#ef6c00;text-transform:uppercase;letter-spacing:.5px;">Most Viewed</div>
+                            <div style="font-size:16px;font-weight:800;color:#e65100;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                <asp:Label ID="lblMostViewedVideo" runat="server" Text="-" />
+                            </div>
+                            <div style="font-size:11px;color:#78909c;">
+                                <asp:Label ID="lblMostViewedCount" runat="server" Text="0" /> views
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="engagement-metric-card" style="background:linear-gradient(135deg,#ede7f6,#d1c4e9);border-radius:16px;padding:18px;text-align:center;">
+                            <i class="fas fa-video" style="font-size:28px;color:#5e35b1;margin-bottom:8px;display:inline-block;"></i>
+                            <div style="font-size:11px;font-weight:700;color:#5e35b1;text-transform:uppercase;letter-spacing:.5px;">Total Videos</div>
+                            <div style="font-size:32px;font-weight:800;color:#4527a0;">
+                                <asp:Label ID="lblTotalVideosEngaged" runat="server" Text="0" />
+                            </div>
+                            <div style="font-size:11px;color:#78909c;">
+                                <i class="fas fa-video"></i> uploaded this session
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </asp:Panel>
+
+            <%-- Chart + Top Videos --%>
+            <div class="row g-3">
+                <div class="col-lg-7">
+                    <div style="background:#fafafa;border-radius:12px;padding:16px;">
+                        <div style="font-size:12px;font-weight:700;color:#78909c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">
+                            <i class="fas fa-chart-bar me-2"></i>Video Analytics
+                        </div>
+                        <div style="position:relative;height:350px;">
+                            <canvas id="engagementChart" role="img" aria-label="Video engagement chart"></canvas>
+                        </div>
+                        <asp:HiddenField ID="hfEngagementData" runat="server" ClientIDMode="Static" />
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div style="background:#f5f5f5;border-radius:12px;padding:16px;height:100%;">
+                        <div style="font-size:12px;font-weight:700;color:#2e7d32;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">
+                            <i class="fas fa-fire me-2" style="color:#ef6c00;"></i>Most Watched Videos
+                        </div>
+                        <asp:Panel ID="pnlTopVideos" runat="server">
+                            <asp:Repeater ID="rptTopVideos" runat="server">
+                                <ItemTemplate>
+                                    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #e0e0e0;">
+                                        <div style="width:32px;height:32px;border-radius:8px;background:<%# GetRankColorEngagement(Container.ItemIndex) %>;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <i class="fas fa-play" style="font-size:12px;color:#fff;"></i>
+                                        </div>
+                                        <div style="flex:1;min-width:0;">
+                                            <div style="font-size:13px;font-weight:700;color:#263238;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                                <%# Eval("Title") %>
+                                            </div>
+                                            <div style="font-size:11px;color:#90a4ae;">
+                                                <i class="fas fa-eye me-1"></i><%# Eval("ViewCount") %> views
+                                            </div>
+                                        </div>
+                                        <div style="text-align:right;flex-shrink:0;">
+                                            <div style="font-size:14px;font-weight:800;color:#ef6c00;">
+                                                <%# Eval("WatchPercent") %>%
+                                            </div>
+                                            <div style="font-size:10px;color:#90a4ae;">avg watch</div>
+                                        </div>
+                                    </div>
+                                </ItemTemplate>
+                            </asp:Repeater>
+                        </asp:Panel>
+                        <asp:Panel ID="pnlNoTopVideos" runat="server" Visible="false">
+                            <div class="empty-state">
+                                <i class="fas fa-video-slash"></i>
+                                <p>No video data available yet.</p>
+                            </div>
+                        </asp:Panel>
+                    </div>
+                </div>
+            </div>
+
+            <%-- Least Watched + Watch Time Leaders --%>
+            <div class="row g-3 mt-3">
+                <div class="col-md-6">
+                    <div style="background:#fff8f5;border-radius:12px;padding:16px;">
+                        <div style="font-size:12px;font-weight:700;color:#c62828;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Least Watched (Needs Attention)
+                        </div>
+                        <asp:Panel ID="pnlLowVideos" runat="server">
+                            <asp:Repeater ID="rptLowVideos" runat="server">
+                                <ItemTemplate>
+                                    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #ffccbc;">
+                                        <div style="width:32px;height:32px;border-radius:8px;background:#ffccbc;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <i class="fas fa-eye-slash" style="font-size:12px;color:#bf360c;"></i>
+                                        </div>
+                                        <div style="flex:1;min-width:0;">
+                                            <div style="font-size:13px;font-weight:700;color:#263238;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                                <%# Eval("Title") %>
+                                            </div>
+                                            <div style="font-size:11px;color:#90a4ae;">
+                                                <i class="fas fa-eye me-1"></i><%# Eval("ViewCount") %> views
+                                                &nbsp;|&nbsp;
+                                                <i class="fas fa-chart-line"></i> <%# Eval("WatchPercent") %>% watch
+                                            </div>
+                                        </div>
+                                        <div style="text-align:right;flex-shrink:0;">
+                                            <a href='CourseVideos.aspx?VideoId=<%# Eval("VideoId") %>'
+                                               class="btn-view" style="padding:4px 12px;font-size:11px;">
+                                                Improve <i class="fas fa-arrow-right ms-1"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </ItemTemplate>
+                            </asp:Repeater>
+                        </asp:Panel>
+                        <asp:Panel ID="pnlNoLowVideos" runat="server" Visible="false">
+                            <div class="empty-state">
+                                <i class="fas fa-check-circle" style="color:#4caf50;"></i>
+                                <p>All videos are performing well!</p>
+                            </div>
+                        </asp:Panel>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div style="background:#e8f5e9;border-radius:12px;padding:16px;">
+                        <div style="font-size:12px;font-weight:700;color:#2e7d32;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">
+                            <i class="fas fa-award me-2"></i>Watch Time Leaders
+                        </div>
+                        <asp:Panel ID="pnlWatchTimeLeaders" runat="server">
+                            <asp:Repeater ID="rptWatchTimeLeaders" runat="server">
+                                <ItemTemplate>
+                                    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #c8e6c9;">
+                                        <div style="width:36px;text-align:center;font-size:14px;font-weight:800;color:#f9a825;">
+                                            #<%# Container.ItemIndex + 1 %>
+                                        </div>
+                                        <div style="flex:1;min-width:0;">
+                                            <div style="font-size:13px;font-weight:700;color:#263238;">
+                                                <%# Eval("StudentName") %>
+                                            </div>
+                                            <div style="font-size:11px;color:#90a4ae;">
+                                                <i class="fas fa-clock me-1"></i><%# FormatWatchTime(Eval("TotalWatchSeconds")) %>
+                                            </div>
+                                        </div>
+                                        <div style="text-align:right;">
+                                            <div style="font-size:14px;font-weight:800;color:#2e7d32;">
+                                                <%# Eval("AvgWatchPercent") %>%
+                                            </div>
+                                            <div style="font-size:10px;color:#90a4ae;">avg completion</div>
+                                        </div>
+                                    </div>
+                                </ItemTemplate>
+                            </asp:Repeater>
+                        </asp:Panel>
+                        <asp:Panel ID="pnlNoWatchTimeLeaders" runat="server" Visible="false">
+                            <div class="empty-state">
+                                <i class="fas fa-user-graduate"></i>
+                                <p>No watch time data available.</p>
+                            </div>
+                        </asp:Panel>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 <%-- Chart.js (only loaded once, safe to add here) --%>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-    // ── Subject Chart ────────────────────────────────────────────
+    // Global chart instances
     var chartInstance = null;
+    var asgChartInstance = null;
+    var divisionChartInstance = null;
+    var avgMarksChartInstance = null;
+
+    // Comparison Analytics variables
+    var _cmpTab = 'section';
+    var _cmpMetric = 'marks';
+    var _secData = null;
+    var _subData = null;
+    var _secChart = null;
+    var _subChart = null;
 
     function renderSubjectChart() {
         var hf = document.getElementById('<%= hfChartData.ClientID %>');
@@ -995,7 +1489,6 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
         ctx.style.cursor = 'pointer';
     }
 
-    // ── Assignment View Switcher ──────────────────────────────────
     function setAsgView(v) {
         ['btnAsgList', 'btnAsgChart'].forEach(function (id) {
             var el = document.getElementById(id);
@@ -1007,12 +1500,10 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
 
         var list = document.getElementById('<%= pnlAssignments.ClientID %>');
         var chart = document.getElementById('<%= pnlAsgChart.ClientID %>');
-        if (list)  list.style.display  = (v === 'list')  ? '' : 'none';
-        if (chart) chart.style.display = (v === 'chart') ? '' : 'none';
+        if (list) list.style.display = (v === 'list') ? 'block' : 'none';
+        if (chart) chart.style.display = (v === 'chart') ? 'block' : 'none';
         if (v === 'chart') renderAsgChart();
     }
-
-    var asgChartInstance = null;
 
     function renderAsgChart() {
         var hf = document.getElementById('<%= hfAsgChartData.ClientID %>');
@@ -1028,17 +1519,36 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
             data: {
                 labels: data.map(function (d) { return d.Title; }),
                 datasets: [
-                    { label: 'Submitted', data: data.map(function (d) { return d.SubmissionCount; }),
-                      backgroundColor: '#1565c0cc', borderColor: '#1565c0', borderWidth: 2, borderRadius: 6 },
-                    { label: 'Pending',   data: data.map(function (d) { return d.Pending; }),
-                      backgroundColor: '#ef6c00cc', borderColor: '#ef6c00', borderWidth: 2, borderRadius: 6 }
+                    {
+                        label: 'Submitted',
+                        data: data.map(function (d) { return d.SubmissionCount; }),
+                        backgroundColor: '#1565c0cc',
+                        borderColor: '#1565c0',
+                        borderWidth: 2,
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Pending',
+                        data: data.map(function (d) { return d.Pending; }),
+                        backgroundColor: '#ef6c00cc',
+                        borderColor: '#ef6c00',
+                        borderWidth: 2,
+                        borderRadius: 6
+                    }
                 ]
             },
             options: {
-                responsive: true, maintainAspectRatio: false,
+                responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: { display: true, position: 'top', labels: { font: { size: 11 } } },
-                    tooltip: { callbacks: { label: function (c) { return ' ' + c.dataset.label + ': ' + c.parsed.y + ' students'; } } }
+                    tooltip: {
+                        callbacks: {
+                            label: function (c) {
+                                return ' ' + c.dataset.label + ': ' + c.parsed.y + ' students';
+                            }
+                        }
+                    }
                 },
                 scales: {
                     x: { ticks: { font: { size: 10 }, maxRotation: 30 }, grid: { display: false } },
@@ -1048,7 +1558,6 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
         });
     }
 
-    // ── Division Chart ────────────────────────────────────────────
     function renderDivisionChart() {
         var hf = document.getElementById('<%= hfDivisionData.ClientID %>');
         if (!hf || !hf.value) return;
@@ -1056,9 +1565,11 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
         try { data = JSON.parse(hf.value); } catch (e) { return; }
         var ctx = document.getElementById('divisionChart');
         if (!ctx) return;
+        
+        if (divisionChartInstance) { divisionChartInstance.destroy(); divisionChartInstance = null; }
 
         var colors = ['#1565c0','#2e7d32','#ef6c00','#5e35b1','#0288d1','#c62828'];
-        new Chart(ctx, {
+        divisionChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: data.map(function (d) { return d.Division; }),
@@ -1066,14 +1577,24 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
                     label: 'Students',
                     data: data.map(function (d) { return d.StudentCount; }),
                     backgroundColor: data.map(function (_, i) { return colors[i % colors.length] + 'cc'; }),
-                    borderColor:     data.map(function (_, i) { return colors[i % colors.length]; }),
-                    borderWidth: 2, borderRadius: 6
+                    borderColor: data.map(function (_, i) { return colors[i % colors.length]; }),
+                    borderWidth: 2, 
+                    borderRadius: 6
                 }]
             },
             options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false },
-                    tooltip: { callbacks: { label: function (c) { return ' ' + c.parsed.y + ' students'; } } } },
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: { 
+                        callbacks: { 
+                            label: function (c) { 
+                                return ' ' + c.parsed.y + ' students'; 
+                            } 
+                        } 
+                    } 
+                },
                 scales: {
                     y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: '#e3f2fd' } },
                     x: { ticks: { font: { size: 10 }, maxRotation: 30 }, grid: { display: false } }
@@ -1082,7 +1603,6 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
         });
     }
 
-    // ── Avg Marks Pie Chart ───────────────────────────────────────
     function renderAvgMarksChart() {
         var hf = document.getElementById('<%= hfAvgMarksData.ClientID %>');
         if (!hf || !hf.value) return;
@@ -1090,8 +1610,10 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
         try { data = JSON.parse(hf.value); } catch (e) { return; }
         var ctx = document.getElementById('avgMarksChart');
         if (!ctx) return;
+        
+        if (avgMarksChartInstance) { avgMarksChartInstance.destroy(); avgMarksChartInstance = null; }
 
-        new Chart(ctx, {
+        avgMarksChartInstance = new Chart(ctx, {
             type: 'pie',
             data: {
                 labels: data.map(function (d) { return d.SubjectName; }),
@@ -1103,10 +1625,17 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
                 }]
             },
             options: {
-                responsive: true, maintainAspectRatio: false,
+                responsive: true, 
+                maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
-                    tooltip: { callbacks: { label: function (c) { return ' ' + c.label + ': ' + c.parsed + ' avg marks'; } } }
+                    tooltip: { 
+                        callbacks: { 
+                            label: function (c) { 
+                                return ' ' + c.label + ': ' + c.parsed + ' avg marks'; 
+                            } 
+                        } 
+                    }
                 }
             }
         });
@@ -1142,7 +1671,7 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
                     return;
                 }
 
-                // ── KPIs ──
+                // KPIs
                 var total = data.length;
                 var sumMarks = data.reduce(function (s, d) { return s + d.MarksObtained; }, 0);
                 var avg = Math.round(sumMarks / total);
@@ -1155,9 +1684,9 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
                 document.getElementById('modalLowest').textContent = lowest;
                 document.getElementById('modalKpiRow').style.display = '';
 
-                // ── Chart ──
+                // Chart
                 var canvas = document.getElementById('studentMarksChart');
-                canvas.style.display = '';
+                canvas.style.display = 'block';
 
                 if (studentMarksChartInstance) {
                     studentMarksChartInstance.destroy();
@@ -1169,7 +1698,6 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
                 var maxMarks = data.map(function (d) { return d.MaxMarks; });
                 var pcts = data.map(function (d) { return d.Percentage; });
 
-                // Color bar by performance
                 var barColors = pcts.map(function (p) {
                     if (p >= 80) return '#2e7d32cc';
                     if (p >= 60) return '#1565c0cc';
@@ -1245,7 +1773,7 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
                     }
                 });
 
-                // ── Table ──
+                // Table
                 var tbody = document.getElementById('modalAsgTableBody');
                 tbody.innerHTML = '';
                 data.forEach(function (d, i) {
@@ -1273,11 +1801,276 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
             });
     }
 
-    // ── Init ─────────────────────────────────────────────────────
+    // ── COMPARISON ANALYTICS FUNCTIONS ──
+    function initCompareData() {
+        var hfSec = document.getElementById('hfSecCompareData');
+        var hfSub = document.getElementById('hfSubCompareData');
+        try { 
+            if (hfSec && hfSec.value) _secData = JSON.parse(hfSec.value); 
+            console.log('Section data loaded:', _secData);
+        } catch (e) { console.error('Error parsing section data:', e); }
+        try { 
+            if (hfSub && hfSub.value) _subData = JSON.parse(hfSub.value); 
+            console.log('Subject data loaded:', _subData);
+        } catch (e) { console.error('Error parsing subject data:', e); }
+    }
+
+    function switchCompareTab(tab) {
+        console.log('Switching tab to:', tab);
+        _cmpTab = tab;
+
+        var tabSec = document.getElementById('tabSec');
+        var tabSub = document.getElementById('tabSub');
+        if (tabSec) tabSec.className = 'compare-tab' + (tab === 'section' ? ' active' : '');
+        if (tabSub) tabSub.className = 'compare-tab' + (tab === 'subject' ? ' active' : '');
+
+        var pSec = document.getElementById('pnlCompareSections');
+        var pSub = document.getElementById('pnlCompareSubjects');
+        
+        if (pSec) pSec.style.display = (tab === 'section') ? 'block' : 'none';
+        if (pSub) pSub.style.display = (tab === 'subject') ? 'block' : 'none';
+        
+        renderCmpChart();
+        return false;
+    }
+
+    function switchMetric(metric) {
+        console.log('Switching metric to:', metric);
+        _cmpMetric = metric;
+
+        var btnMarks = document.getElementById('btnMarks');
+        var btnAttend = document.getElementById('btnAttend');
+        var btnEngage = document.getElementById('btnEngage');
+        
+        if (btnMarks) btnMarks.className = 'metric-btn marks' + (metric === 'marks' ? ' active' : '');
+        if (btnAttend) btnAttend.className = 'metric-btn attend' + (metric === 'attendance' ? ' active' : '');
+        if (btnEngage) btnEngage.className = 'metric-btn engage' + (metric === 'engagement' ? ' active' : '');
+
+        renderCmpChart();
+        return false;
+    }
+
+    function cmpMetricField() {
+        if (_cmpMetric === 'marks') return 'AvgMarks';
+        if (_cmpMetric === 'attendance') return 'AttendancePct';
+        return 'VideoViews';
+    }
+
+    function cmpMetricLabel() {
+        if (_cmpMetric === 'marks') return 'Avg Marks';
+        if (_cmpMetric === 'attendance') return 'Attendance %';
+        return 'Video Views';
+    }
+
+    function cmpMetricColor() {
+        if (_cmpMetric === 'marks') return '#2e7d32';
+        if (_cmpMetric === 'attendance') return '#ef6c00';
+        return '#5e35b1';
+    }
+
+    function renderCmpChart() {
+        if (_cmpTab === 'section') renderCmpSectionChart();
+        else renderCmpSubjectChart();
+    }
+
+    function renderCmpSectionChart() {
+        var ctx = document.getElementById('secCompareChart');
+        if (!ctx) return;
+
+        if (_secChart) { _secChart.destroy(); _secChart = null; }
+
+        if (!_secData || _secData.length === 0) {
+            ctx.style.display = 'none';
+            var emp = document.getElementById('<%= pnlNoSecCompare.ClientID %>');
+            if (emp) emp.style.display = 'block';
+            return;
+        }
+
+        ctx.style.display = 'block';
+        var emp2 = document.getElementById('<%= pnlNoSecCompare.ClientID %>');
+        if (emp2) emp2.style.display = 'none';
+
+        var field = cmpMetricField();
+        var mc = cmpMetricColor();
+        var labels = _secData.map(function (d) { return d.SectionName || 'No Section'; });
+        var vals = _secData.map(function (d) { return parseFloat(d[field]) || 0; });
+        var maxVal = vals.length ? Math.max.apply(null, vals) : 1;
+
+        _secChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: cmpMetricLabel(),
+                    data: vals,
+                    backgroundColor: vals.map(function (v) { return v === maxVal ? mc + 'ee' : mc + '44'; }),
+                    borderColor: vals.map(function (v) { return v === maxVal ? mc : mc + '99'; }),
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: buildCmpOptions()
+        });
+    }
+
+    function renderCmpSubjectChart() {
+        var ctx = document.getElementById('subCompareChart');
+        if (!ctx) return;
+
+        if (_subChart) { _subChart.destroy(); _subChart = null; }
+
+        if (!_subData || _subData.length === 0) {
+            ctx.style.display = 'none';
+            var emp = document.getElementById('<%= pnlNoSubCompare.ClientID %>');
+            if (emp) emp.style.display = 'block';
+            return;
+        }
+
+        ctx.style.display = 'block';
+        var emp2 = document.getElementById('<%= pnlNoSubCompare.ClientID %>');
+        if (emp2) emp2.style.display = 'none';
+
+        var field = cmpMetricField();
+        var mc = cmpMetricColor();
+        var labels = _subData.map(function (d) { return d.SubjectName; });
+        var vals = _subData.map(function (d) { return parseFloat(d[field]) || 0; });
+        var maxVal = vals.length ? Math.max.apply(null, vals) : 1;
+
+        _subChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: cmpMetricLabel(),
+                    data: vals,
+                    backgroundColor: vals.map(function (v) { return v === maxVal ? mc + 'ee' : mc + '44'; }),
+                    borderColor: vals.map(function (v) { return v === maxVal ? mc : mc + '99'; }),
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: buildCmpOptions()
+        });
+    }
+
+    function buildCmpOptions() {
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function (c) {
+                            var v = c.parsed.y;
+                            if (_cmpMetric === 'attendance') return ' ' + v + '%';
+                            if (_cmpMetric === 'engagement') return ' ' + v + ' views';
+                            return ' Avg: ' + v + ' marks';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: { size: 11 },
+                        callback: function (v) {
+                            if (_cmpMetric === 'attendance') return v + '%';
+                            return v;
+                        }
+                    },
+                    grid: { color: '#e3f2fd' }
+                },
+                x: {
+                    ticks: { font: { size: 11 }, maxRotation: 30, autoSkip: false },
+                    grid: { display: false }
+                }
+            }
+        };
+    }
+
+    // Initialize everything when page loads
     document.addEventListener('DOMContentLoaded', function () {
         renderDivisionChart();
         renderSubjectChart();
         renderAvgMarksChart();
+        initCompareData();
+        renderCmpChart();
+        renderEngagementChart();
     });
+    // ── Engagement Chart ────────────────────────────────────────
+    var engagementChart = null;
+
+    function renderEngagementChart() {
+        var hf = document.getElementById('hfEngagementData');
+        if (!hf || !hf.value) return;
+        var data;
+        try { data = JSON.parse(hf.value); } catch (e) { return; }
+
+        var ctx = document.getElementById('engagementChart');
+        if (!ctx) return;
+
+        if (engagementChart) { engagementChart.destroy(); engagementChart = null; }
+
+        var chartTypeEl = document.getElementById('<%= ddlEngagementChartType.ClientID %>');
+    var chartType = chartTypeEl ? chartTypeEl.value : 'bar';
+
+    var colors = ['#1565c0', '#2e7d32', '#ef6c00', '#5e35b1', '#00838f', '#c62828', '#4527a0'];
+
+    var chartData = {
+        labels: data.map(function (d) { return d.VideoName; }),
+        datasets: [{
+            label: 'Avg Watch %',
+            data: data.map(function (d) { return d.WatchPercent; }),
+            backgroundColor: data.map(function (_, i) { return colors[i % colors.length] + 'cc'; }),
+            borderColor: data.map(function (_, i) { return colors[i % colors.length]; }),
+            borderWidth: 2,
+            borderRadius: chartType !== 'pie' ? 8 : 0
+        }]
+    };
+
+    var scalesConfig = chartType !== 'pie' ? {
+        y: {
+            beginAtZero: true,
+            max: 100,
+            ticks: { callback: function (v) { return v + '%'; }, font: { size: 11 } },
+            grid: { color: '#e3f2fd' }
+        },
+        x: {
+            ticks: { font: { size: 10 }, maxRotation: 35 },
+            grid: { display: false }
+        }
+    } : {};
+
+    var options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: chartType === 'pie', position: 'top', labels: { font: { size: 11 } } },
+            tooltip: {
+                callbacks: {
+                    label: function (c) {
+                        if (chartType === 'pie') {
+                            var total = c.dataset.data.reduce(function (a, v) { return a + v; }, 0);
+                            var pct = ((c.parsed / total) * 100).toFixed(1);
+                            return ' ' + c.label + ': ' + c.parsed + '% (' + pct + '% of total)';
+                        }
+                        return ' ' + c.dataset.label + ': ' + c.parsed.y + '%';
+                    }
+                }
+            }
+        },
+        scales: scalesConfig
+    };
+
+    if (chartType === 'pie') {
+        engagementChart = new Chart(ctx, { type: 'pie', data: chartData, options: options });
+    } else if (chartType === 'horizontalBar') {
+        engagementChart = new Chart(ctx, { type: 'bar', data: chartData, options: Object.assign({}, options, { indexAxis: 'y' }) });
+    } else {
+        engagementChart = new Chart(ctx, { type: 'bar', data: chartData, options: options });
+    }
+}
 </script>
 </asp:Content>
