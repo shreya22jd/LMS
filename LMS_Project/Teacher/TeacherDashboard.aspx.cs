@@ -77,6 +77,8 @@ namespace LMS_Project.Teacher
                 LoadComparisonAnalytics();
                 LoadEngagementFilterDropdowns();
                 LoadContentEngagement();
+                LoadLearningPathProgress();   // move existing call here if not already
+                LoadActivityTracking();        // ← ADD
             }
         }
 
@@ -404,7 +406,42 @@ namespace LMS_Project.Teacher
                 pnlNoSubCompare.Visible = true;
             }
         }
+        private void LoadActivityTracking()
+        {
+            int sessionId = Session["CurrentSessionId"] != null
+                            ? Convert.ToInt32(Session["CurrentSessionId"])
+                            : bl.GetCurrentSessionId(InstituteId);
 
+            // KPIs
+            DataTable dtKpi = bl.GetActivityKPIs(TeacherId, InstituteId);
+            if (dtKpi.Rows.Count > 0)
+            {
+                DataRow r = dtKpi.Rows[0];
+                lblActTodayCount.Text = r["TodayCount"].ToString();
+                lblActWeekCount.Text = r["WeekCount"].ToString();
+                lblActLastActive.Text = r["LastActive"].ToString();
+                lblActActiveDays.Text = r["ActiveDaysThisMonth"].ToString();
+            }
+
+            // Trend data (last 7 days)
+            DataTable dtTrend = bl.GetActivityTrend(TeacherId, InstituteId);
+            hfActivityTrendData.Value = bl.GetActivityTrendJson(dtTrend);
+            pnlActivityChart.Visible = dtTrend.Rows.Count > 0;
+
+            // Recent log
+            DataTable dtLog = bl.GetRecentActivityLog(TeacherId, InstituteId);
+            bool hasLog = dtLog.Rows.Count > 0;
+            rptActivityLog.DataSource = dtLog;
+            rptActivityLog.DataBind();
+            pnlActivityLog.Visible = hasLog;
+            pnlNoActivityLog.Visible = !hasLog;
+
+            // Breakdown chips
+            DataTable dtBreak = bl.GetActivityBreakdown(TeacherId, InstituteId);
+            rptActivityBreakdown.DataSource = dtBreak;
+            rptActivityBreakdown.DataBind();
+            pnlActivityBreakdown.Visible = dtBreak.Rows.Count > 0;
+        }
         // ── Helpers ──────────────────────────────────────────────────
         private DataRow GetBestRow(DataTable dt, string col)
         {
@@ -493,6 +530,172 @@ namespace LMS_Project.Teacher
             pnlEngagementKPIs.Visible = dtKPIs.Rows.Count > 0;
         }
 
+        public string GetActivityIcon(string actionType)
+        {
+            if (string.IsNullOrEmpty(actionType)) return "fa-circle";
+            var t = actionType.ToLower();
+            if (t.Contains("login")) return "fa-sign-in-alt";
+            if (t.Contains("assignment")) return "fa-tasks";
+            if (t.Contains("attendance")) return "fa-clipboard-check";
+            if (t.Contains("video")) return "fa-video";
+            if (t.Contains("upload")) return "fa-upload";
+            if (t.Contains("grade") || t.Contains("mark")) return "fa-star";
+            if (t.Contains("student")) return "fa-user-graduate";
+            if (t.Contains("subject")) return "fa-book-open";
+            if (t.Contains("calendar")) return "fa-calendar-alt";
+            return "fa-bolt";
+        }
+
+        public string GetActivityIconBg(string actionType)
+        {
+            if (string.IsNullOrEmpty(actionType)) return "#90a4ae";
+            var t = actionType.ToLower();
+            if (t.Contains("login")) return "#1565c0";
+            if (t.Contains("assignment")) return "#ef6c00";
+            if (t.Contains("attendance")) return "#2e7d32";
+            if (t.Contains("video")) return "#5e35b1";
+            if (t.Contains("upload")) return "#0288d1";
+            if (t.Contains("grade") || t.Contains("mark")) return "#f9a825";
+            if (t.Contains("student")) return "#00838f";
+            if (t.Contains("subject")) return "#1976d2";
+            if (t.Contains("calendar")) return "#c62828";
+            return "#78909c";
+        }
+        // ── Learning Path Progress ──────────────────────────────────
+        private void LoadLearningPathProgress()
+        {
+            int sessionId = Session["CurrentSessionId"] != null
+                            ? Convert.ToInt32(Session["CurrentSessionId"])
+                            : bl.GetCurrentSessionId(InstituteId);
+
+            DataTable dtSummary = bl.GetLearningPathSummary(TeacherId, InstituteId, sessionId);
+            if (dtSummary.Rows.Count > 0)
+            {
+                DataRow r = dtSummary.Rows[0];
+                lblLpTotalChapters.Text = r["TotalChapters"].ToString();
+                lblLpTotalVideos.Text = r["TotalVideos"].ToString();
+
+                double avgWatch = 0;
+                double.TryParse(r["OverallAvgWatch"].ToString(), out avgWatch);
+                lblLpAvgWatch.Text = avgWatch == Math.Floor(avgWatch)
+                    ? ((int)avgWatch).ToString()
+                    : Math.Round(avgWatch, 1).ToString("0.#");
+
+                double vidComp = 0;
+                double.TryParse(r["VideoCompletionPct"].ToString(), out vidComp);
+                lblLpVideoCompletion.Text = vidComp == Math.Floor(vidComp)
+                    ? ((int)vidComp).ToString()
+                    : Math.Round(vidComp, 1).ToString("0.#");
+            }
+
+            DataTable dtRaw = bl.GetLearningPathProgress(TeacherId, InstituteId, sessionId);
+            bool hasData = dtRaw.Rows.Count > 0;
+            DataTable dtBind = dtRaw;
+
+            if (hasData)
+            {
+                // ── Build clean table with string columns for formatted decimals ──
+                DataTable dtClean = new DataTable();
+                foreach (DataColumn col in dtRaw.Columns)
+                {
+                    if (col.ColumnName == "AvgWatchPercent" || col.ColumnName == "SyllabusCompletionPct")
+                        dtClean.Columns.Add(col.ColumnName, typeof(string));
+                    else
+                        dtClean.Columns.Add(col.ColumnName, col.DataType);
+                }
+
+                // ── Colors for pie slices ──
+                string[] pieColors = { "#1565c0","#2e7d32","#ef6c00","#5e35b1",
+                               "#0288d1","#c62828","#00838f","#4527a0","#f9a825","#388e3c" };
+
+                // ── Build pie data list and legend table ──
+                var pieList = new System.Collections.Generic.List<object>();
+                DataTable dtLegend = new DataTable();
+                dtLegend.Columns.Add("SubjectName", typeof(string));
+                dtLegend.Columns.Add("SyllabusCompletionPct", typeof(string));
+                dtLegend.Columns.Add("Color", typeof(string));
+
+                int colorIdx = 0;
+                foreach (DataRow raw in dtRaw.Rows)
+                {
+                    DataRow clean = dtClean.NewRow();
+                    foreach (DataColumn col in dtRaw.Columns)
+                    {
+                        if (col.ColumnName == "AvgWatchPercent" || col.ColumnName == "SyllabusCompletionPct")
+                        {
+                            double val = 0;
+                            double.TryParse(raw[col.ColumnName].ToString(), out val);
+                            clean[col.ColumnName] = val == Math.Floor(val)
+                                ? ((int)val).ToString()
+                                : Math.Round(val, 1).ToString("0.#");
+                        }
+                        else
+                        {
+                            clean[col.ColumnName] = raw[col.ColumnName];
+                        }
+                    }
+                    dtClean.Rows.Add(clean);
+
+                    // Pie slice data
+                    double sylPct = 0;
+                    double.TryParse(raw["SyllabusCompletionPct"].ToString(), out sylPct);
+                    string color = pieColors[colorIdx % pieColors.Length];
+                    string subjectName = raw["SubjectName"].ToString();
+
+                    pieList.Add(new
+                    {
+                        SubjectName = subjectName,
+                        SyllabusCompletionPct = Math.Round(sylPct, 1),
+                        Color = color,
+                        StudentCount = Convert.ToInt32(raw["StudentCount"]),
+                        TotalChapters = Convert.ToInt32(raw["TotalChapters"]),
+                        ChaptersCovered = Convert.ToInt32(raw["ChaptersCovered"]),
+                        TotalVideos = Convert.ToInt32(raw["TotalVideos"]),
+                        VideosWatched = Convert.ToInt32(raw["VideosWatched"]),
+                        AvgWatchPercent = clean["AvgWatchPercent"].ToString()
+                    });
+
+                    // Legend row — use already-formatted value from clean row
+                    string formatted = clean["SyllabusCompletionPct"].ToString();
+                    dtLegend.Rows.Add(subjectName, formatted, color);
+
+                    colorIdx++;
+                }
+
+                // Serialize pie data to hidden field
+                hfLpPieData.Value = new System.Web.Script.Serialization.JavaScriptSerializer()
+                                        .Serialize(pieList);
+
+                // Bind legend repeater
+                rptLpPieLegend.DataSource = dtLegend;
+                rptLpPieLegend.DataBind();
+
+                dtBind = dtClean;
+            }
+
+            rptLearningPath.DataSource = dtBind;
+            rptLearningPath.DataBind();
+
+            pnlLearningPath.Visible = hasData;
+            pnlNoLearningPath.Visible = !hasData;
+        }
+        public string GetProgressColor(object pct)
+        {
+            double val = 0;
+            double.TryParse(pct?.ToString(), out val);
+            if (val >= 75) return "#2e7d32";
+            if (val >= 40) return "#ef6c00";
+            return "#c62828";
+        }
+
+        public string GetProgressBg(object pct)
+        {
+            double val = 0;
+            double.TryParse(pct?.ToString(), out val);
+            if (val >= 75) return "#e8f5e9";
+            if (val >= 40) return "#fff3e0";
+            return "#ffebee";
+        }
         private string TruncateName(string name, int maxLen)
         {
             return name.Length <= maxLen ? name : name.Substring(0, maxLen) + "…";

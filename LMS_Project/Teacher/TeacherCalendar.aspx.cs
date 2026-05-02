@@ -317,7 +317,27 @@ namespace LMS_Project.Teacher
                 ShowMsg(lblMessage, $"Error: {ex.Message}", false);
             }
         }
+        public string GetEventBadgeStyle(string eventType)
+        {
+            switch (eventType.ToLower())
+            {
+                case "holiday": return "background:#ffebee;color:#c62828;";
+                case "exam": return "background:#fff3e0;color:#ef6c00;";
+                case "assignment": return "background:#e3f2fd;color:#1976d2;";
+                default: return "background:#e8f5e9;color:#2e7d32;";
+            }
+        }
 
+        public string GetEventIcon(string eventType)
+        {
+            switch (eventType.ToLower())
+            {
+                case "holiday": return "🎉";
+                case "exam": return "📝";
+                case "assignment": return "📚";
+                default: return "📌";
+            }
+        }
         protected void btnUpdate_Click(object sender, EventArgs e)
         {
             hfReopenModal.Value = "editEventModal";

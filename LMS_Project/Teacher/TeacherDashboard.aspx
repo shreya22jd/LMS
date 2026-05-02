@@ -40,45 +40,45 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
     margin-top: 10px;
 }
 
-/* ── Stat Cards ── */
-.stat-card {
+/* ── Compact Stat Cards (for side-by-side layout) ── */
+.stat-card-sm {
     border: none;
-    border-radius: 14px;
-    padding: 22px 20px;
+    border-radius: 12px;
+    padding: 14px 14px;
     display: flex;
     align-items: center;
-    gap: 16px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.07);
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
     transition: transform .2s, box-shadow .2s;
     cursor: default;
     height: 100%;
 }
-.stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 18px rgba(0,0,0,.12);
+.stat-card-sm:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 14px rgba(0,0,0,.11);
 }
-.stat-card .icon-box {
-    width: 54px; height: 54px;
-    border-radius: 14px;
+.stat-card-sm .icon-box-sm {
+    width: 40px; height: 40px;
+    border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
+    font-size: 16px;
     flex-shrink: 0;
 }
-.stat-card .stat-label {
-    font-size: 11px; font-weight: 700;
+.stat-card-sm .stat-label-sm {
+    font-size: 10px; font-weight: 700;
     text-transform: uppercase;
     letter-spacing: .6px;
     color: #78909c;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
-.stat-card .stat-value {
-    font-size: 32px; font-weight: 800;
+.stat-card-sm .stat-value-sm {
+    font-size: 24px; font-weight: 800;
     line-height: 1;
     color: #263238;
 }
-.stat-card .stat-sub {
-    font-size: 11px; color: #90a4ae;
-    margin-top: 3px;
+.stat-card-sm .stat-sub-sm {
+    font-size: 10px; color: #90a4ae;
+    margin-top: 2px;
 }
 
 .card-green   { background: #e3f2fd; }
@@ -100,14 +100,13 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
 }
 .section-header h6 {
     font-weight: 700; font-size: 15px;
-    color: #2e7d32; margin: 0;
+    color: #1565c0; margin: 0;
 }
 .section-header a {
-    font-size: 12px; color: #388e3c;
+    font-size: 12px; color: #1976d2;
     text-decoration: none;
 }
 .section-header a:hover { text-decoration: underline; }
-
 /* ── Subject Cards ── */
 .subject-card {
     border: none;
@@ -246,7 +245,7 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
 }
 
 .qa-item {
-    width: calc(20% - 10px); /* 5 items per row */
+    width: calc(33.33% - 10px); /* 5 items per row */
 }
 
 /* Responsive */
@@ -255,7 +254,7 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
 }
 
 @media (max-width: 576px) {
-    .qa-item { width: calc(50% - 10px); } /* 2 per row */
+    .qa-item { width: calc(50% - 10px);  } /* 2 per row */
 }
 
 /* ── White panel card ── */
@@ -381,6 +380,8 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
     transform: translateY(-4px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.12);
 }
+/* ── Activity Tracking ── */
+.act-trend-toggle .btn { font-size: 11px; }
 </style>
 </asp:Content>
 
@@ -395,67 +396,73 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
     <asp:Label ID="lblSessionPill"     runat="server" CssClass="meta-pill" />
 </div>
 
-<%-- ══ STAT CARDS ══ --%>
+<%-- ══ STAT CARDS + QUICK ACTIONS (side by side) ══ --%>
 <div class="row g-3 mb-4">
 
-    <div class="col-6 col-md-3">
-        <div class="stat-card card-green">
-            <div class="icon-box icon-green">
-                <i class="fas fa-book-open"></i>
-            </div>
-            <div>
-                <div class="stat-label">Subjects</div>
-                <div class="stat-value"><asp:Label ID="lblTotalSubjects" runat="server" Text="0" /></div>
-                <div class="stat-sub">Assigned this session</div>
+    <%-- LEFT: Stat Cards (col-md-5) --%>
+    <div class="col-md-5">
+        <div class="panel-card h-100">
+            <div class="row g-2">
+
+                <div class="col-6">
+                    <div class="stat-card-sm card-green">
+                        <div class="icon-box-sm icon-green">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div>
+                            <div class="stat-label-sm">Subjects</div>
+                            <div class="stat-value-sm"><asp:Label ID="lblTotalSubjects" runat="server" Text="0" /></div>
+                            <div class="stat-sub-sm">This session</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="stat-card-sm card-teal">
+                        <div class="icon-box-sm icon-teal">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <div class="stat-label-sm">Students</div>
+                            <div class="stat-value-sm"><asp:Label ID="lblTotalStudents" runat="server" Text="0" /></div>
+                            <div class="stat-sub-sm">Your courses</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="stat-card-sm card-orange">
+                        <div class="icon-box-sm icon-orange">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div>
+                            <div class="stat-label-sm">Assignments</div>
+                            <div class="stat-value-sm"><asp:Label ID="lblTotalAssignments" runat="server" Text="0" /></div>
+                            <div class="stat-sub-sm">Active</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="stat-card-sm card-lime">
+                        <div class="icon-box-sm icon-lime">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div>
+                            <div class="stat-label-sm">Videos</div>
+                            <div class="stat-value-sm"><asp:Label ID="lblTotalVideos" runat="server" Text="0" /></div>
+                            <div class="stat-sub-sm">Uploaded</div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
-    <div class="col-6 col-md-3">
-        <div class="stat-card card-teal">
-            <div class="icon-box icon-teal">
-                <i class="fas fa-users"></i>
-            </div>
-            <div>
-                <div class="stat-label">Students</div>
-                <div class="stat-value"><asp:Label ID="lblTotalStudents" runat="server" Text="0" /></div>
-                <div class="stat-sub">Under your courses</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-6 col-md-3">
-        <div class="stat-card card-orange">
-            <div class="icon-box icon-orange">
-                <i class="fas fa-tasks"></i>
-            </div>
-            <div>
-                <div class="stat-label">Assignments</div>
-                <div class="stat-value"><asp:Label ID="lblTotalAssignments" runat="server" Text="0" /></div>
-                <div class="stat-sub">Active assignments</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-6 col-md-3">
-        <div class="stat-card card-lime">
-            <div class="icon-box icon-lime">
-                <i class="fas fa-video"></i>
-            </div>
-            <div>
-                <div class="stat-label">Videos</div>
-                <div class="stat-value"><asp:Label ID="lblTotalVideos" runat="server" Text="0" /></div>
-                <div class="stat-sub">Course videos uploaded</div>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<%-- ══ QUICK ACTIONS ══ --%>
-<div class="row g-3 mb-4">
-    <div class="col-12">
-        <div class="panel-card">
+    <%-- RIGHT: Quick Actions (col-md-7) --%>
+    <div class="col-md-7">
+        <div class="panel-card h-100">
             <div class="section-header">
                 <h6><i class="fas fa-bolt me-2"></i>Quick Actions</h6>
             </div>
@@ -473,11 +480,11 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
                     </a>
                 </div>
                 <div class="qa-item">
-    <a href="Subjects.aspx" class="quick-action qa-lime">
-        <i class="fas fa-video"></i>
-        Course Videos
-    </a>
-</div>
+                    <a href="Subjects.aspx" class="quick-action qa-lime">
+                        <i class="fas fa-video"></i>
+                        Course Videos
+                    </a>
+                </div>
                 <div class="qa-item">
                     <a href="MyStudents.aspx" class="quick-action qa-purple">
                         <i class="fas fa-users"></i>
@@ -493,6 +500,7 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
             </div>
         </div>
     </div>
+
 </div>
 
 <%-- ══ SUBJECTS + RECENT STUDENTS ══ --%>
@@ -1424,6 +1432,344 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
         </div>
     </div>
 </div>
+<%-- ══ LEARNING PATH + ACTIVITY TRACKING ══ --%>
+<div class="row g-3 mt-2">
+
+    <%-- LEFT: Learning Path Progress (col-lg-7) --%>
+    <div class="col-lg-7">
+        <div class="panel-card" style="height:100%;">
+            <div class="section-header mb-2">
+                <h6><i class="fas fa-route me-2"></i>Learning Path Progress</h6>
+                <a href="Subjects.aspx" style="color:#1976d2;">View subjects &rarr;</a>
+            </div>
+            <p style="font-size:12px;color:#90a4ae;margin:-6px 0 20px;">
+                Track syllabus completion, chapters covered, and video watch progress per subject.
+            </p>
+
+            <%-- ── Summary KPI Strip ── --%>
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                    <div style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);border-radius:14px;padding:16px;text-align:center;">
+                        <i class="fas fa-book-open" style="font-size:24px;color:#1565c0;margin-bottom:6px;display:block;"></i>
+                        <div style="font-size:11px;font-weight:700;color:#1565c0;text-transform:uppercase;letter-spacing:.5px;">Total Chapters</div>
+                        <div style="font-size:30px;font-weight:800;color:#0d47a1;">
+                            <asp:Label ID="lblLpTotalChapters" runat="server" Text="0" />
+                        </div>
+                        <div style="font-size:11px;color:#78909c;">across all subjects</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:14px;padding:16px;text-align:center;">
+                        <i class="fas fa-video" style="font-size:24px;color:#2e7d32;margin-bottom:6px;display:block;"></i>
+                        <div style="font-size:11px;font-weight:700;color:#2e7d32;text-transform:uppercase;letter-spacing:.5px;">Total Videos</div>
+                        <div style="font-size:30px;font-weight:800;color:#1b5e20;">
+                            <asp:Label ID="lblLpTotalVideos" runat="server" Text="0" />
+                        </div>
+                        <div style="font-size:11px;color:#78909c;">uploaded this session</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);border-radius:14px;padding:16px;text-align:center;">
+                        <i class="fas fa-hourglass-half" style="font-size:24px;color:#ef6c00;margin-bottom:6px;display:block;"></i>
+                        <div style="font-size:11px;font-weight:700;color:#ef6c00;text-transform:uppercase;letter-spacing:.5px;">Avg Watch %</div>
+                        <div style="font-size:30px;font-weight:800;color:#e65100;">
+                            <asp:Label ID="lblLpAvgWatch" runat="server" Text="0" />%
+                        </div>
+                        <div style="font-size:11px;color:#78909c;">student average</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div style="background:linear-gradient(135deg,#ede7f6,#d1c4e9);border-radius:14px;padding:16px;text-align:center;">
+                        <i class="fas fa-chart-pie" style="font-size:24px;color:#5e35b1;margin-bottom:6px;display:block;"></i>
+                        <div style="font-size:11px;font-weight:700;color:#5e35b1;text-transform:uppercase;letter-spacing:.5px;">Video Completion</div>
+                        <div style="font-size:30px;font-weight:800;color:#4527a0;">
+                            <asp:Label ID="lblLpVideoCompletion" runat="server" Text="0" />%
+                        </div>
+                        <div style="font-size:11px;color:#78909c;">videos watched</div>
+                    </div>
+                </div>
+            </div>
+
+            <%-- ── Per-Subject Breakdown ── --%>
+            <asp:Panel ID="pnlLearningPath" runat="server">
+                <div style="font-size:11px;font-weight:700;color:#78909c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;">
+                    <i class="fas fa-layer-group me-1"></i> Subject-wise Breakdown
+                </div>
+                <%-- Syllabus Completion Pie Chart --%>
+<div class="row g-3 mb-4">
+    <div class="col-md-5">
+        <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,.06);">
+            <div style="font-size:11px;font-weight:700;color:#1565c0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">
+                <i class="fas fa-chart-pie me-1"></i> Syllabus Completion by Subject
+            </div>
+            <div style="position:relative;height:220px;">
+                <canvas id="lpPieChart" role="img" aria-label="Pie chart of syllabus completion per subject"></canvas>
+            </div>
+            <asp:HiddenField ID="hfLpPieData" runat="server" ClientIDMode="Static" />
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,.06);height:100%;">
+            <div style="font-size:11px;font-weight:700;color:#78909c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">
+                <i class="fas fa-list me-1"></i> Completion Legend
+            </div>
+<asp:Repeater ID="rptLpPieLegend" runat="server">
+    <ItemTemplate>
+        <div onclick='openSubjectProgress(<%# Container.ItemIndex %>)'
+             style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f0f4ff;cursor:pointer;border-radius:6px;transition:background .15s;"
+             onmouseover="this.style.background='#f0f7ff';this.style.paddingLeft='6px'"
+             onmouseout="this.style.background='';this.style.paddingLeft='0'">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:12px;height:12px;border-radius:50%;background:<%# Eval("Color") %>;flex-shrink:0;"></div>
+                <span style="font-size:12px;font-weight:600;color:#263238;"><%# Eval("SubjectName") %></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div style="background:#e0e0e0;border-radius:6px;height:6px;width:80px;overflow:hidden;">
+                    <div style="width:<%# Eval("SyllabusCompletionPct") %>%;height:100%;background:<%# Eval("Color") %>;border-radius:6px;"></div>
+                </div>
+                <span style="font-size:12px;font-weight:800;color:<%# Eval("Color") %>;min-width:36px;text-align:right;">
+                    <%# Eval("SyllabusCompletionPct") %>%
+                </span>
+                <i class="fas fa-chevron-right" style="font-size:10px;color:#90a4ae;"></i>
+            </div>
+        </div>
+    </ItemTemplate>
+</asp:Repeater>        </div>
+    </div>
+</div>
+<%-- Replace the rptLearningPath repeater with just the hidden data store --%>
+<asp:Repeater ID="rptLearningPath" runat="server" Visible="false">
+    <ItemTemplate></ItemTemplate>
+</asp:Repeater>
+
+<%-- ── Subject Detail Modal ── --%>
+<div class="modal fade" id="subjectProgressModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px;border:none;">
+            <div class="modal-header" style="background:linear-gradient(135deg,#1565c0,#1976d2);border-radius:16px 16px 0 0;padding:18px 24px;">
+                <div>
+                    <h5 class="modal-title" id="modalSubjectName" style="color:#fff;font-weight:800;margin:0;font-size:18px;"></h5>
+                    <div id="modalSubjectMeta" style="color:rgba(255,255,255,.75);font-size:12px;margin-top:3px;"></div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding:24px;">
+
+                <%-- KPI Strip --%>
+                <div class="row g-2 mb-4" id="spKpiRow">
+                    <div class="col-6 col-md-3">
+                        <div style="background:#e3f2fd;border-radius:10px;padding:12px;text-align:center;">
+                            <div style="font-size:10px;font-weight:700;color:#1565c0;text-transform:uppercase;letter-spacing:.5px;">Students</div>
+                            <div style="font-size:26px;font-weight:800;color:#1565c0;" id="spStudents">0</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div style="background:#e8f5e9;border-radius:10px;padding:12px;text-align:center;">
+                            <div style="font-size:10px;font-weight:700;color:#2e7d32;text-transform:uppercase;letter-spacing:.5px;">Syllabus</div>
+                            <div style="font-size:26px;font-weight:800;color:#2e7d32;" id="spSyllabus">0%</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div style="background:#fff3e0;border-radius:10px;padding:12px;text-align:center;">
+                            <div style="font-size:10px;font-weight:700;color:#ef6c00;text-transform:uppercase;letter-spacing:.5px;">Avg Watch</div>
+                            <div style="font-size:26px;font-weight:800;color:#ef6c00;" id="spAvgWatch">0%</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div style="background:#ede7f6;border-radius:10px;padding:12px;text-align:center;">
+                            <div style="font-size:10px;font-weight:700;color:#5e35b1;text-transform:uppercase;letter-spacing:.5px;">Videos</div>
+                            <div style="font-size:22px;font-weight:800;color:#5e35b1;" id="spVideos">0/0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <%-- Progress Bars --%>
+                <div style="background:#f8fbff;border-radius:12px;padding:16px;margin-bottom:20px;">
+                    <div style="margin-bottom:14px;">
+                        <div style="display:flex;justify-content:space-between;font-size:12px;color:#78909c;margin-bottom:5px;">
+                            <span><i class="fas fa-graduation-cap me-1" style="color:#1565c0;"></i>Syllabus Completion</span>
+                            <span style="font-weight:700;" id="spSyllabusBarLbl">0%</span>
+                        </div>
+                        <div style="background:#e0e0e0;border-radius:8px;height:10px;overflow:hidden;">
+                            <div id="spSyllabusBar" style="height:100%;border-radius:8px;background:#1565c0;transition:width .6s;width:0%;"></div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <div style="display:flex;justify-content:space-between;font-size:12px;color:#78909c;margin-bottom:5px;">
+                            <span><i class="fas fa-video me-1" style="color:#2e7d32;"></i>Videos Watched</span>
+                            <span style="font-weight:700;" id="spVideosBarLbl">0/0</span>
+                        </div>
+                        <div style="background:#e0e0e0;border-radius:8px;height:10px;overflow:hidden;">
+                            <div id="spVideosBar" style="height:100%;border-radius:8px;background:#2e7d32;transition:width .6s;width:0%;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;font-size:12px;color:#78909c;margin-bottom:5px;">
+                            <span><i class="fas fa-book-open me-1" style="color:#ef6c00;"></i>Chapters Covered</span>
+                            <span style="font-weight:700;" id="spChaptersBarLbl">0/0</span>
+                        </div>
+                        <div style="background:#e0e0e0;border-radius:8px;height:10px;overflow:hidden;">
+                            <div id="spChaptersBar" style="height:100%;border-radius:8px;background:#ef6c00;transition:width .6s;width:0%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <%-- Chart --%>
+                <div style="background:#fafafa;border-radius:12px;padding:16px;">
+                    <div style="font-size:11px;font-weight:700;color:#78909c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">
+                        <i class="fas fa-chart-bar me-1"></i> Progress Overview
+                    </div>
+                    <div style="position:relative;height:220px;">
+                        <canvas id="subjectProgressChart" role="img"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>            </asp:Panel>
+            <asp:Panel ID="pnlNoLearningPath" runat="server" Visible="false">
+                <div class="empty-state">
+                    <i class="fas fa-route" style="color:#90caf9;"></i>
+                    <p>No learning path data yet.<br />Upload chapters and videos to track progress.</p>
+                </div>
+            </asp:Panel>
+        </div>
+    </div>
+
+    <%-- RIGHT: Activity Tracking (col-lg-5) --%>
+    <div class="col-lg-5">
+        <div class="panel-card" style="height:100%;">
+
+            <div class="section-header mb-2">
+                <h6><i class="fas fa-bolt me-2"></i>Activity Tracking</h6>
+            </div>
+            <p style="font-size:12px;color:#90a4ae;margin:-6px 0 16px;">
+                Daily actions, last active time, and activity trends.
+            </p>
+
+            <%-- KPI Strip --%>
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <div style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);border-radius:12px;padding:12px 14px;">
+                        <div style="font-size:10px;font-weight:700;color:#1565c0;text-transform:uppercase;letter-spacing:.5px;">Today's Actions</div>
+                        <div style="font-size:28px;font-weight:800;color:#0d47a1;">
+                            <asp:Label ID="lblActTodayCount" runat="server" Text="0" />
+                        </div>
+                        <div style="font-size:10px;color:#78909c;"><i class="fas fa-calendar-day me-1"></i>actions logged today</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:12px;padding:12px 14px;">
+                        <div style="font-size:10px;font-weight:700;color:#2e7d32;text-transform:uppercase;letter-spacing:.5px;">This Week</div>
+                        <div style="font-size:28px;font-weight:800;color:#1b5e20;">
+                            <asp:Label ID="lblActWeekCount" runat="server" Text="0" />
+                        </div>
+                        <div style="font-size:10px;color:#78909c;"><i class="fas fa-calendar-week me-1"></i>actions this week</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);border-radius:12px;padding:12px 14px;">
+                        <div style="font-size:10px;font-weight:700;color:#ef6c00;text-transform:uppercase;letter-spacing:.5px;">Last Active</div>
+                        <div style="font-size:13px;font-weight:800;color:#e65100;line-height:1.3;margin-top:3px;">
+                            <asp:Label ID="lblActLastActive" runat="server" Text="-" />
+                        </div>
+                        <div style="font-size:10px;color:#78909c;margin-top:2px;"><i class="fas fa-clock me-1"></i>most recent activity</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div style="background:linear-gradient(135deg,#ede7f6,#d1c4e9);border-radius:12px;padding:12px 14px;">
+                        <div style="font-size:10px;font-weight:700;color:#5e35b1;text-transform:uppercase;letter-spacing:.5px;">Active Days</div>
+                        <div style="font-size:28px;font-weight:800;color:#4527a0;">
+                            <asp:Label ID="lblActActiveDays" runat="server" Text="0" />
+                        </div>
+                        <div style="font-size:10px;color:#78909c;"><i class="fas fa-fire me-1"></i>days active this month</div>
+                    </div>
+                </div>
+            </div>
+
+            <%-- Chart type toggle --%>
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <span style="font-size:11px;font-weight:700;color:#78909c;">View as:</span>
+                <div class="btn-group btn-group-sm">
+                    <button type="button" id="btnActLine" onclick="setActChartType('line')"
+                            class="btn btn-primary" title="Line Chart">
+                        <i class="fas fa-chart-line"></i>
+                    </button>
+                    <button type="button" id="btnActBar" onclick="setActChartType('bar')"
+                            class="btn btn-outline-primary" title="Bar Chart">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                </div>
+                <span style="font-size:11px;color:#90a4ae;margin-left:4px;">Last 7 days</span>
+            </div>
+
+            <%-- Trend Chart --%>
+            <asp:Panel ID="pnlActivityChart" runat="server">
+                <div style="position:relative;height:180px;margin-bottom:16px;">
+                    <canvas id="activityTrendChart" role="img" aria-label="Teacher activity trend chart"></canvas>
+                </div>
+                <asp:HiddenField ID="hfActivityTrendData" runat="server" ClientIDMode="Static" />
+            </asp:Panel>
+
+            <%-- Recent Activity Log --%>
+            <div style="font-size:11px;font-weight:700;color:#78909c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">
+                <i class="fas fa-history me-1"></i> Recent Actions
+            </div>
+
+            <asp:Panel ID="pnlActivityLog" runat="server">
+                <asp:Repeater ID="rptActivityLog" runat="server">
+                    <ItemTemplate>
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #e3f2fd;">
+                            <div style="width:34px;height:34px;border-radius:9px;background:<%# GetActivityIconBg(Eval("ActionType").ToString()) %>;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fas <%# GetActivityIcon(Eval("ActionType").ToString()) %>" style="font-size:13px;color:#fff;"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:12px;font-weight:700;color:#263238;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                    <%# Eval("ActionDescription") %>
+                                </div>
+                                <div style="font-size:10px;color:#90a4ae;">
+                                    <i class="fas fa-tag me-1"></i><%# Eval("ActionType") %>
+                                </div>
+                            </div>
+                            <div style="text-align:right;flex-shrink:0;">
+                                <div style="font-size:10px;color:#90a4ae;"><%# Eval("TimeAgo") %></div>
+                                <div style="font-size:10px;color:#b0bec5;"><%# Eval("ActionDate") %></div>
+                            </div>
+                        </div>
+                    </ItemTemplate>
+                </asp:Repeater>
+            </asp:Panel>
+
+            <asp:Panel ID="pnlNoActivityLog" runat="server" Visible="false">
+                <div class="empty-state">
+                    <i class="fas fa-history" style="color:#90caf9;"></i>
+                    <p>No activity recorded yet.</p>
+                </div>
+            </asp:Panel>
+
+            <%-- Action breakdown mini-chips --%>
+            <asp:Panel ID="pnlActivityBreakdown" runat="server">
+                <div style="font-size:11px;font-weight:700;color:#78909c;text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px;">
+                    <i class="fas fa-layer-group me-1"></i> Action Breakdown
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                    <asp:Repeater ID="rptActivityBreakdown" runat="server">
+                        <ItemTemplate>
+                            <span style="display:inline-flex;align-items:center;gap:5px;background:<%# GetActivityIconBg(Eval("ActionType").ToString()) %>22;color:<%# GetActivityIconBg(Eval("ActionType").ToString()) %>;border:1.5px solid <%# GetActivityIconBg(Eval("ActionType").ToString()) %>44;border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;">
+                                <i class="fas <%# GetActivityIcon(Eval("ActionType").ToString()) %>"></i>
+                                <%# Eval("ActionType") %>
+                                <span style="background:<%# GetActivityIconBg(Eval("ActionType").ToString()) %>;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;"><%# Eval("ActionCount") %></span>
+                            </span>
+                        </ItemTemplate>
+                    </asp:Repeater>
+                </div>
+            </asp:Panel>
+
+        </div>
+    </div>
+
+</div>
 <%-- Chart.js (only loaded once, safe to add here) --%>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
@@ -1440,6 +1786,10 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
     var _subData = null;
     var _secChart = null;
     var _subChart = null;
+
+    // ── Activity Trend Chart ────────────────────────────────────────
+    var activityChartInstance = null;
+    var _actChartType = 'line';
 
     function renderSubjectChart() {
         var hf = document.getElementById('<%= hfChartData.ClientID %>');
@@ -1989,7 +2339,87 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
             }
         };
     }
+    function setActChartType(type) {
+        _actChartType = type;
+        var btnLine = document.getElementById('btnActLine');
+        var btnBar = document.getElementById('btnActBar');
+        if (btnLine) btnLine.className = (type === 'line')
+            ? 'btn btn-primary btn-sm' : 'btn btn-outline-primary btn-sm';
+        if (btnBar) btnBar.className = (type === 'bar')
+            ? 'btn btn-primary btn-sm' : 'btn btn-outline-primary btn-sm';
+        renderActivityTrendChart();
+    }
 
+    function renderActivityTrendChart() {
+        var hf = document.getElementById('hfActivityTrendData');
+        if (!hf || !hf.value) return;
+        var data;
+        try { data = JSON.parse(hf.value); } catch (e) { return; }
+        var ctx = document.getElementById('activityTrendChart');
+        if (!ctx) return;
+
+        if (activityChartInstance) { activityChartInstance.destroy(); activityChartInstance = null; }
+
+        var labels = data.map(function (d) { return d.DayLabel; });
+        var counts = data.map(function (d) { return d.ActionCount; });
+        var gradient;
+
+        if (_actChartType === 'line') {
+            // Build canvas gradient for fill
+            var chartCtx = ctx.getContext('2d');
+            gradient = chartCtx.createLinearGradient(0, 0, 0, 180);
+            gradient.addColorStop(0, 'rgba(21,101,192,0.25)');
+            gradient.addColorStop(1, 'rgba(21,101,192,0.02)');
+        }
+
+        activityChartInstance = new Chart(ctx, {
+            type: _actChartType,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Actions',
+                    data: counts,
+                    backgroundColor: _actChartType === 'line'
+                        ? gradient
+                        : counts.map(function (v, i) {
+                            var max = Math.max.apply(null, counts);
+                            return v === max ? '#1565c0cc' : '#1976d244';
+                        }),
+                    borderColor: '#1565c0',
+                    borderWidth: _actChartType === 'line' ? 2.5 : 2,
+                    borderRadius: _actChartType === 'bar' ? 7 : 0,
+                    pointBackgroundColor: '#1565c0',
+                    pointRadius: _actChartType === 'line' ? 4 : 0,
+                    pointHoverRadius: 6,
+                    fill: _actChartType === 'line',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (c) { return ' ' + c.parsed.y + ' actions'; }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1, font: { size: 10 } },
+                        grid: { color: '#e3f2fd' }
+                    },
+                    x: {
+                        ticks: { font: { size: 10 }, maxRotation: 0 },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
     // Initialize everything when page loads
     document.addEventListener('DOMContentLoaded', function () {
         renderDivisionChart();
@@ -1998,6 +2428,9 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
         initCompareData();
         renderCmpChart();
         renderEngagementChart();
+        renderActivityTrendChart(); 
+        renderLpPieChart();
+        initLpFullData();
     });
     // ── Engagement Chart ────────────────────────────────────────
     var engagementChart = null;
@@ -2071,6 +2504,153 @@ background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);    b
     } else {
         engagementChart = new Chart(ctx, { type: 'bar', data: chartData, options: options });
     }
-}
+    }
+    // ── Learning Path Pie Chart ─────────────────────────────────
+    var lpPieChartInstance = null;
+
+    function renderLpPieChart() {
+        var hf = document.getElementById('hfLpPieData');
+        if (!hf || !hf.value) return;
+        var data;
+        try { data = JSON.parse(hf.value); } catch (e) { return; }
+        var ctx = document.getElementById('lpPieChart');
+        if (!ctx) return;
+
+        if (lpPieChartInstance) { lpPieChartInstance.destroy(); lpPieChartInstance = null; }
+
+        lpPieChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.map(function (d) { return d.SubjectName; }),
+                datasets: [{
+                    data: data.map(function (d) { return d.SyllabusCompletionPct; }),
+                    backgroundColor: data.map(function (d) { return d.Color + 'cc'; }),
+                    borderColor: data.map(function (d) { return d.Color; }),
+                    borderWidth: 2,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '55%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (c) {
+                                return ' ' + c.label + ': ' + c.parsed + '% done';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    // ── Subject Progress Modal ──────────────────────────────────
+    var _lpFullData = null;
+    var subjectProgressChartInstance = null;
+
+    function initLpFullData() {
+        var hf = document.getElementById('hfLpPieData');
+        if (!hf || !hf.value) return;
+        try { _lpFullData = JSON.parse(hf.value); } catch (e) { }
+    }
+
+    function openSubjectProgress(idx) {
+        if (!_lpFullData || idx >= _lpFullData.length) return;
+        var d = _lpFullData[idx];
+
+        // Header
+        document.getElementById('modalSubjectName').textContent = d.SubjectName;
+        document.getElementById('modalSubjectMeta').textContent =
+            d.StudentCount + ' students enrolled';
+
+        // KPI cards
+        document.getElementById('spStudents').textContent = d.StudentCount;
+        document.getElementById('spSyllabus').textContent = d.SyllabusCompletionPct + '%';
+        document.getElementById('spAvgWatch').textContent = d.AvgWatchPercent + '%';
+        document.getElementById('spVideos').textContent = d.VideosWatched + '/' + d.TotalVideos;
+
+        // Progress bars
+        var sylPct = parseFloat(d.SyllabusCompletionPct) || 0;
+        var vidPct = d.TotalVideos > 0
+            ? Math.round(d.VideosWatched / d.TotalVideos * 100)
+            : 0;
+        var chPct = d.TotalChapters > 0
+            ? Math.round(d.ChaptersCovered / d.TotalChapters * 100)
+            : 0;
+
+        document.getElementById('spSyllabusBar').style.width = sylPct + '%';
+        document.getElementById('spSyllabusBarLbl').textContent = sylPct + '%';
+        document.getElementById('spVideosBar').style.width = vidPct + '%';
+        document.getElementById('spVideosBarLbl').textContent =
+            d.VideosWatched + ' / ' + d.TotalVideos;
+        document.getElementById('spChaptersBar').style.width = chPct + '%';
+        document.getElementById('spChaptersBarLbl').textContent =
+            d.ChaptersCovered + ' / ' + d.TotalChapters;
+
+        // Show modal first so canvas has dimensions
+        var modal = new bootstrap.Modal(document.getElementById('subjectProgressModal'));
+        modal.show();
+
+        // Render chart after modal is visible
+        setTimeout(function () {
+            var ctx = document.getElementById('subjectProgressChart');
+            if (!ctx) return;
+            if (subjectProgressChartInstance) {
+                subjectProgressChartInstance.destroy();
+                subjectProgressChartInstance = null;
+            }
+
+            var color = d.Color || '#1565c0';
+
+            subjectProgressChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Syllabus %', 'Avg Watch %', 'Videos Done %', 'Chapters Done %'],
+                    datasets: [{
+                        label: d.SubjectName,
+                        data: [sylPct, parseFloat(d.AvgWatchPercent) || 0, vidPct, chPct],
+                        backgroundColor: [
+                            '#1565c0cc', '#2e7d32cc', '#ef6c00cc', '#5e35b1cc'
+                        ],
+                        borderColor: [
+                            '#1565c0', '#2e7d32', '#ef6c00', '#5e35b1'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (c) { return ' ' + c.parsed.y + '%'; }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function (v) { return v + '%'; },
+                                font: { size: 11 }
+                            },
+                            grid: { color: '#e3f2fd' }
+                        },
+                        x: {
+                            ticks: { font: { size: 11 } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }, 300);
+    }
 </script>
 </asp:Content>

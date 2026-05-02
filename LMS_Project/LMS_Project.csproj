@@ -167,6 +167,9 @@
     <Content Include="SuperAdmin\AddInstitute.aspx" />
     <Content Include="SuperAdmin\AddSociety.aspx" />
     <Content Include="SuperAdmin\Dashboard.aspx" />
+    <Content Include="Teacher\Controls\KpiCard.ascx" />
+    <Content Include="Teacher\Controls\MetricCard.ascx" />
+    <Content Include="Teacher\Controls\StatCard.ascx" />
     <Content Include="Teacher\MyStudentDetails.aspx" />
     <Content Include="Teacher\MyStudents.aspx" />
     <Content Include="Teacher\SubjectDetails.aspx" />
@@ -351,6 +354,27 @@
     </Compile>
     <Compile Include="Student\UserHelp.aspx.designer.cs">
       <DependentUpon>UserHelp.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Teacher\Controls\KpiCard.ascx.cs">
+      <DependentUpon>KpiCard.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Teacher\Controls\KpiCard.ascx.designer.cs">
+      <DependentUpon>KpiCard.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Teacher\Controls\MetricCard.ascx.cs">
+      <DependentUpon>MetricCard.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Teacher\Controls\MetricCard.ascx.designer.cs">
+      <DependentUpon>MetricCard.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Teacher\Controls\StatCard.ascx.cs">
+      <DependentUpon>StatCard.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Teacher\Controls\StatCard.ascx.designer.cs">
+      <DependentUpon>StatCard.ascx</DependentUpon>
     </Compile>
     <Compile Include="Teacher\GetStudentMarks.ashx.cs">
       <DependentUpon>GetStudentMarks.ashx</DependentUpon>

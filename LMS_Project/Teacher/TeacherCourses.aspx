@@ -218,7 +218,7 @@
                             </span>
                         </div>
 
-                        <div class="card-footer-row">
+                      <%--  <div class="card-footer-row">
                             <span class="pill pill-lime">
                                 <i class="fas fa-calendar me-1"></i><%# Eval("SessionName") %>
                             </span>
@@ -227,7 +227,7 @@
                                 <i class="fas fa-play-circle me-1"></i>Manage
                             </a>
                         </div>
-
+                      --%>
                     </div>
                 </div>
             </ItemTemplate>
