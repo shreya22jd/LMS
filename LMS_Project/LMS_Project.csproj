@@ -167,9 +167,6 @@
     <Content Include="SuperAdmin\AddInstitute.aspx" />
     <Content Include="SuperAdmin\AddSociety.aspx" />
     <Content Include="SuperAdmin\Dashboard.aspx" />
-    <Content Include="Teacher\Controls\KpiCard.ascx" />
-    <Content Include="Teacher\Controls\MetricCard.ascx" />
-    <Content Include="Teacher\Controls\StatCard.ascx" />
     <Content Include="Teacher\MyStudentDetails.aspx" />
     <Content Include="Teacher\MyStudents.aspx" />
     <Content Include="Teacher\SubjectDetails.aspx" />
@@ -179,6 +176,8 @@
     <Content Include="Teacher\TeacherCalendar.aspx" />
     <Content Include="Teacher\TeacherCourses.aspx" />
     <Content Include="Teacher\TeacherDashboard.aspx" />
+    <Content Include="Teacher\TeacherDashboard.css" />
+    <Content Include="Teacher\TeacherDashboardScripts.js" />
     <Content Include="Teacher\TeacherHelp.aspx" />
     <Content Include="Teacher\TeacherProfile.aspx" />
     <Content Include="Teacher\TeacherVideoPlayer.aspx" />
@@ -355,26 +354,8 @@
     <Compile Include="Student\UserHelp.aspx.designer.cs">
       <DependentUpon>UserHelp.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Teacher\Controls\KpiCard.ascx.cs">
-      <DependentUpon>KpiCard.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Teacher\Controls\KpiCard.ascx.designer.cs">
-      <DependentUpon>KpiCard.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Teacher\Controls\MetricCard.ascx.cs">
-      <DependentUpon>MetricCard.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Teacher\Controls\MetricCard.ascx.designer.cs">
-      <DependentUpon>MetricCard.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Teacher\Controls\StatCard.ascx.cs">
-      <DependentUpon>StatCard.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Teacher\Controls\StatCard.ascx.designer.cs">
-      <DependentUpon>StatCard.ascx</DependentUpon>
+    <Compile Include="Teacher\GetSectionStudents.ashx.cs">
+      <DependentUpon>GetSectionStudents.ashx</DependentUpon>
     </Compile>
     <Compile Include="Teacher\GetStudentMarks.ashx.cs">
       <DependentUpon>GetStudentMarks.ashx</DependentUpon>
@@ -656,6 +637,7 @@
     <Content Include="Teacher\TeacherMaster.Master" />
     <Content Include="Parent\ParentMaster.Master" />
     <Content Include="Teacher\GetStudentMarks.ashx" />
+    <Content Include="Teacher\GetSectionStudents.ashx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

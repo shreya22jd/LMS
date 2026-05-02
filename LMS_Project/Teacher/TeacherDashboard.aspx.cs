@@ -214,11 +214,19 @@ namespace LMS_Project.Teacher
         // ── Recent Students ─────────────────────────────────────────
         private void LoadRecentStudents()
         {
-            int currSession = Session["CurrentSessionId"] != null
-                              ? Convert.ToInt32(Session["CurrentSessionId"])
-                              : bl.GetCurrentSessionId(InstituteId);
+            int currSession = SelStudentSessionId > 0
+                              ? SelStudentSessionId
+                              : (Session["CurrentSessionId"] != null
+                                 ? Convert.ToInt32(Session["CurrentSessionId"])
+                                 : bl.GetCurrentSessionId(InstituteId));
 
-            DataTable dtDiv = bl.GetStudentsByDivision(TeacherId, InstituteId, currSession);
+            if (SelStudentSessionId == 0) SelStudentSessionId = currSession;
+
+            // ← Pass section and stream filters
+            DataTable dtDiv = bl.GetStudentsByDivision(
+                TeacherId, InstituteId, currSession,
+                SelStudentSectionId, SelStudentStreamId);
+
             hfDivisionData.Value = bl.GetDivisionChartJson(dtDiv);
 
             DataTable dtStats = bl.GetStudentAnalytics(TeacherId, InstituteId, currSession);
@@ -233,9 +241,7 @@ namespace LMS_Project.Teacher
 
             pnlStudents.Visible = true;
             pnlNoStudents.Visible = false;
-        }
-
-        // ── Assignment Dropdowns ────────────────────────────────────
+        }        // ── Assignment Dropdowns ────────────────────────────────────
         private void LoadAssignmentFilterDropdowns()
         {
             ddlAsgSubject.Items.Clear();
@@ -298,7 +304,7 @@ namespace LMS_Project.Teacher
             bool hasTop = dtTop.Rows.Count > 0;
             rptTopStudents.DataSource = dtTop;
             rptTopStudents.DataBind();
-           // pnlTopStudents.Visible = hasTop;
+            // pnlTopStudents.Visible = hasTop;
             //pnlNoTopStudents.Visible = !hasTop;
 
             // Low performers
@@ -306,8 +312,8 @@ namespace LMS_Project.Teacher
             bool hasLow = dtLow.Rows.Count > 0;
             rptLowStudents.DataSource = dtLow;
             rptLowStudents.DataBind();
-         //   pnlLowStudents.Visible = hasLow;
-         //   pnlNoLowStudents.Visible = !hasLow;
+            //   pnlLowStudents.Visible = hasLow;
+            //   pnlNoLowStudents.Visible = !hasLow;
 
             // Avg marks per subject (for pie + legend)
             DataTable dtAvg = bl.GetAvgMarksPerSubject(TeacherId, InstituteId, currSession);
@@ -711,6 +717,7 @@ namespace LMS_Project.Teacher
             SelStudentSectionId = Convert.ToInt32(ddlStudentSection.SelectedValue);
             LoadRecentStudents();
         }
+
         protected void ddlStudentStream_SelectedIndexChanged(object sender, EventArgs e)
         {
             SelStudentStreamId = Convert.ToInt32(ddlStudentStream.SelectedValue);

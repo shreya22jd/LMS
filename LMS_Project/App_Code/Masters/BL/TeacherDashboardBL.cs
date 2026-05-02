@@ -369,7 +369,8 @@ namespace LearningManagementSystem.BL
             return result;
         }
 
-        public DataTable GetStudentsByDivision(int teacherId, int instituteId, int sessionId)
+        public DataTable GetStudentsByDivision(int teacherId, int instituteId, int sessionId,
+                                                int sectionId = 0, int streamId = 0)
         {
             SqlCommand cmd = new SqlCommand(@"
         SELECT 
@@ -383,20 +384,25 @@ namespace LearningManagementSystem.BL
                ON  sad.UserId      = ass.UserId
         LEFT JOIN Sections               sec 
                ON  sec.SectionId   = sad.SectionId
+        LEFT JOIN LevelSemesterSubjects  LSS 
+               ON  LSS.SubjectId   = SF.SubjectId
+               AND LSS.SessionId   = SF.SessionId
         WHERE  SF.TeacherId   = @TeacherId
           AND  SF.InstituteId = @InstituteId
           AND  SF.SessionId   = @SessionId
           AND  ISNULL(SF.IsActive, 1) = 1
+          AND  (@SectionId = 0 OR sad.SectionId = @SectionId)
+          AND  (@StreamId  = 0 OR LSS.StreamId  = @StreamId)
         GROUP BY sec.SectionName
         ORDER BY StudentCount DESC
     ");
-
             cmd.Parameters.AddWithValue("@TeacherId", teacherId);
             cmd.Parameters.AddWithValue("@InstituteId", instituteId);
             cmd.Parameters.AddWithValue("@SessionId", sessionId);
+            cmd.Parameters.AddWithValue("@SectionId", sectionId);
+            cmd.Parameters.AddWithValue("@StreamId", streamId);
             return dl.GetDataTable(cmd);
         }
-
         public DataTable GetStudentAnalytics(int teacherId, int instituteId, int sessionId)
         {
             SqlCommand cmd = new SqlCommand(@"
@@ -1408,6 +1414,58 @@ SELECT
             cmd.Parameters.AddWithValue("@TeacherId", teacherId);
             cmd.Parameters.AddWithValue("@InstituteId", instituteId);
             return dl.GetDataTable(cmd);
+        }
+        public DataTable GetStudentsBySection(int teacherId, int instituteId, int sessionId, string sectionName)
+        {
+            SqlCommand cmd = new SqlCommand(@"
+        SELECT DISTINCT
+            ass.UserId                              AS UserId,
+            up.FullName                             AS StudentName,
+            ISNULL(sad.RollNumber,    '')           AS RollNumber,
+            ISNULL(sec.SectionName,   'Unassigned') AS SectionName,
+            ISNULL(co.CourseName,     '')           AS CourseName,
+            ISNULL(sem.SemesterName,  '')           AS SemesterName
+        FROM   SubjectFaculty            SF
+        JOIN   AssignStudentSubject      ass
+               ON  ass.SubjectId   = SF.SubjectId
+               AND ass.SessionId   = SF.SessionId
+               AND ass.InstituteId = SF.InstituteId
+        JOIN   UserProfile               up   ON up.UserId    = ass.UserId
+        LEFT JOIN StudentAcademicDetails sad  ON sad.UserId   = ass.UserId
+        LEFT JOIN Sections               sec  ON sec.SectionId = sad.SectionId
+        LEFT JOIN Courses                co   ON co.CourseId  = sad.CourseId
+        LEFT JOIN Semesters              sem  ON sem.SemesterId = sad.SemesterId
+        WHERE  SF.TeacherId   = @TeacherId
+          AND  SF.InstituteId = @InstituteId
+          AND  SF.SessionId   = @SessionId
+          AND  ISNULL(SF.IsActive, 1) = 1
+          AND  (
+                (@SectionName = 'Unassigned' AND sad.SectionId IS NULL)
+                OR
+                (sec.SectionName = @SectionName)
+               )
+        ORDER BY up.FullName
+    ");
+            cmd.Parameters.AddWithValue("@TeacherId", teacherId);
+            cmd.Parameters.AddWithValue("@InstituteId", instituteId);
+            cmd.Parameters.AddWithValue("@SessionId", sessionId);
+            cmd.Parameters.AddWithValue("@SectionName", sectionName);
+            return dl.GetDataTable(cmd);
+        }
+
+        public string GetStudentsBySectionJson(DataTable dt)
+        {
+            var list = new System.Collections.Generic.List<object>();
+            foreach (DataRow row in dt.Rows)
+                list.Add(new
+                {
+                    UserId = Convert.ToInt32(row["UserId"]),
+                    StudentName = row["StudentName"].ToString(),
+                    RollNumber = row["RollNumber"].ToString(),
+                    CourseName = row["CourseName"].ToString(),
+                    SemesterName = row["SemesterName"].ToString()
+                });
+            return new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(list);
         }
     }
 }
