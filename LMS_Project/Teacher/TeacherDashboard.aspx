@@ -137,13 +137,14 @@
 <%-- ══ SUBJECTS + RECENT STUDENTS ══ --%>
 <div class="row g-3 mb-4">
 
-    <%-- LEFT: Subjects (col-md-8) --%>
-    <div class="col-md-8">
-    <div class="panel-card">
-        <div class="section-header">
-            <h6><i class="fas fa-book-open me-2"></i>My Subjects</h6>
-            <a href="TeacherCourses.aspx">View all &rarr;</a>
-        </div>
+<%-- LEFT: My Subjects --%>
+    <div class="col-md-6">
+        <div class="panel-card h-100">
+            <div class="section-header">
+                <h6><i class="fas fa-book-open me-2"></i>My Subjects</h6>
+                <a href="TeacherCourses.aspx">View all &rarr;</a>
+            </div>
+
 
         <%-- KPI Mini Cards --%>
         <asp:Panel ID="pnlSubjectKPIs" runat="server">
@@ -241,7 +242,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <a href='CourseVideos.aspx?SubjectId=<%# Eval("SubjectId") %>'
+                                        <a href='SubjectAnalytics.aspx?SubjectId=<%# Eval("SubjectId") %>'
                                            class="btn-view" style="padding:3px 10px;font-size:11px;">
                                             <i class="fas fa-play-circle me-1"></i>Manage
                                         </a>
@@ -265,13 +266,13 @@
     </div>
 </div>
 
-    <%-- RIGHT: Recent Students (col-md-4) --%>
-    <div class="col-md-4">
-    <div class="panel-card">
-        <div class="section-header">
-            <h6><i class="fas fa-users me-2"></i>Student Analytics</h6>
-            <a href="MyStudents.aspx">View all &rarr;</a>
-        </div>
+  <%-- RIGHT: Student Analytics --%>
+    <div class="col-md-6">
+        <div class="panel-card h-100">
+            <div class="section-header">
+                <h6><i class="fas fa-users me-2"></i>Student Analytics</h6>
+                <a href="MyStudents.aspx">View all &rarr;</a>
+            </div>
         <div class="d-flex flex-wrap gap-2 mb-3">
 
     <asp:DropDownList ID="ddlStudentSession" runat="server"
@@ -355,138 +356,8 @@
 
     </div>
 </div>
-
-<%-- ══ RECENT ASSIGNMENTS ══ --%>
-<div class="row g-3">
-    <div class="col-md-8">
-        <div class="panel-card">
-            <div class="section-header">
-                <h6><i class="fas fa-tasks me-2"></i>Recent Assignments</h6>
-                <a href="TeacherAssignment.aspx">View all &rarr;</a>
-            </div>
-
-            <%-- Filter + View Toggle --%>
-            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-
-                <div class="btn-group btn-group-sm" role="group">
-                    <button type="button" id="btnAsgList" onclick="setAsgView('list')"
-                            class="btn btn-primary" title="List View">
-                        <i class="fas fa-list"></i>
-                    </button>
-                    <button type="button" id="btnAsgChart" onclick="setAsgView('chart')"
-                            class="btn btn-outline-primary" title="Chart View">
-                        <i class="fas fa-chart-bar"></i>
-                    </button>
-                </div>
-
-                <asp:DropDownList ID="ddlAsgSubject" runat="server"
-                    CssClass="form-select form-select-sm"
-                    Style="width:auto; min-width:160px;"
-                    AutoPostBack="true"
-                    OnSelectedIndexChanged="ddlAsgSubject_SelectedIndexChanged">
-                </asp:DropDownList>
-
-            </div>
-
-            <%-- LIST VIEW --%>
-            <asp:Panel ID="pnlAssignments" runat="server">
-                <asp:Repeater ID="rptAssignments" runat="server">
-                    <ItemTemplate>
-                        <div class="assignment-row">
-                            <div class="a-icon"><i class="fas fa-file-alt"></i></div>
-                            <div>
-                                <div class="a-title"><%# Eval("Title") %></div>
-                                <div class="a-sub">
-                                    <i class="fas fa-book me-1"></i><%# Eval("SubjectName") %>
-                                    &nbsp;|&nbsp;
-                                    <i class="fas fa-star me-1"></i><%# Eval("MaxMarks") %> marks
-                                </div>
-                            </div>
-                            <div class="a-right">
-                                <div class="mb-1">
-                                    <i class="far fa-calendar-alt me-1"></i>
-                                    Due: <%# Eval("DueDate", "{0:dd MMM yyyy}") %>
-                                </div>
-                                <div>
-                                    <i class="fas fa-paper-plane me-1 text-success"></i>
-                                    <%# Eval("SubmissionCount") %> / <%# Eval("TotalStudents") %> submitted
-                                </div>
-                            </div>
-                        </div>
-                    </ItemTemplate>
-                </asp:Repeater>
-            </asp:Panel>
-
-            <%-- CHART VIEW --%>
-            <asp:Panel ID="pnlAsgChart" runat="server" Visible="false">
-                <div style="position:relative; height:300px;">
-                    <canvas id="asgChart"></canvas>
-                </div>
-                <asp:HiddenField ID="hfAsgChartData" runat="server" />
-            </asp:Panel>
-
-            <%-- EMPTY STATE --%>
-            <asp:Panel ID="pnlNoAssignments" runat="server" Visible="false">
-                <div class="empty-state">
-                    <i class="fas fa-clipboard-check" style="color:#2e7d32;"></i>
-                    <p>No assignments found.<br />
-                        <a href="TeacherAssignment.aspx" style="color:#2e7d32;">
-                            Create your first assignment &rarr;
-                        </a>
-                    </p>
-                </div>
-            </asp:Panel>
-
-        </div>
-    </div>
-
-    <%-- Submission summary side card --%>
-    <div class="col-md-4">
-        <div class="panel-card">
-            <div class="section-header">
-                <h6><i class="fas fa-paper-plane me-2"></i>Submission Summary</h6>
-            </div>
-
-            <asp:Panel ID="pnlAsgSummary" runat="server">
-                <asp:Repeater ID="rptAsgSummary" runat="server">
-                    <ItemTemplate>
-                        <div style="margin-bottom:14px;">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span style="font-size:12px; font-weight:600; color:#263238;">
-                                    <%# Eval("Title") %>
-                                </span>
-                                <span style="font-size:11px; color:#78909c;">
-                                    <%# Eval("SubmissionCount") %>/<%# Eval("TotalStudents") %>
-                                </span>
-                            </div>
-                            <div class="progress" style="height:7px; border-radius:10px;">
-                                <div class="progress-bar"
-                                     role="progressbar"
-                                     style="width:<%# Eval("SubmissionPercent") %>%;
-                                            background:#1565c0; border-radius:10px;"
-                                     aria-valuenow='<%# Eval("SubmissionPercent") %>'
-                                     aria-valuemin="0" aria-valuemax="100">
-                                </div>
-                            </div>
-                            <div style="font-size:10px; color:#90a4ae; margin-top:2px;">
-                                <%# Eval("SubmissionPercent") %>% submitted
-                            </div>
-                        </div>
-                    </ItemTemplate>
-                </asp:Repeater>
-            </asp:Panel>
-
-            <asp:Panel ID="pnlNoAsgSummary" runat="server" Visible="false">
-                <div class="empty-state">
-                    <i class="fas fa-chart-pie"></i>
-                    <p>No submission data yet.</p>
-                </div>
-            </asp:Panel>
-
-        </div>
-    </div>
-</div>
-<%-- ══ STUDENT PERFORMANCE ══ --%>
+ </div>
+ <%-- ══ STUDENT PERFORMANCE ══ --%>
 <div class="row g-3 mt-2">
     <div class="col-12">
         <div class="panel-card">
@@ -682,7 +553,8 @@
         </div>
     </div>
 </div>
-  <%-- ══ COMPARISON ANALYTICS SECTION ══ --%>
+
+<%-- ══ COMPARISON ANALYTICS SECTION ══ --%>
 <div class="row g-3 mt-2">
     <div class="col-12">
         <div class="panel-card">
@@ -835,6 +707,139 @@
         </div>
     </div>
 </div>
+
+<%-- ══ RECENT ASSIGNMENTS ══ --%>
+<div class="row g-3 mt-2">
+    <div class="col-md-8">
+        <div class="panel-card">
+            <div class="section-header">
+                <h6><i class="fas fa-tasks me-2"></i>Recent Assignments</h6>
+                <a href="TeacherAssignment.aspx">View all &rarr;</a>
+            </div>
+
+            <%-- Filter + View Toggle --%>
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" id="btnAsgList" onclick="setAsgView('list')"
+                            class="btn btn-primary" title="List View">
+                        <i class="fas fa-list"></i>
+                    </button>
+                    <button type="button" id="btnAsgChart" onclick="setAsgView('chart')"
+                            class="btn btn-outline-primary" title="Chart View">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                </div>
+
+                <asp:DropDownList ID="ddlAsgSubject" runat="server"
+                    CssClass="form-select form-select-sm"
+                    Style="width:auto; min-width:160px;"
+                    AutoPostBack="true"
+                    OnSelectedIndexChanged="ddlAsgSubject_SelectedIndexChanged">
+                </asp:DropDownList>
+
+            </div>
+
+            <%-- LIST VIEW --%>
+            <asp:Panel ID="pnlAssignments" runat="server">
+                <asp:Repeater ID="rptAssignments" runat="server">
+                    <ItemTemplate>
+                        <div class="assignment-row">
+                            <div class="a-icon"><i class="fas fa-file-alt"></i></div>
+                            <div>
+                                <div class="a-title"><%# Eval("Title") %></div>
+                                <div class="a-sub">
+                                    <i class="fas fa-book me-1"></i><%# Eval("SubjectName") %>
+                                    &nbsp;|&nbsp;
+                                    <i class="fas fa-star me-1"></i><%# Eval("MaxMarks") %> marks
+                                </div>
+                            </div>
+                            <div class="a-right">
+                                <div class="mb-1">
+                                    <i class="far fa-calendar-alt me-1"></i>
+                                    Due: <%# Eval("DueDate", "{0:dd MMM yyyy}") %>
+                                </div>
+                                <div>
+                                    <i class="fas fa-paper-plane me-1 text-success"></i>
+                                    <%# Eval("SubmissionCount") %> / <%# Eval("TotalStudents") %> submitted
+                                </div>
+                            </div>
+                        </div>
+                    </ItemTemplate>
+                </asp:Repeater>
+            </asp:Panel>
+
+            <%-- CHART VIEW --%>
+            <asp:Panel ID="pnlAsgChart" runat="server" Visible="false">
+                <div style="position:relative; height:300px;">
+                    <canvas id="asgChart"></canvas>
+                </div>
+                <asp:HiddenField ID="hfAsgChartData" runat="server" />
+            </asp:Panel>
+
+            <%-- EMPTY STATE --%>
+            <asp:Panel ID="pnlNoAssignments" runat="server" Visible="false">
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-check" style="color:#2e7d32;"></i>
+                    <p>No assignments found.<br />
+                        <a href="TeacherAssignment.aspx" style="color:#2e7d32;">
+                            Create your first assignment &rarr;
+                        </a>
+                    </p>
+                </div>
+            </asp:Panel>
+
+        </div>
+    </div>
+
+    <%-- Submission summary side card --%>
+    <div class="col-md-4">
+        <div class="panel-card">
+            <div class="section-header">
+                <h6><i class="fas fa-paper-plane me-2"></i>Submission Summary</h6>
+            </div>
+
+            <asp:Panel ID="pnlAsgSummary" runat="server">
+                <asp:Repeater ID="rptAsgSummary" runat="server">
+                    <ItemTemplate>
+                        <div style="margin-bottom:14px;">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span style="font-size:12px; font-weight:600; color:#263238;">
+                                    <%# Eval("Title") %>
+                                </span>
+                                <span style="font-size:11px; color:#78909c;">
+                                    <%# Eval("SubmissionCount") %>/<%# Eval("TotalStudents") %>
+                                </span>
+                            </div>
+                            <div class="progress" style="height:7px; border-radius:10px;">
+                                <div class="progress-bar"
+                                     role="progressbar"
+                                     style="width:<%# Eval("SubmissionPercent") %>%;
+                                            background:#1565c0; border-radius:10px;"
+                                     aria-valuenow='<%# Eval("SubmissionPercent") %>'
+                                     aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                            <div style="font-size:10px; color:#90a4ae; margin-top:2px;">
+                                <%# Eval("SubmissionPercent") %>% submitted
+                            </div>
+                        </div>
+                    </ItemTemplate>
+                </asp:Repeater>
+            </asp:Panel>
+
+            <asp:Panel ID="pnlNoAsgSummary" runat="server" Visible="false">
+                <div class="empty-state">
+                    <i class="fas fa-chart-pie"></i>
+                    <p>No submission data yet.</p>
+                </div>
+            </asp:Panel>
+
+        </div>
+    </div>
+</div>
+
+
 <%-- ══ CONTENT ENGAGEMENT SECTION ══ --%>
 <div class="row g-3 mt-2">
     <div class="col-12">
@@ -1269,136 +1274,156 @@
     </div>
 
     <%-- RIGHT: Activity Tracking (col-lg-5) --%>
-    <div class="col-lg-5">
-        <div class="panel-card" style="height:100%;">
+    <%-- ══ ACTIVITY TRACKING - FIXED VERSION ══ --%>
+<div class="col-lg-5">
+    <div class="panel-card" style="height:100%;">
 
-            <div class="section-header mb-2">
-                <h6><i class="fas fa-bolt me-2"></i>Activity Tracking</h6>
-            </div>
-            <p style="font-size:12px;color:#90a4ae;margin:-6px 0 16px;">
-                Daily actions, last active time, and activity trends.
-            </p>
+        <div class="section-header mb-2">
+            <h6><i class="fas fa-bolt me-2"></i>Activity Tracking</h6>
+        </div>
+        <p style="font-size:12px;color:#90a4ae;margin:-6px 0 16px;">
+            Daily actions, last active time, and activity trends.
+        </p>
 
-            <%-- KPI Strip --%>
-            <div class="row g-2 mb-3">
-                <div class="col-6">
-                    <div style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);border-radius:12px;padding:12px 14px;">
-                        <div style="font-size:10px;font-weight:700;color:#1565c0;text-transform:uppercase;letter-spacing:.5px;">Today's Actions</div>
-                        <div style="font-size:28px;font-weight:800;color:#0d47a1;">
-                            <asp:Label ID="lblActTodayCount" runat="server" Text="0" />
-                        </div>
-                        <div style="font-size:10px;color:#78909c;"><i class="fas fa-calendar-day me-1"></i>actions logged today</div>
+        <%-- KPI Strip --%>
+        <div class="row g-2 mb-3">
+            <div class="col-6">
+                <div style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);border-radius:12px;padding:12px 14px;">
+                    <div style="font-size:10px;font-weight:700;color:#1565c0;text-transform:uppercase;letter-spacing:.5px;">Assignments This Month</div>
+                    <div style="font-size:28px;font-weight:800;color:#0d47a1;">
+                        <asp:Label ID="lblActTodayCount" runat="server" Text="0" />
                     </div>
-                </div>
-                <div class="col-6">
-                    <div style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:12px;padding:12px 14px;">
-                        <div style="font-size:10px;font-weight:700;color:#2e7d32;text-transform:uppercase;letter-spacing:.5px;">This Week</div>
-                        <div style="font-size:28px;font-weight:800;color:#1b5e20;">
-                            <asp:Label ID="lblActWeekCount" runat="server" Text="0" />
-                        </div>
-                        <div style="font-size:10px;color:#78909c;"><i class="fas fa-calendar-week me-1"></i>actions this week</div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);border-radius:12px;padding:12px 14px;">
-                        <div style="font-size:10px;font-weight:700;color:#ef6c00;text-transform:uppercase;letter-spacing:.5px;">Last Active</div>
-                        <div style="font-size:13px;font-weight:800;color:#e65100;line-height:1.3;margin-top:3px;">
-                            <asp:Label ID="lblActLastActive" runat="server" Text="-" />
-                        </div>
-                        <div style="font-size:10px;color:#78909c;margin-top:2px;"><i class="fas fa-clock me-1"></i>most recent activity</div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div style="background:linear-gradient(135deg,#ede7f6,#d1c4e9);border-radius:12px;padding:12px 14px;">
-                        <div style="font-size:10px;font-weight:700;color:#5e35b1;text-transform:uppercase;letter-spacing:.5px;">Active Days</div>
-                        <div style="font-size:28px;font-weight:800;color:#4527a0;">
-                            <asp:Label ID="lblActActiveDays" runat="server" Text="0" />
-                        </div>
-                        <div style="font-size:10px;color:#78909c;"><i class="fas fa-fire me-1"></i>days active this month</div>
-                    </div>
+                    <div style="font-size:10px;color:#78909c;"><i class="fas fa-calendar-day me-1"></i>actions logged today</div>
                 </div>
             </div>
-
-            <%-- Chart type toggle --%>
-            <div class="d-flex align-items-center gap-2 mb-3">
-                <span style="font-size:11px;font-weight:700;color:#78909c;">View as:</span>
-                <div class="btn-group btn-group-sm">
-                    <button type="button" id="btnActLine" onclick="setActChartType('line')"
-                            class="btn btn-primary" title="Line Chart">
-                        <i class="fas fa-chart-line"></i>
-                    </button>
-                    <button type="button" id="btnActBar" onclick="setActChartType('bar')"
-                            class="btn btn-outline-primary" title="Bar Chart">
-                        <i class="fas fa-chart-bar"></i>
-                    </button>
+            <div class="col-6">
+                <div style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:12px;padding:12px 14px;">
+                    <div style="font-size:10px;font-weight:700;color:#2e7d32;text-transform:uppercase;letter-spacing:.5px;">Submissions Graded</div>
+                    <div style="font-size:28px;font-weight:800;color:#1b5e20;">
+                        <asp:Label ID="lblActWeekCount" runat="server" Text="0" />
+                    </div>
+                    <div style="font-size:10px;color:#78909c;"><i class="fas fa-calendar-week me-1"></i>actions this week</div>
                 </div>
-                <span style="font-size:11px;color:#90a4ae;margin-left:4px;">Last 7 days</span>
             </div>
-
-            <%-- Trend Chart --%>
-            <asp:Panel ID="pnlActivityChart" runat="server">
-                <div style="position:relative;height:180px;margin-bottom:16px;">
-                    <canvas id="activityTrendChart" role="img" aria-label="Teacher activity trend chart"></canvas>
+            <div class="col-6">
+                <div style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);border-radius:12px;padding:12px 14px;">
+                    <div style="font-size:10px;font-weight:700;color:#ef6c00;text-transform:uppercase;letter-spacing:.5px;">Last Assignment</div>
+                    <div style="font-size:13px;font-weight:800;color:#e65100;line-height:1.3;margin-top:3px;">
+                        <asp:Label ID="lblActLastActive" runat="server" Text="-" />
+                    </div>
+                    <div style="font-size:10px;color:#78909c;margin-top:2px;"><i class="fas fa-clock me-1"></i>most recent activity</div>
                 </div>
-                <asp:HiddenField ID="hfActivityTrendData" runat="server" ClientIDMode="Static" />
-            </asp:Panel>
-
-            <%-- Recent Activity Log --%>
-            <div style="font-size:11px;font-weight:700;color:#78909c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">
-                <i class="fas fa-history me-1"></i> Recent Actions
             </div>
+            <div class="col-6">
+                <div style="background:linear-gradient(135deg,#ede7f6,#d1c4e9);border-radius:12px;padding:12px 14px;">
+                    <div style="font-size:10px;font-weight:700;color:#5e35b1;text-transform:uppercase;letter-spacing:.5px;">Videos This Month</div>
+                    <div style="font-size:28px;font-weight:800;color:#4527a0;">
+                        <asp:Label ID="lblActActiveDays" runat="server" Text="0" />
+                    </div>
+                    <div style="font-size:10px;color:#78909c;"><i class="fas fa-fire me-1"></i>days active this month</div>
+                </div>
+            </div>
+        </div>
 
-            <asp:Panel ID="pnlActivityLog" runat="server">
-                <asp:Repeater ID="rptActivityLog" runat="server">
+        <%-- Chart type toggle --%>
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <span style="font-size:11px;font-weight:700;color:#78909c;">View as:</span>
+            <div class="btn-group btn-group-sm">
+                <button type="button" id="btnActLine" onclick="setActChartType('line')"
+                        class="btn btn-primary" title="Line Chart">
+                    <i class="fas fa-chart-line"></i>
+                </button>
+                <button type="button" id="btnActBar" onclick="setActChartType('bar')"
+                        class="btn btn-outline-primary" title="Bar Chart">
+                    <i class="fas fa-chart-bar"></i>
+                </button>
+            </div>
+            <span style="font-size:11px;color:#90a4ae;margin-left:4px;">Last 7 days</span>
+        </div>
+
+        <%-- Trend Chart --%>
+        <asp:Panel ID="pnlActivityChart" runat="server">
+            <div style="position:relative;height:180px;margin-bottom:16px;">
+                <canvas id="activityTrendChart" role="img" aria-label="Teacher activity trend chart"></canvas>
+            </div>
+            <asp:HiddenField ID="hfActivityTrendData" runat="server" ClientIDMode="Static" />
+        </asp:Panel>
+
+        <%-- Recent Activity Log - ONLY ONE PANEL --%>
+        <div style="font-size:11px;font-weight:700;color:#78909c;text-transform:uppercase;
+                    letter-spacing:.5px;margin-bottom:10px;">
+            <i class="fas fa-history me-1"></i> Recent Actions
+        </div>
+
+        <asp:Panel ID="pnlActivityLog" runat="server">
+            <asp:Repeater ID="rptActivityLog" runat="server">
+                <ItemTemplate>
+                    <div class="activity-log-item"
+                         style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;
+                                border-bottom:1px solid #e3f2fd;">
+                        <div style="width:34px;height:34px;border-radius:9px;
+                                    background:<%# GetActivityIconBg(Eval("ActionType").ToString()) %>;
+                                    display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas <%# GetActivityIcon(Eval("ActionType").ToString()) %>"
+                               style="font-size:13px;color:#fff;"></i>
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:12px;font-weight:700;color:#263238;
+                                        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                <%# Eval("ActionDescription") %>
+                            </div>
+                            <div style="font-size:10px;color:#90a4ae;">
+                                <i class="fas fa-tag me-1"></i><%# Eval("ActionType") %>
+                            </div>
+                        </div>
+                        <div style="text-align:right;flex-shrink:0;">
+                            <div style="font-size:10px;color:#90a4ae;"><%# Eval("TimeAgo") %></div>
+                            <div style="font-size:10px;color:#b0bec5;"><%# Eval("ActionDate") %></div>
+                        </div>
+                    </div>
+                </ItemTemplate>
+            </asp:Repeater>
+
+            <%-- See more button --%>
+            <div id="activitySeeMoreBtn" style="text-align:center;margin-top:10px;display:none;">
+                <button type="button" onclick="openAllActivityModal()"
+                        style="background:none;border:1.5px solid #bbdefb;border-radius:20px;
+                               padding:5px 18px;font-size:11px;font-weight:700;color:#1565c0;
+                               cursor:pointer;transition:all .2s;"
+                        onmouseover="this.style.background='#e3f2fd'"
+                        onmouseout="this.style.background='none'">
+                    <i class="fas fa-chevron-down me-1"></i>See all activity
+                </button>
+            </div>
+        </asp:Panel>
+
+        <asp:Panel ID="pnlNoActivityLog" runat="server" Visible="false">
+            <div class="empty-state">
+                <i class="fas fa-history" style="color:#90caf9;"></i>
+                <p>No activity recorded yet.</p>
+            </div>
+        </asp:Panel>
+
+        <%-- Action breakdown mini-chips --%>
+        <asp:Panel ID="pnlActivityBreakdown" runat="server">
+            <div style="font-size:11px;font-weight:700;color:#78909c;text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px;">
+                <i class="fas fa-layer-group me-1"></i> Action Breakdown
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <asp:Repeater ID="rptActivityBreakdown" runat="server">
                     <ItemTemplate>
-                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #e3f2fd;">
-                            <div style="width:34px;height:34px;border-radius:9px;background:<%# GetActivityIconBg(Eval("ActionType").ToString()) %>;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                <i class="fas <%# GetActivityIcon(Eval("ActionType").ToString()) %>" style="font-size:13px;color:#fff;"></i>
-                            </div>
-                            <div style="flex:1;min-width:0;">
-                                <div style="font-size:12px;font-weight:700;color:#263238;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                                    <%# Eval("ActionDescription") %>
-                                </div>
-                                <div style="font-size:10px;color:#90a4ae;">
-                                    <i class="fas fa-tag me-1"></i><%# Eval("ActionType") %>
-                                </div>
-                            </div>
-                            <div style="text-align:right;flex-shrink:0;">
-                                <div style="font-size:10px;color:#90a4ae;"><%# Eval("TimeAgo") %></div>
-                                <div style="font-size:10px;color:#b0bec5;"><%# Eval("ActionDate") %></div>
-                            </div>
-                        </div>
+                        <span style="display:inline-flex;align-items:center;gap:5px;background:<%# GetActivityIconBg(Eval("ActionType").ToString()) %>22;color:<%# GetActivityIconBg(Eval("ActionType").ToString()) %>;border:1.5px solid <%# GetActivityIconBg(Eval("ActionType").ToString()) %>44;border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;">
+                            <i class="fas <%# GetActivityIcon(Eval("ActionType").ToString()) %>"></i>
+                            <%# Eval("ActionType") %>
+                            <span style="background:<%# GetActivityIconBg(Eval("ActionType").ToString()) %>;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;"><%# Eval("ActionCount") %></span>
+                        </span>
                     </ItemTemplate>
                 </asp:Repeater>
-            </asp:Panel>
+            </div>
+        </asp:Panel>
 
-            <asp:Panel ID="pnlNoActivityLog" runat="server" Visible="false">
-                <div class="empty-state">
-                    <i class="fas fa-history" style="color:#90caf9;"></i>
-                    <p>No activity recorded yet.</p>
-                </div>
-            </asp:Panel>
-
-            <%-- Action breakdown mini-chips --%>
-            <asp:Panel ID="pnlActivityBreakdown" runat="server">
-                <div style="font-size:11px;font-weight:700;color:#78909c;text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px;">
-                    <i class="fas fa-layer-group me-1"></i> Action Breakdown
-                </div>
-                <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                    <asp:Repeater ID="rptActivityBreakdown" runat="server">
-                        <ItemTemplate>
-                            <span style="display:inline-flex;align-items:center;gap:5px;background:<%# GetActivityIconBg(Eval("ActionType").ToString()) %>22;color:<%# GetActivityIconBg(Eval("ActionType").ToString()) %>;border:1.5px solid <%# GetActivityIconBg(Eval("ActionType").ToString()) %>44;border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;">
-                                <i class="fas <%# GetActivityIcon(Eval("ActionType").ToString()) %>"></i>
-                                <%# Eval("ActionType") %>
-                                <span style="background:<%# GetActivityIconBg(Eval("ActionType").ToString()) %>;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;"><%# Eval("ActionCount") %></span>
-                            </span>
-                        </ItemTemplate>
-                    </asp:Repeater>
-                </div>
-            </asp:Panel>
-
-        </div>
     </div>
+</div>
 
 </div>
   <script>
@@ -1481,7 +1506,35 @@
         </div>
     </div>
 </div>
-  // DELETE THIS FROM ASPX:
+    <%-- ══ ALL ACTIVITY MODAL ══ --%>
+<div class="modal fade" id="allActivityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="border-radius:16px;border:none;">
+            <div class="modal-header"
+                 style="background:linear-gradient(135deg,#1565c0,#42a5f5);
+                        border-radius:16px 16px 0 0;padding:18px 24px;">
+                <div>
+                    <h5 class="modal-title"
+                        style="color:#fff;font-weight:800;margin:0;font-size:18px;">
+                        <i class="fas fa-history me-2"></i>All Recent Actions
+                    </h5>
+                    <div style="color:rgba(255,255,255,.75);font-size:12px;margin-top:3px;">
+                        Your latest assignments, videos, grading &amp; more
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding:20px;" id="allActivityModalBody">
+                <div style="text-align:center;padding:30px;color:#90a4ae;">
+                    <i class="fas fa-spinner fa-spin"
+                       style="font-size:24px;margin-bottom:8px;display:block;"></i>
+                    Loading...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         setTimeout(function () {

@@ -99,29 +99,30 @@ namespace LMS_Project.BL
             SqlCommand cmd = new SqlCommand(@"
         SELECT 
             ISNULL(SUM(CASE WHEN A.Status='Present' THEN 1 ELSE 0 END), 0) AS Present,
-            ISNULL(SUM(CASE WHEN A.Status='Absent'  THEN 1 ELSE 0 END), 0) AS Absent
+            ISNULL(SUM(CASE WHEN A.Status='Absent'  THEN 1 ELSE 0 END), 0) AS Absent,
+            ISNULL(SUM(CASE WHEN A.Status='Leave'   THEN 1 ELSE 0 END), 0) AS Leave
         FROM Attendance A
         WHERE A.UserId = @U
           AND A.SubjectId IN (
               SELECT SF.SubjectId FROM SubjectFaculty SF
               WHERE SF.TeacherId = @T AND SF.IsActive = 1
-          );
+          )
     ");
             cmd.Parameters.AddWithValue("@U", userId);
             cmd.Parameters.AddWithValue("@T", teacherUserId);
 
             DataTable dt = dl.GetDataTable(cmd);
             if (dt == null || dt.Rows.Count == 0)
-                return new TeacherStudentGC { Present = 0, Absent = 0 };
+                return new TeacherStudentGC { Present = 0, Absent = 0, Leave = 0 };
 
             DataRow r = dt.Rows[0];
             return new TeacherStudentGC
             {
                 Present = Convert.ToInt32(r["Present"]),
-                Absent = Convert.ToInt32(r["Absent"])
+                Absent = Convert.ToInt32(r["Absent"]),
+                Leave = Convert.ToInt32(r["Leave"])
             };
-        }
-        // ── Subjects + Progress ──────────────────────────────────────
+        }        // ── Subjects + Progress ──────────────────────────────────────
         public List<TeacherStudentSubjectGC> GetSubjects(int userId)
         {
             SqlCommand cmd = new SqlCommand(@"
@@ -358,6 +359,71 @@ namespace LMS_Project.BL
                 AssignmentsOverdue = Convert.ToInt32(r["Overdue"]),
                 AssignmentsPending = Convert.ToInt32(r["Pending"])   // ← add to GC
             };
+        }
+
+        // ── Marks detail per assignment (graded only) ────────────────
+        public DataTable GetStudentMarksDetail(int userId, int teacherUserId, int sessionId)
+        {
+            SqlCommand cmd = new SqlCommand(@"
+        SELECT
+            A.Title        AS AssignmentTitle,
+            Sub.SubjectName,
+            ASub.MarksObtained,
+            A.MaxMarks,
+            ISNULL(ROUND(100.0 * ASub.MarksObtained / NULLIF(A.MaxMarks,0), 1), 0) AS Percentage,
+            ASub.SubmittedOn
+        FROM AssignmentSubmissions ASub
+        JOIN Assignments A   ON ASub.AssignmentId = A.AssignmentId
+        JOIN Subjects Sub    ON A.SubjectId = Sub.SubjectId
+        WHERE ASub.StudentId = @U
+          AND ASub.MarksObtained IS NOT NULL
+          AND A.SessionId = @SessionId
+          AND A.SubjectId IN (
+              SELECT SF.SubjectId FROM SubjectFaculty SF
+              WHERE SF.TeacherId = @T AND SF.IsActive = 1
+          )
+        ORDER BY ASub.SubmittedOn DESC
+    ");
+            cmd.Parameters.AddWithValue("@U", userId);
+            cmd.Parameters.AddWithValue("@T", teacherUserId);
+            cmd.Parameters.AddWithValue("@SessionId", sessionId);
+            return dl.GetDataTable(cmd);
+        }
+
+        // ── Attendance by subject ────────────────────────────────────
+        public DataTable GetAttendanceBySubject(int userId, int teacherUserId)
+        {
+            SqlCommand cmd = new SqlCommand(@"
+        SELECT
+            Sub.SubjectName,
+            SUM(CASE WHEN A.Status='Present' THEN 1 ELSE 0 END) AS PresentCount,
+            SUM(CASE WHEN A.Status='Absent'  THEN 1 ELSE 0 END) AS AbsentCount
+        FROM Attendance A
+        JOIN Subjects Sub ON A.SubjectId = Sub.SubjectId
+        WHERE A.UserId = @U
+          AND A.SubjectId IN (
+              SELECT SF.SubjectId FROM SubjectFaculty SF
+              WHERE SF.TeacherId = @T AND SF.IsActive = 1
+          )
+        GROUP BY Sub.SubjectId, Sub.SubjectName
+    ");
+            cmd.Parameters.AddWithValue("@U", userId);
+            cmd.Parameters.AddWithValue("@T", teacherUserId);
+            return dl.GetDataTable(cmd);
+        }
+
+        // ── Quiz attempt count ───────────────────────────────────────
+        public int GetQuizAttemptCount(int userId, int sessionId)
+        {
+            SqlCommand cmd = new SqlCommand(@"
+        SELECT COUNT(*) FROM QuizResults
+        WHERE StudentId = @U AND SessionId = @SessionId
+    ");
+            cmd.Parameters.AddWithValue("@U", userId);
+            cmd.Parameters.AddWithValue("@SessionId", sessionId);
+            DataTable dt = dl.GetDataTable(cmd);
+            if (dt == null || dt.Rows.Count == 0) return 0;
+            return Convert.ToInt32(dt.Rows[0][0]);
         }
     }
 }

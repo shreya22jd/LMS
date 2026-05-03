@@ -1287,44 +1287,45 @@ SELECT
         {
             SqlCommand cmd = new SqlCommand(@"
         SELECT
-            (
-                SELECT COUNT(*)
-                FROM   UserActivityLog
-                WHERE  UserId      = @TeacherId
-                  AND  InstituteId = @InstituteId
-                  AND  CAST(ActionTime AS DATE) = CAST(GETDATE() AS DATE)
+            (SELECT COUNT(*) FROM Assignments a
+             JOIN SubjectFaculty SF ON SF.SubjectId = a.SubjectId
+             WHERE SF.TeacherId = @TeacherId
+               AND SF.InstituteId = @InstituteId
+               AND MONTH(a.CreatedOn) = MONTH(GETDATE())
+               AND YEAR(a.CreatedOn) = YEAR(GETDATE())
+               AND a.IsActive = 1
             ) AS TodayCount,
-            (
-                SELECT COUNT(*)
-                FROM   UserActivityLog
-                WHERE  UserId      = @TeacherId
-                  AND  InstituteId = @InstituteId
-                  AND  ActionTime >= DATEADD(DAY, -6, CAST(GETDATE() AS DATE))
-            ) AS WeekCount,
-            ISNULL(
-                (
-                    SELECT TOP 1
-                        CONVERT(VARCHAR(16), ActionTime, 120)
-                    FROM   UserActivityLog
-                    WHERE  UserId      = @TeacherId
-                      AND  InstituteId = @InstituteId
-                    ORDER  BY ActionTime DESC
-                ), 'No activity yet'
-            ) AS LastActive,
-            (
-                SELECT COUNT(DISTINCT CAST(ActionTime AS DATE))
-                FROM   UserActivityLog
-                WHERE  UserId      = @TeacherId
-                  AND  InstituteId = @InstituteId
-                  AND  MONTH(ActionTime) = MONTH(GETDATE())
-                  AND  YEAR(ActionTime)  = YEAR(GETDATE())
-            ) AS ActiveDaysThisMonth");
 
+            (SELECT COUNT(*) FROM AssignmentSubmissions asub
+             JOIN Assignments a ON a.AssignmentId = asub.AssignmentId
+             JOIN SubjectFaculty SF ON SF.SubjectId = a.SubjectId
+             WHERE SF.TeacherId = @TeacherId
+               AND SF.InstituteId = @InstituteId
+               AND asub.MarksObtained IS NOT NULL
+            ) AS WeekCount,
+
+            ISNULL((
+                SELECT TOP 1 CONVERT(VARCHAR(16), a.CreatedOn, 120)
+                FROM Assignments a
+                JOIN SubjectFaculty SF ON SF.SubjectId = a.SubjectId
+                WHERE SF.TeacherId = @TeacherId
+                  AND SF.InstituteId = @InstituteId
+                  AND a.IsActive = 1
+                ORDER BY a.CreatedOn DESC
+            ), 'None yet') AS LastActive,
+
+            (SELECT COUNT(*) FROM Videos v
+             WHERE v.UploadedBy = @TeacherId
+               AND v.InstituteId = @InstituteId
+               AND v.IsActive = 1
+               AND MONTH(v.UploadedOn) = MONTH(GETDATE())
+               AND YEAR(v.UploadedOn) = YEAR(GETDATE())
+            ) AS ActiveDaysThisMonth
+    ");
             cmd.Parameters.AddWithValue("@TeacherId", teacherId);
             cmd.Parameters.AddWithValue("@InstituteId", instituteId);
             return dl.GetDataTable(cmd);
         }
-
         public DataTable GetActivityTrend(int teacherId, int instituteId)
         {
             SqlCommand cmd = new SqlCommand(@"
@@ -1338,79 +1339,157 @@ SELECT
         )
         SELECT
             d.ActivityDate,
-            DATENAME(WEEKDAY, d.ActivityDate) AS DayLabel,
-            ISNULL(COUNT(ual.LogId), 0) AS ActionCount
+            LEFT(DATENAME(WEEKDAY, d.ActivityDate), 3) AS DayLabel,
+            ISNULL(SUM(CASE WHEN src.ActionType = 'Assignment' THEN 1 ELSE 0 END), 0) AS AssignmentCount,
+            ISNULL(SUM(CASE WHEN src.ActionType = 'Video' THEN 1 ELSE 0 END), 0) AS VideoCount,
+            ISNULL(COUNT(src.ActionType), 0) AS ActionCount
         FROM Days d
-        LEFT JOIN UserActivityLog ual
-               ON CAST(ual.ActionTime AS DATE) = d.ActivityDate
-              AND ual.UserId = @TeacherId
-              AND ual.InstituteId = @InstituteId
-        GROUP BY d.ActivityDate
-        ORDER BY d.ActivityDate ASC");
+        LEFT JOIN (
+            SELECT CAST(a.CreatedOn AS DATE) AS ActionDate, 'Assignment' AS ActionType
+            FROM Assignments a
+            JOIN SubjectFaculty SF ON SF.SubjectId = a.SubjectId
+            WHERE SF.TeacherId = @TeacherId
+              AND SF.InstituteId = @InstituteId
+              AND a.IsActive = 1
 
+            UNION ALL
+
+            SELECT CAST(v.UploadedOn AS DATE) AS ActionDate, 'Video' AS ActionType
+            FROM Videos v
+            WHERE v.UploadedBy = @TeacherId
+              AND v.InstituteId = @InstituteId
+              AND v.IsActive = 1
+        ) src ON src.ActionDate = d.ActivityDate
+        GROUP BY d.ActivityDate
+        ORDER BY d.ActivityDate ASC
+    ");
             cmd.Parameters.AddWithValue("@TeacherId", teacherId);
             cmd.Parameters.AddWithValue("@InstituteId", instituteId);
             return dl.GetDataTable(cmd);
         }
-
         public string GetActivityTrendJson(DataTable dt)
         {
-            var list = new List<object>();
+            var list = new System.Collections.Generic.List<object>();
             foreach (DataRow row in dt.Rows)
             {
                 string day = row["DayLabel"].ToString();
-                if (day.Length > 3) day = day.Substring(0, 3);
                 list.Add(new
                 {
                     DayLabel = day,
-                    ActionCount = Convert.ToInt32(row["ActionCount"])
+                    ActionCount = Convert.ToInt32(row["ActionCount"]),
+                    AssignmentCount = Convert.ToInt32(row["AssignmentCount"]),
+                    VideoCount = Convert.ToInt32(row["VideoCount"])
                 });
             }
-            return new JavaScriptSerializer().Serialize(list);
+            return new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(list);
         }
-
         public DataTable GetRecentActivityLog(int teacherId, int instituteId)
         {
+            // Pull recent real actions from actual tables
             SqlCommand cmd = new SqlCommand(@"
-        SELECT TOP 8
-            ual.LogId,
-            ISNULL(ual.ActivityType, 'General') AS ActionType,
-            ISNULL(ual.ActivityType, 'Activity') AS ActionDescription,
-            CONVERT(VARCHAR(11), ual.ActionTime, 106) AS ActionDate,
-            CASE
-                WHEN DATEDIFF(MINUTE, ual.ActionTime, GETDATE()) < 1
-                    THEN 'Just now'
-                WHEN DATEDIFF(MINUTE, ual.ActionTime, GETDATE()) < 60
-                    THEN CAST(DATEDIFF(MINUTE, ual.ActionTime, GETDATE()) AS VARCHAR) + ' min ago'
-                WHEN DATEDIFF(HOUR, ual.ActionTime, GETDATE()) < 24
-                    THEN CAST(DATEDIFF(HOUR, ual.ActionTime, GETDATE()) AS VARCHAR) + ' hr ago'
-                WHEN DATEDIFF(DAY, ual.ActionTime, GETDATE()) < 7
-                    THEN CAST(DATEDIFF(DAY, ual.ActionTime, GETDATE()) AS VARCHAR) + ' days ago'
-                ELSE CONVERT(VARCHAR(11), ual.ActionTime, 106)
-            END AS TimeAgo
-        FROM UserActivityLog ual
-        WHERE ual.UserId = @TeacherId
-          AND ual.InstituteId = @InstituteId
-        ORDER BY ual.ActionTime DESC");
+        SELECT TOP 8 * FROM (
 
+            SELECT
+                'Assignment' AS ActionType,
+                'Created: ' + a.Title AS ActionDescription,
+                CONVERT(VARCHAR(11), a.CreatedOn, 106) AS ActionDate,
+                CASE
+                    WHEN DATEDIFF(MINUTE, a.CreatedOn, GETDATE()) < 60
+                        THEN CAST(DATEDIFF(MINUTE, a.CreatedOn, GETDATE()) AS VARCHAR) + ' min ago'
+                    WHEN DATEDIFF(HOUR, a.CreatedOn, GETDATE()) < 24
+                        THEN CAST(DATEDIFF(HOUR, a.CreatedOn, GETDATE()) AS VARCHAR) + ' hr ago'
+                    ELSE CAST(DATEDIFF(DAY, a.CreatedOn, GETDATE()) AS VARCHAR) + ' days ago'
+                END AS TimeAgo,
+                a.CreatedOn AS SortDate
+            FROM Assignments a
+            JOIN SubjectFaculty SF ON SF.SubjectId = a.SubjectId
+            WHERE SF.TeacherId = @TeacherId
+              AND SF.InstituteId = @InstituteId
+              AND a.IsActive = 1
+
+            UNION ALL
+
+            SELECT
+                'Attendance' AS ActionType,
+                'Attendance marked for ' + sub.SubjectName AS ActionDescription,
+                CONVERT(VARCHAR(11), MAX(att.Date), 106) AS ActionDate,
+                CAST(DATEDIFF(DAY, MAX(att.Date), GETDATE()) AS VARCHAR) + ' days ago' AS TimeAgo,
+                CAST(MAX(att.Date) AS DATETIME) AS SortDate
+            FROM Attendance att
+            JOIN Subjects sub ON sub.SubjectId = att.SubjectId
+            WHERE att.MarkedBy = @TeacherId
+              AND att.InstituteId = @InstituteId
+            GROUP BY sub.SubjectName, att.Date
+
+            UNION ALL
+
+            SELECT
+                'Grading' AS ActionType,
+                'Graded: ' + a.Title AS ActionDescription,
+                CONVERT(VARCHAR(11), MAX(asub.GradedOn), 106) AS ActionDate,
+                CAST(DATEDIFF(DAY, MAX(asub.GradedOn), GETDATE()) AS VARCHAR) + ' days ago' AS TimeAgo,
+                MAX(asub.GradedOn) AS SortDate
+            FROM AssignmentSubmissions asub
+            JOIN Assignments a ON a.AssignmentId = asub.AssignmentId
+            JOIN SubjectFaculty SF ON SF.SubjectId = a.SubjectId
+            WHERE SF.TeacherId = @TeacherId
+              AND SF.InstituteId = @InstituteId
+              AND asub.GradedOn IS NOT NULL
+            GROUP BY a.Title
+
+            UNION ALL
+
+            SELECT
+                'Video' AS ActionType,
+                'Uploaded: ' + v.Title AS ActionDescription,
+                CONVERT(VARCHAR(11), v.UploadedOn, 106) AS ActionDate,
+                CAST(DATEDIFF(DAY, v.UploadedOn, GETDATE()) AS VARCHAR) + ' days ago' AS TimeAgo,
+                v.UploadedOn AS SortDate
+            FROM Videos v
+            WHERE v.UploadedBy = @TeacherId
+              AND v.InstituteId = @InstituteId
+              AND v.IsActive = 1
+
+        ) combined
+        ORDER BY SortDate DESC
+    ");
             cmd.Parameters.AddWithValue("@TeacherId", teacherId);
             cmd.Parameters.AddWithValue("@InstituteId", instituteId);
             return dl.GetDataTable(cmd);
         }
-
         public DataTable GetActivityBreakdown(int teacherId, int instituteId)
         {
             SqlCommand cmd = new SqlCommand(@"
-        SELECT
-            ISNULL(ActivityType, 'General') AS ActionType,
-            COUNT(*) AS ActionCount
-        FROM UserActivityLog
-        WHERE UserId = @TeacherId
-          AND InstituteId = @InstituteId
-          AND ActionTime >= DATEADD(DAY, -29, GETDATE())
-        GROUP BY ActivityType
-        ORDER BY ActionCount DESC");
+        SELECT ActionType, COUNT(*) AS ActionCount FROM (
+            SELECT 'Assignment' AS ActionType
+            FROM Assignments a
+            JOIN SubjectFaculty SF ON SF.SubjectId = a.SubjectId
+            WHERE SF.TeacherId = @TeacherId AND SF.InstituteId = @InstituteId AND a.IsActive = 1
 
+            UNION ALL
+
+            SELECT 'Attendance' AS ActionType
+            FROM Attendance att
+            WHERE att.MarkedBy = @TeacherId AND att.InstituteId = @InstituteId
+
+            UNION ALL
+
+            SELECT 'Grading' AS ActionType
+            FROM AssignmentSubmissions asub
+            JOIN Assignments a ON a.AssignmentId = asub.AssignmentId
+            JOIN SubjectFaculty SF ON SF.SubjectId = a.SubjectId
+            WHERE SF.TeacherId = @TeacherId AND SF.InstituteId = @InstituteId
+              AND asub.MarksObtained IS NOT NULL
+
+            UNION ALL
+
+            SELECT 'Video' AS ActionType
+            FROM Videos v
+            WHERE v.UploadedBy = @TeacherId AND v.InstituteId = @InstituteId AND v.IsActive = 1
+        ) combined
+        GROUP BY ActionType
+        ORDER BY ActionCount DESC
+    ");
             cmd.Parameters.AddWithValue("@TeacherId", teacherId);
             cmd.Parameters.AddWithValue("@InstituteId", instituteId);
             return dl.GetDataTable(cmd);

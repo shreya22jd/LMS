@@ -47,6 +47,7 @@ namespace LMS_Project.GC
         // ── Attendance Summary ────────────────────────────
         public int Present { get; set; }
         public int Absent { get; set; }
+        public int Leave { get; set; }
         public double AttendancePercent =>
             (Present + Absent) == 0 ? 0 :
             Math.Round((double)Present / (Present + Absent) * 100, 1);

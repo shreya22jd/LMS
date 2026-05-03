@@ -33,6 +33,15 @@ namespace LMS_Project.Teacher
         protected global::System.Web.UI.WebControls.HiddenField hfAttAbsent;
 
         /// <summary>
+        /// hfAttLeave control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfAttLeave;
+
+        /// <summary>
         /// hfVideoLabels control.
         /// </summary>
         /// <remarks>
@@ -76,6 +85,60 @@ namespace LMS_Project.Teacher
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField hfAsgnPending;
+
+        /// <summary>
+        /// hfMarksLabels control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfMarksLabels;
+
+        /// <summary>
+        /// hfMarksScores control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfMarksScores;
+
+        /// <summary>
+        /// hfMarksMax control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfMarksMax;
+
+        /// <summary>
+        /// hfAttBySubLabels control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfAttBySubLabels;
+
+        /// <summary>
+        /// hfAttBySubPresent control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfAttBySubPresent;
+
+        /// <summary>
+        /// hfAttBySubAbsent control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfAttBySubAbsent;
 
         /// <summary>
         /// lblError control.
@@ -184,6 +247,51 @@ namespace LMS_Project.Teacher
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblAssignments;
+
+        /// <summary>
+        /// lblAvgScore control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblAvgScore;
+
+        /// <summary>
+        /// lblSubjectCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblSubjectCount;
+
+        /// <summary>
+        /// lblQuizAttempts control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblQuizAttempts;
+
+        /// <summary>
+        /// lblSubmissionRate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblSubmissionRate;
+
+        /// <summary>
+        /// rptMarks control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rptMarks;
 
         /// <summary>
         /// lblGender control.

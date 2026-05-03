@@ -945,6 +945,7 @@ function initTeacherDashboard(chartIds, panelIds, dropdownIds) {
     renderActivityTrendChart();
     renderLpPieChart();
     initLpFullData();
+    initActivityLogDisplay();
 }
 
 // ========== 1. SUBJECT CHART (Students per Subject) ==========
@@ -989,9 +990,10 @@ function renderSubjectChart() {
             },
             onClick: function (evt, elements) {
                 if (elements.length > 0)
-                    window.location.href = 'CourseVideos.aspx?SubjectId=' + subIds[elements[0].index];
+                    window.location.href = 'SubjectAnalytics.aspx?SubjectId=' + subIds[elements[0].index];
             }
         }
+
     });
     ctx.style.cursor = 'pointer';
 }
@@ -1120,7 +1122,8 @@ function renderDivisionChart() {
             openSectionStudentsModal(divLabels[points[0].index]);
         }
     });
-} function renderAvgMarksChart() {
+}
+function renderAvgMarksChart() {
     var hf = document.getElementById(elementIds.hfAvgMarksData);
     if (!hf || !hf.value) return;
     var data;
@@ -1358,16 +1361,49 @@ function renderCmpSectionChart() {
         return;
     }
     ctx.style.display = 'block';
+    var emp2 = document.getElementById(elementIds.pnlNoSecCompare);
+    if (emp2) emp2.style.display = 'none';
+
     var field = cmpMetricField(), mc = cmpMetricColor();
     var labels = _secData.map(d => d.SectionName || 'No Section');
     var vals = _secData.map(d => parseFloat(d[field]) || 0);
-    var maxVal = vals.length ? Math.max.apply(null, vals) : 1;
+
+    var pieColors = ['#1565c0', '#2e7d32', '#ef6c00', '#5e35b1', '#0288d1', '#c62828', '#00838f', '#f9a825'];
+
     _secChart = new Chart(ctx, {
-        type: 'bar',
-        data: { labels: labels, datasets: [{ label: cmpMetricLabel(), data: vals, backgroundColor: vals.map(v => v === maxVal ? mc + 'ee' : mc + '44'), borderColor: vals.map(v => v === maxVal ? mc : mc + '99'), borderWidth: 2, borderRadius: 8 }] },
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: vals,
+                backgroundColor: labels.map((_, i) => pieColors[i % pieColors.length] + 'cc'),
+                borderColor: labels.map((_, i) => pieColors[i % pieColors.length]),
+                borderWidth: 2,
+                hoverOffset: 8
+            }]
+        },
         options: {
-            responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => { let v = c.parsed.y; if (_cmpMetric === 'attendance') return ' ' + v + '%'; if (_cmpMetric === 'engagement') return ' ' + v + ' views'; return ' Avg: ' + v + ' marks'; } } } },
-            scales: { y: { beginAtZero: true, ticks: { font: { size: 11 }, callback: v => _cmpMetric === 'attendance' ? v + '%' : v }, grid: { color: '#e3f2fd' } }, x: { ticks: { font: { size: 11 }, maxRotation: 30 }, grid: { display: false } } }
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'right',
+                    labels: { font: { size: 11 }, padding: 14 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (c) {
+                            var v = c.parsed;
+                            var total = c.dataset.data.reduce((a, b) => a + b, 0);
+                            var pct = total > 0 ? ((v / total) * 100).toFixed(1) : 0;
+                            if (_cmpMetric === 'attendance') return ' ' + c.label + ': ' + v + '% (' + pct + '% share)';
+                            if (_cmpMetric === 'engagement') return ' ' + c.label + ': ' + v + ' views (' + pct + '% share)';
+                            return ' ' + c.label + ': ' + v + ' avg marks (' + pct + '% share)';
+                        }
+                    }
+                }
+            }
         }
     });
 }
@@ -1383,16 +1419,49 @@ function renderCmpSubjectChart() {
         return;
     }
     ctx.style.display = 'block';
-    var field = cmpMetricField(), mc = cmpMetricColor();
+    var emp2 = document.getElementById(elementIds.pnlNoSubCompare);
+    if (emp2) emp2.style.display = 'none';
+
+    var field = cmpMetricField();
     var labels = _subData.map(d => d.SubjectName);
     var vals = _subData.map(d => parseFloat(d[field]) || 0);
-    var maxVal = vals.length ? Math.max.apply(null, vals) : 1;
+
+    var pieColors = ['#1565c0', '#2e7d32', '#ef6c00', '#5e35b1', '#0288d1', '#c62828', '#00838f', '#f9a825'];
+
     _subChart = new Chart(ctx, {
-        type: 'bar',
-        data: { labels: labels, datasets: [{ label: cmpMetricLabel(), data: vals, backgroundColor: vals.map(v => v === maxVal ? mc + 'ee' : mc + '44'), borderColor: vals.map(v => v === maxVal ? mc : mc + '99'), borderWidth: 2, borderRadius: 8 }] },
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: vals,
+                backgroundColor: labels.map((_, i) => pieColors[i % pieColors.length] + 'cc'),
+                borderColor: labels.map((_, i) => pieColors[i % pieColors.length]),
+                borderWidth: 2,
+                hoverOffset: 8
+            }]
+        },
         options: {
-            responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => { let v = c.parsed.y; if (_cmpMetric === 'attendance') return ' ' + v + '%'; if (_cmpMetric === 'engagement') return ' ' + v + ' views'; return ' Avg: ' + v + ' marks'; } } } },
-            scales: { y: { beginAtZero: true, ticks: { font: { size: 11 }, callback: v => _cmpMetric === 'attendance' ? v + '%' : v }, grid: { color: '#e3f2fd' } }, x: { ticks: { font: { size: 11 }, maxRotation: 30 }, grid: { display: false } } }
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'right',
+                    labels: { font: { size: 11 }, padding: 14 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (c) {
+                            var v = c.parsed;
+                            var total = c.dataset.data.reduce((a, b) => a + b, 0);
+                            var pct = total > 0 ? ((v / total) * 100).toFixed(1) : 0;
+                            if (_cmpMetric === 'attendance') return ' ' + c.label + ': ' + v + '% (' + pct + '% share)';
+                            if (_cmpMetric === 'engagement') return ' ' + c.label + ': ' + v + ' views (' + pct + '% share)';
+                            return ' ' + c.label + ': ' + v + ' avg marks (' + pct + '% share)';
+                        }
+                    }
+                }
+            }
         }
     });
 }
@@ -1415,22 +1484,187 @@ function renderActivityTrendChart() {
     var ctx = document.getElementById('activityTrendChart');
     if (!ctx) return;
     if (activityChartInstance) activityChartInstance.destroy();
+
     var labels = data.map(d => d.DayLabel);
-    var counts = data.map(d => d.ActionCount);
-    var gradient;
-    if (_actChartType === 'line') {
-        var chartCtx = ctx.getContext('2d');
-        gradient = chartCtx.createLinearGradient(0, 0, 0, 180);
-        gradient.addColorStop(0, 'rgba(21,101,192,0.25)');
-        gradient.addColorStop(1, 'rgba(21,101,192,0.02)');
-    }
+    var assignments = data.map(d => d.AssignmentCount);
+    var videos = data.map(d => d.VideoCount);
+
     activityChartInstance = new Chart(ctx, {
-        type: _actChartType,
-        data: { labels: labels, datasets: [{ label: 'Actions', data: counts, backgroundColor: _actChartType === 'line' ? gradient : counts.map((v, i) => { let max = Math.max.apply(null, counts); return v === max ? '#1565c0cc' : '#1976d244'; }), borderColor: '#1565c0', borderWidth: _actChartType === 'line' ? 2.5 : 2, borderRadius: _actChartType === 'bar' ? 7 : 0, pointBackgroundColor: '#1565c0', pointRadius: _actChartType === 'line' ? 4 : 0, pointHoverRadius: 6, fill: _actChartType === 'line', tension: 0.4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' ' + c.parsed.y + ' actions' } } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: '#e3f2fd' } }, x: { ticks: { font: { size: 10 }, maxRotation: 0 }, grid: { display: false } } } }
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Assignments',
+                    data: assignments,
+                    backgroundColor: '#1565c0cc',
+                    borderColor: '#1565c0',
+                    borderWidth: 2,
+                    borderRadius: 6
+                },
+                {
+                    label: 'Videos',
+                    data: videos,
+                    backgroundColor: '#5e35b1cc',
+                    borderColor: '#5e35b1',
+                    borderWidth: 2,
+                    borderRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { font: { size: 10 }, boxWidth: 12 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (c) {
+                            return ' ' + c.dataset.label + ': ' + c.parsed.y;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1, font: { size: 10 } },
+                    grid: { color: '#e3f2fd' }
+                },
+                x: {
+                    ticks: { font: { size: 10 }, maxRotation: 0 },
+                    grid: { display: false }
+                }
+            }
+        }
     });
 }
 
+// ========== ACTIVITY LOG: SHOW TOP 2 + SEE MORE MODAL ==========
+// ========== ACTIVITY LOG: SHOW TOP 2 + SEE MORE MODAL ==========
+function initActivityLogDisplay() {
+    // Give the page a moment to fully render
+    setTimeout(function () {
+        // Find all activity log items
+        var items = document.querySelectorAll('.activity-log-item');
+        console.log('Found activity items:', items.length);
+
+        if (!items || items.length === 0) {
+            // Try alternative selector if needed
+            var altItems = document.querySelectorAll('#pnlActivityLog .activity-log-item, #Panel1 .activity-log-item');
+            if (altItems && altItems.length > 0) {
+                items = altItems;
+                console.log('Found via alt selector:', items.length);
+            }
+        }
+
+        if (items && items.length > 0) {
+            // Hide items beyond the first 2
+            items.forEach(function (item, i) {
+                if (i >= 2) {
+                    item.style.display = 'none';
+                } else {
+                    item.style.display = 'flex'; // Ensure first 2 are visible
+                }
+            });
+
+            // Show "See more" button only if there are more than 2
+            var btn = document.getElementById('activitySeeMoreBtn');
+            if (btn) {
+                btn.style.display = items.length > 2 ? 'block' : 'none';
+                console.log('See more button display:', btn.style.display);
+            }
+        } else {
+            // Hide see more button if no items
+            var btn = document.getElementById('activitySeeMoreBtn');
+            if (btn) btn.style.display = 'none';
+        }
+    }, 100); // Small delay to ensure DOM is ready
+}
+
+function openAllActivityModal() {
+    // Find all activity items (including hidden ones)
+    var items = document.querySelectorAll('.activity-log-item');
+
+    // Also check if items are inside specific panels
+    if (!items || items.length === 0) {
+        items = document.querySelectorAll('#pnlActivityLog .activity-log-item, #Panel1 .activity-log-item');
+    }
+
+    var modal = new bootstrap.Modal(document.getElementById('allActivityModal'));
+    modal.show();
+
+    var body = document.getElementById('allActivityModalBody');
+    if (!body) return;
+
+    if (!items || items.length === 0) {
+        body.innerHTML = '<div style="text-align:center;padding:30px;color:#90a4ae;">'
+            + '<i class="fas fa-history" style="font-size:32px;display:block;margin-bottom:8px;"></i>'
+            + 'No activity recorded yet.</div>';
+        return;
+    }
+
+    // Clone all activity items into the modal
+    var html = '';
+    items.forEach(function (item) {
+        html += item.outerHTML;
+    });
+
+    body.innerHTML = '<div id="allActivityList" style="max-height:500px;overflow-y:auto;">' + html + '</div>';
+
+    // Ensure all are visible inside modal
+    var cloned = body.querySelectorAll('.activity-log-item');
+    cloned.forEach(function (item) {
+        item.style.display = 'flex';
+    });
+
+    // Add highlight effect on hover
+    var modalItems = body.querySelectorAll('.activity-log-item');
+    modalItems.forEach(function (item) {
+        item.addEventListener('mouseover', function () {
+            this.style.background = '#f0f7ff';
+            this.style.paddingLeft = '6px';
+        });
+        item.addEventListener('mouseout', function () {
+            this.style.background = '';
+            this.style.paddingLeft = '';
+        });
+    });
+}
+//function openAllActivityModal() {
+//    var modal = new bootstrap.Modal(document.getElementById('allActivityModal'));
+//    modal.show();
+
+//    // Clone all activity items into the modal
+//    var items = document.querySelectorAll('.activity-log-item');
+//    var body = document.getElementById('allActivityModalBody');
+//    if (!body) return;
+
+//    if (!items || items.length === 0) {
+//        body.innerHTML = '<div style="text-align:center;padding:30px;color:#90a4ae;">'
+//            + '<i class="fas fa-history" style="font-size:32px;display:block;margin-bottom:8px;"></i>'
+//            + 'No activity recorded yet.</div>';
+//        return;
+//    }
+
+//    var html = '';
+//    items.forEach(function (item) {
+//        html += item.outerHTML;
+//    });
+
+//    // Wrap in a container and make all items visible inside the modal
+//    body.innerHTML = '<div id="allActivityList">' + html + '</div>';
+
+//    // Ensure all are visible inside modal (override the hidden ones)
+//    var cloned = body.querySelectorAll('.activity-log-item');
+//    cloned.forEach(function (item) {
+//        item.style.display = 'flex';
+//    });
+//}
 // ========== 8. ENGAGEMENT CHART ==========
 function renderEngagementChart() {
     var hf = document.getElementById(elementIds.hfEngagementData);

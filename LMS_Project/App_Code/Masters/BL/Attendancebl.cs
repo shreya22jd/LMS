@@ -84,26 +84,49 @@ public class AttendanceBL
     // ─────────────────────────────────────────────
     public bool IsAttendanceAlreadyMarked(int subjectId, DateTime date, int instituteId, int societyId)
     {
+        // Use date only (no time)
+        DateTime dateOnly = date.Date;
+
         SqlCommand cmd = new SqlCommand(@"
-            SELECT COUNT(1)
-            FROM Attendance
-            WHERE SubjectId   = @SubjectId
-              AND Date        = @Date
-              AND InstituteId = @InstituteId
-              AND SocietyId   = @SocietyId");
+        SELECT COUNT(1) as AttendanceCount, 
+               (SELECT TOP 1 Status FROM Attendance 
+                WHERE SubjectId = @SubjectId 
+                  AND CAST(Date AS DATE) = @Date
+                  AND InstituteId = @InstituteId 
+                  AND SocietyId = @SocietyId) as SampleStatus
+        FROM Attendance
+        WHERE SubjectId   = @SubjectId
+          AND CAST(Date AS DATE) = @Date
+          AND InstituteId = @InstituteId
+          AND SocietyId   = @SocietyId");
 
         cmd.Parameters.AddWithValue("@SubjectId", subjectId);
-        cmd.Parameters.AddWithValue("@Date", date.Date);
+        cmd.Parameters.AddWithValue("@Date", dateOnly.ToString("yyyy-MM-dd"));
         cmd.Parameters.AddWithValue("@InstituteId", instituteId);
         cmd.Parameters.AddWithValue("@SocietyId", societyId);
 
         DataTable dt = _dl.GetDataTable(cmd);
         if (dt != null && dt.Rows.Count > 0)
-            return Convert.ToInt32(dt.Rows[0][0]) > 0;
+        {
+            int count = Convert.ToInt32(dt.Rows[0]["AttendanceCount"]);
+
+            // Debug output - check your Visual Studio Output window
+            System.Diagnostics.Debug.WriteLine($"=== Attendance Check ===");
+            System.Diagnostics.Debug.WriteLine($"SubjectId: {subjectId}");
+            System.Diagnostics.Debug.WriteLine($"Date: {dateOnly}");
+            System.Diagnostics.Debug.WriteLine($"InstituteId: {instituteId}");
+            System.Diagnostics.Debug.WriteLine($"SocietyId: {societyId}");
+            System.Diagnostics.Debug.WriteLine($"Found Count: {count}");
+            if (count > 0 && dt.Rows[0]["SampleStatus"] != DBNull.Value)
+            {
+                System.Diagnostics.Debug.WriteLine($"Sample Status: {dt.Rows[0]["SampleStatus"]}");
+            }
+
+            return count > 0;
+        }
 
         return false;
     }
-
     // ─────────────────────────────────────────────
     // 4. Save / Update Attendance
     // ─────────────────────────────────────────────

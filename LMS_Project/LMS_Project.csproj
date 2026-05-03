@@ -169,6 +169,7 @@
     <Content Include="SuperAdmin\Dashboard.aspx" />
     <Content Include="Teacher\MyStudentDetails.aspx" />
     <Content Include="Teacher\MyStudents.aspx" />
+    <Content Include="Teacher\SubjectAnalytics.aspx" />
     <Content Include="Teacher\SubjectDetails.aspx" />
     <Content Include="Teacher\Subjects.aspx" />
     <Content Include="Teacher\TeacherAssignment.aspx" />
@@ -333,6 +334,7 @@
     <Compile Include="App_Code\Masters\BL\CalendarBL.cs" />
     <Compile Include="App_Code\Masters\BL\HelpBL.cs" />
     <Compile Include="App_Code\Masters\BL\StudentDetailsBL.cs" />
+    <Compile Include="App_Code\Masters\BL\SubjectAnalyticsBL.cs" />
     <Compile Include="App_Code\Masters\BL\TeacherDashboardBL.cs" />
     <Compile Include="App_Code\Masters\BL\TeacherStudentDetailsBL.cs" />
     <Compile Include="App_Code\Masters\GC\AssignmentGC.cs" />
@@ -366,6 +368,13 @@
     </Compile>
     <Compile Include="Teacher\MyStudentDetails.aspx.designer.cs">
       <DependentUpon>MyStudentDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Teacher\SubjectAnalytics.aspx.cs">
+      <DependentUpon>SubjectAnalytics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Teacher\SubjectAnalytics.aspx.designer.cs">
+      <DependentUpon>SubjectAnalytics.aspx</DependentUpon>
     </Compile>
     <Compile Include="Teacher\SubjectDetails.aspx.cs">
       <DependentUpon>SubjectDetails.aspx</DependentUpon>
