@@ -432,12 +432,12 @@
             <div class="card-header-custom" style="justify-content:space-between;">
                 <span><i class="fas fa-clock"></i> Recent Activity</span>
                 <div>
-                    <button class="tab-btn active" onclick="switchTab('videos',this)">
-                        <i class="fas fa-video me-1"></i>Videos
-                    </button>
-                    <button class="tab-btn" onclick="switchTab('assignments',this)">
-                        <i class="fas fa-tasks me-1"></i>Assignments
-                    </button>
+                  <button class="tab-btn active" onclick="window.switchTab('videos',this); return false;">
+    <i class="fas fa-video me-1"></i>Videos
+</button>
+<button class="tab-btn" onclick="window.switchTab('assignments',this); return false;">
+    <i class="fas fa-tasks me-1"></i>Assignments
+</button>
                 </div>
             </div>
             <div class="card-body-custom" style="overflow-y:auto;max-height:380px;">
@@ -496,138 +496,148 @@
     // ── Tab state ──────────────────────────────────────────────────
     var _activeTab = 'videos';
 
-    function switchTab(tab, btn) {
+    // Define switchTab as a global function
+    window.switchTab = function (tab, btn) {
         _activeTab = tab;
-        document.getElementById('tabVideos').style.display = tab === 'videos' ? '' : 'none';
-        document.getElementById('tabAssignments').style.display = tab === 'assignments' ? '' : 'none';
-        document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
-        btn.classList.add('active');
+
+        var videosDiv = document.getElementById('tabVideos');
+        var assignmentsDiv = document.getElementById('tabAssignments');
+
+        if (videosDiv) videosDiv.style.display = tab === 'videos' ? 'block' : 'none';
+        if (assignmentsDiv) assignmentsDiv.style.display = tab === 'assignments' ? 'block' : 'none';
+
+        // Update button active states
+        document.querySelectorAll('.tab-btn').forEach(function (b) {
+            b.classList.remove('active');
+        });
+        if (btn) btn.classList.add('active');
+
+        // Prevent any default behavior
+        return false;
+    };
+
+    function parseHF(id) {
+        var el = document.getElementById(id);
+        if (!el || !el.value) return [];
+        try { return JSON.parse(el.value); } catch (e) { return []; }
     }
 
-    window.addEventListener('DOMContentLoaded', function () {
+    function makeManualLegend(containerId, items) {
+        var c = document.getElementById(containerId);
+        if (!c) return;
+        c.innerHTML = ''; // Clear existing
+        items.forEach(function (d) {
+            c.innerHTML += '<span style="font-size:.78rem;display:flex;align-items:center;gap:5px;">'
+                + '<span style="width:10px;height:10px;border-radius:50%;background:' + d[1] + ';display:inline-block;"></span>'
+                + d[0] + ' (' + d[2] + ')</span>';
+        });
+    }
 
-        // ── Apply initial tab state FIRST before charts render ────
-        document.getElementById('tabVideos').style.display = 'block';
-        document.getElementById('tabAssignments').style.display = 'none';
+    // Initialize charts after DOM is ready
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set initial tab state
+        var videosDiv = document.getElementById('tabVideos');
+        var assignmentsDiv = document.getElementById('tabAssignments');
 
-        function parseHF(id) {
-            var el = document.getElementById(id);
-            if (!el || !el.value) return [];
-            try { return JSON.parse(el.value); } catch (e) { return []; }
+        if (videosDiv && assignmentsDiv) {
+            videosDiv.style.display = 'block';
+            assignmentsDiv.style.display = 'none';
         }
 
-        function makeManualLegend(containerId, items) {
-            var c = document.getElementById(containerId);
-            if (!c) return;
-            items.forEach(function (d) {
-                c.innerHTML += '<span style="font-size:.78rem;display:flex;align-items:center;gap:5px;">'
-                    + '<span style="width:10px;height:10px;border-radius:50%;background:' + d[1] + ';display:inline-block;"></span>'
-                    + d[0] + ' (' + d[2] + ')</span>';
-            });
-        }
+        var present = parseInt(document.getElementById('<%= hfAttPresent.ClientID %>').value) || 0;
+        var absent = parseInt(document.getElementById('<%= hfAttAbsent.ClientID %>').value) || 0;
+        var leave = parseInt(document.getElementById('<%= hfAttLeave.ClientID %>').value) || 0;
 
-        var present = parseInt('<%= hfAttPresent.Value %>') || 0;
-    var absent = parseInt('<%= hfAttAbsent.Value %>') || 0;
-    var leave = parseInt('<%= hfAttLeave.Value %>') || 0;
+        var submitted = parseInt(document.getElementById('<%= hfAsgnSubmitted.ClientID %>').value) || 0;
+        var overdue = parseInt(document.getElementById('<%= hfAsgnOverdue.ClientID %>').value) || 0;
+        var pending = parseInt(document.getElementById('<%= hfAsgnPending.ClientID %>').value) || 0;
 
-    var submitted = parseInt('<%= hfAsgnSubmitted.Value %>') || 0;
-    var overdue = parseInt('<%= hfAsgnOverdue.Value %>') || 0;
-    var pending = parseInt('<%= hfAsgnPending.Value %>') || 0;
+        var videoLabels = parseHF('<%= hfVideoLabels.ClientID %>');
+        var videoData   = parseHF('<%= hfVideoData.ClientID %>');
 
-    var videoLabels = parseHF('<%= hfVideoLabels.ClientID %>');
-    var videoData   = parseHF('<%= hfVideoData.ClientID %>');
+        var marksLabels = parseHF('<%= hfMarksLabels.ClientID %>');
+        var marksScores = parseHF('<%= hfMarksScores.ClientID %>');
+        var marksMax    = parseHF('<%= hfMarksMax.ClientID %>');
 
-    var marksLabels = parseHF('<%= hfMarksLabels.ClientID %>');
-    var marksScores = parseHF('<%= hfMarksScores.ClientID %>');
-    var marksMax    = parseHF('<%= hfMarksMax.ClientID %>');
+        var attSubLabels  = parseHF('<%= hfAttBySubLabels.ClientID %>');
+        var attSubPresent = parseHF('<%= hfAttBySubPresent.ClientID %>');
+        var attSubAbsent  = parseHF('<%= hfAttBySubAbsent.ClientID %>');
 
-    var attSubLabels  = parseHF('<%= hfAttBySubLabels.ClientID %>');
-    var attSubPresent = parseHF('<%= hfAttBySubPresent.ClientID %>');
-    var attSubAbsent  = parseHF('<%= hfAttBySubAbsent.ClientID %>');
+        // 1. Attendance doughnut
+        new Chart(document.getElementById('chartAtt'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Present', 'Absent', 'Leave'],
+                datasets: [{
+                    data: [present, absent, leave],
+                    backgroundColor: ['#22c55e', '#ef4444', '#f59e0b'], borderWidth: 2
+                }]
+            },
+            options: { cutout: '65%', plugins: { legend: { display: false } } }
+        });
+        makeManualLegend('attLegend', [['Present', '#22c55e', present], ['Absent', '#ef4444', absent], ['Leave', '#f59e0b', leave]]);
 
-    // 1. Attendance doughnut
-    new Chart(document.getElementById('chartAtt'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Present', 'Absent', 'Leave'],
-            datasets: [{
-                data: [present, absent, leave],
-                backgroundColor: ['#22c55e', '#ef4444', '#f59e0b'], borderWidth: 2
-            }]
-        },
-        options: { cutout: '65%', plugins: { legend: { display: false } } }
+        // 2. Assignment pie
+        new Chart(document.getElementById('chartAsgn'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Submitted', 'Overdue', 'Pending'],
+                datasets: [{
+                    data: [submitted, overdue, pending],
+                    backgroundColor: ['#22c55e', '#ef4444', '#f97316'], borderWidth: 2
+                }]
+            },
+            options: { cutout: '65%', plugins: { legend: { display: false } } }
+        });
+        makeManualLegend('asgnLegend', [['Submitted', '#22c55e', submitted], ['Overdue', '#ef4444', overdue], ['Pending', '#f97316', pending]]);
+
+        // 3. Videos per subject bar
+        new Chart(document.getElementById('chartVideos'), {
+            type: 'bar',
+            data: {
+                labels: videoLabels,
+                datasets: [{
+                    label: 'Videos Watched', data: videoData,
+                    backgroundColor: '#3b82f6cc', borderRadius: 4
+                }]
+            },
+            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+        });
+
+        // 4. Marks obtained vs max (grouped bar)
+        new Chart(document.getElementById('chartMarks'), {
+            type: 'bar',
+            data: {
+                labels: marksLabels,
+                datasets: [
+                    { label: 'Marks Obtained', data: marksScores, backgroundColor: '#3b82f6cc', borderRadius: 4 },
+                    { label: 'Max Marks', data: marksMax, backgroundColor: '#e5e7ebcc', borderRadius: 4 }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'top' } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // 5. Attendance by subject (horizontal stacked bar)
+        new Chart(document.getElementById('chartAttSubject'), {
+            type: 'bar',
+            data: {
+                labels: attSubLabels,
+                datasets: [
+                    { label: 'Present', data: attSubPresent, backgroundColor: '#22c55ecc', borderRadius: 4 },
+                    { label: 'Absent', data: attSubAbsent, backgroundColor: '#ef4444cc', borderRadius: 4 }
+                ]
+            },
+            options: {
+                indexAxis: 'y',
+                plugins: { legend: { position: 'top' } },
+                scales: { x: { stacked: true, beginAtZero: true }, y: { stacked: true } }
+            }
+        });
     });
-    makeManualLegend('attLegend', [['Present', '#22c55e', present], ['Absent', '#ef4444', absent], ['Leave', '#f59e0b', leave]]);
-
-    // 2. Assignment pie
-    new Chart(document.getElementById('chartAsgn'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Submitted', 'Overdue', 'Pending'],
-            datasets: [{
-                data: [submitted, overdue, pending],
-                backgroundColor: ['#22c55e', '#ef4444', '#f97316'], borderWidth: 2
-            }]
-        },
-        options: { cutout: '65%', plugins: { legend: { display: false } } }
-    });
-    makeManualLegend('asgnLegend', [['Submitted', '#22c55e', submitted], ['Overdue', '#ef4444', overdue], ['Pending', '#f97316', pending]]);
-
-    // 3. Videos per subject bar
-    new Chart(document.getElementById('chartVideos'), {
-        type: 'bar',
-        data: {
-            labels: videoLabels,
-            datasets: [{
-                label: 'Videos Watched', data: videoData,
-                backgroundColor: '#3b82f6cc', borderRadius: 4
-            }]
-        },
-        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
-    });
-
-    // 4. Marks obtained vs max (grouped bar)
-    new Chart(document.getElementById('chartMarks'), {
-        type: 'bar',
-        data: {
-            labels: marksLabels,
-            datasets: [
-                { label: 'Marks Obtained', data: marksScores, backgroundColor: '#3b82f6cc', borderRadius: 4 },
-                { label: 'Max Marks', data: marksMax, backgroundColor: '#e5e7ebcc', borderRadius: 4 }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { position: 'top' } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-
-    // 5. Attendance by subject (horizontal stacked bar)
-    new Chart(document.getElementById('chartAttSubject'), {
-        type: 'bar',
-        data: {
-            labels: attSubLabels,
-            datasets: [
-                { label: 'Present', data: attSubPresent, backgroundColor: '#22c55ecc', borderRadius: 4 },
-                { label: 'Absent', data: attSubAbsent, backgroundColor: '#ef4444cc', borderRadius: 4 }
-            ]
-        },
-        options: {
-            indexAxis: 'y',
-            plugins: { legend: { position: 'top' } },
-            scales: { x: { stacked: true, beginAtZero: true }, y: { stacked: true } }
-        }
-    });
-
-    // ── Re-apply tab state AFTER all charts render ─────────────
-    // This is the key fix — charts rendering can cause a brief
-    // DOM repaint that resets inline styles set before DOMContentLoaded
-    setTimeout(function () {
-        document.getElementById('tabVideos').style.display = _activeTab === 'videos' ? '' : 'none';
-        document.getElementById('tabAssignments').style.display = _activeTab === 'assignments' ? '' : 'none';
-    }, 50);
-});
 </script>
 
 </asp:Content>
