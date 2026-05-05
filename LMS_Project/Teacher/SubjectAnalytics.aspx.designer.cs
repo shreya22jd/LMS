@@ -231,22 +231,40 @@ namespace LMS_Project.Teacher
         protected global::System.Web.UI.WebControls.HiddenField hfLeaveTotal;
 
         /// <summary>
-        /// hfVideoChapters control.
+        /// hfVideoLabels control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hfVideoChapters;
+        protected global::System.Web.UI.WebControls.HiddenField hfVideoLabels;
 
         /// <summary>
-        /// hfVideoViews control.
+        /// hfVideoChapterNames control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hfVideoViews;
+        protected global::System.Web.UI.WebControls.HiddenField hfVideoChapterNames;
+
+        /// <summary>
+        /// hfVideoTotalViews control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfVideoTotalViews;
+
+        /// <summary>
+        /// hfVideoUniqueViewers control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfVideoUniqueViewers;
 
         /// <summary>
         /// hfAssignmentTitles control.
@@ -274,23 +292,5 @@ namespace LMS_Project.Teacher
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField hfAssignmentTotal;
-
-        /// <summary>
-        /// hfQuizTitles control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hfQuizTitles;
-
-        /// <summary>
-        /// hfQuizAvgPct control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hfQuizAvgPct;
     }
 }

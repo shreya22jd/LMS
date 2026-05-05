@@ -90,23 +90,20 @@ namespace LMS_Project.Teacher
 
                 Repeater rptVideos = (Repeater)e.Item.FindControl("rptVideos");
                 Repeater rptMaterials = (Repeater)e.Item.FindControl("rptMaterials");
+                Panel pnlNoMaterials = (Panel)e.Item.FindControl("pnlNoMaterials");
 
                 rptVideos.DataSource = bl.GetVideosByChapter(Convert.ToInt32(chapterId), SessionId);
                 rptVideos.DataBind();
 
-                rptMaterials.DataSource = bl.GetMaterialsByChapter(Convert.ToInt32(chapterId), SessionId);
+                DataTable dtMat = bl.GetMaterialsByChapter(Convert.ToInt32(chapterId), SessionId);
+                rptMaterials.DataSource = dtMat;
                 rptMaterials.DataBind();
 
-
-                //Repeater rptAssignments = (Repeater)e.Item.FindControl("rptAssignments");
-
-                //rptAssignments.DataSource = bl.GetAssignmentsBySubject(
-                //    Convert.ToInt32(hfSubjectId.Value)
-                //);
-                //rptAssignments.DataBind();
+                // Show empty state if no materials
+                if (pnlNoMaterials != null)
+                    pnlNoMaterials.Visible = (dtMat == null || dtMat.Rows.Count == 0);
             }
         }
-
         private void BindSubjectAssignments()
         {
             try
@@ -177,7 +174,49 @@ namespace LMS_Project.Teacher
                 ShowMsg("Chapter Deleted Successfully", true);
             }
         }
+        protected string GetMaterialIcon(string fileType)
+        {
+            if (string.IsNullOrWhiteSpace(fileType))
+                return "<i class=\"fa-solid fa-file me-1 text-secondary\"></i>";
 
+            string ext = fileType.ToLower().TrimStart('.');
+
+            switch (ext)
+            {
+                case ".pdf":
+                case "pdf":
+                    return "<i class=\"fa-solid fa-file-pdf text-danger\" style=\"font-size:1.3rem\"></i>";
+                case ".doc":
+                case "doc":
+                case ".docx":
+                case "docx":
+                    return "<i class=\"fa-solid fa-file-word text-primary\" style=\"font-size:1.3rem\"></i>";
+                case ".ppt":
+                case "ppt":
+                case ".pptx":
+                case "pptx":
+                    return "<i class=\"fa-solid fa-file-powerpoint text-warning\" style=\"font-size:1.3rem\"></i>";
+                case ".xls":
+                case "xls":
+                case ".xlsx":
+                case "xlsx":
+                    return "<i class=\"fa-solid fa-file-excel text-success\" style=\"font-size:1.3rem\"></i>";
+                case ".jpg":
+                case "jpg":
+                case ".jpeg":
+                case "jpeg":
+                case ".png":
+                case "png":
+                    return "<i class=\"fa-solid fa-file-image text-info\" style=\"font-size:1.3rem\"></i>";
+                case ".mp4":
+                case "mp4":
+                case ".avi":
+                case "avi":
+                    return "<i class=\"fa-solid fa-file-video text-danger\" style=\"font-size:1.3rem\"></i>";
+                default:
+                    return "<i class=\"fa-solid fa-file text-secondary\" style=\"font-size:1.3rem\"></i>";
+            }
+        }
         // ================= UPLOAD CONTENT =================
         protected void btnUploadSave_Click(object sender, EventArgs e)
         {
@@ -276,7 +315,13 @@ namespace LMS_Project.Teacher
                 ShowMsg("Error: " + ex.Message, false);
             }
         }
-
+        protected string GetMaterialUrl(object filePath)
+        {
+            if (filePath == null || filePath == DBNull.Value) return "#";
+            // FilePath is stored as /Uploads/Materials/filename.ext
+            // Just return it as-is for direct browser access
+            return filePath.ToString().Replace("~", "");
+        }
         private void ShowMsg(string msg, bool success)
         {
             lblMsg.Text = msg;

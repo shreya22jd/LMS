@@ -96,24 +96,6 @@ namespace LMS_Project.Teacher
         protected global::System.Web.UI.WebControls.Panel pnlSubjectKPIs;
 
         /// <summary>
-        /// lblKpiTotalSubjects control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblKpiTotalSubjects;
-
-        /// <summary>
-        /// lblKpiTotalStudents control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblKpiTotalStudents;
-
-        /// <summary>
         /// lblKpiAvgStudents control.
         /// </summary>
         /// <remarks>
@@ -544,15 +526,6 @@ namespace LMS_Project.Teacher
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel pnlNoSubCompare;
-
-        /// <summary>
-        /// ddlAsgSubject control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlAsgSubject;
 
         /// <summary>
         /// pnlAssignments control.

@@ -220,17 +220,35 @@
                                             </asp:Repeater>
                                         </div>
 
-                                        <div class="tab-pane fade" id="in<%# Eval("ChapterId") %>">
-                                            <h6 class="text-success border-bottom pb-2"><i class="fa-solid fa-file-pdf me-2"></i>Learning Materials</h6>
-                                            <asp:Repeater ID="rptMaterials" runat="server">
-                                                <ItemTemplate>
-                                                    <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
-                                                        <span><i class="fa-solid fa-file-lines me-2"></i><%# Eval("Title") %> (<%# Eval("FileType") %>)</span>
-                                                        <a href='MaterialPlayer.aspx?MaterialId=<%# Eval("MaterialId") %>' class="btn btn-outline-success btn-sm">View</a>
-                                                    </div>
-                                                </ItemTemplate>
-                                            </asp:Repeater>
-                                        </div>
+                                     <div class="tab-pane fade" id="in<%# Eval("ChapterId") %>">
+    <h6 class="text-success border-bottom pb-2">
+        <i class="fa-solid fa-file-pdf me-2"></i>Learning Materials
+    </h6>
+    <asp:Repeater ID="rptMaterials" runat="server">
+        <ItemTemplate>
+            <div class="d-flex justify-content-between align-items-center p-2 border-bottom hover-bg">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="material-icon"><%# GetMaterialIcon(Eval("FileType").ToString()) %></span>
+                    <div>
+                        <div class="fw-semibold" style="font-size:.9rem;"><%# Eval("Title") %></div>
+                        <small class="text-muted text-uppercase"><%# Eval("FileType") %></small>
+                    </div>
+                </div>
+                <a href='<%# ResolveUrl(Eval("FilePath").ToString()) %>'
+                   target="_blank"
+                   class="btn btn-outline-success btn-sm">
+                    <i class="fa-solid fa-eye me-1"></i>View
+                </a>
+            </div>
+        </ItemTemplate>
+    </asp:Repeater>
+    <asp:Panel ID="pnlNoMaterials" runat="server" Visible="false">
+        <div class="text-center text-muted py-3" style="font-size:13px;">
+            <i class="fa-solid fa-file-circle-xmark fa-lg d-block mb-2"></i>
+            No materials uploaded yet.
+        </div>
+    </asp:Panel>
+</div>
                                     </div>
                                 </div>
                             </div>

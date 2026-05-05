@@ -149,7 +149,7 @@
         <%-- KPI Mini Cards --%>
         <asp:Panel ID="pnlSubjectKPIs" runat="server">
             <div class="row g-2 mb-3">
-                <div class="col-6 col-md-3">
+              <%--   <div class="col-6 col-md-3">
                     <div style="background:#e3f2fd;border-radius:10px;padding:10px 12px;">
                         <div style="font-size:10px;font-weight:700;color:#1565c0;text-transform:uppercase;letter-spacing:.5px;">Total Subjects</div>
                         <div style="font-size:22px;font-weight:800;color:#1565c0;">
@@ -164,7 +164,7 @@
                             <asp:Label ID="lblKpiTotalStudents" runat="server" Text="0" />
                         </div>
                     </div>
-                </div>
+                </div> --%>
                 <div class="col-6 col-md-3">
                     <div style="background:#fff3e0;border-radius:10px;padding:10px 12px;">
                         <div style="font-size:10px;font-weight:700;color:#ef6c00;text-transform:uppercase;letter-spacing:.5px;">Avg / Subject</div>
@@ -241,12 +241,12 @@
                                             <%# Eval("EnrolmentPercent") %>% of total
                                         </div>
                                     </td>
-                                    <td>
+                                  <%--   <td>
                                         <a href='SubjectAnalytics.aspx?SubjectId=<%# Eval("SubjectId") %>'
                                            class="btn-view" style="padding:3px 10px;font-size:11px;">
                                             <i class="fas fa-play-circle me-1"></i>Manage
                                         </a>
-                                    </td>
+                                    </td>--%>
                                 </tr>
                             </ItemTemplate>
                         </asp:Repeater>
@@ -720,7 +720,7 @@
             <%-- Filter + View Toggle --%>
             <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
 
-                <div class="btn-group btn-group-sm" role="group">
+               <%--  <div class="btn-group btn-group-sm" role="group">
                     <button type="button" id="btnAsgList" onclick="setAsgView('list')"
                             class="btn btn-primary" title="List View">
                         <i class="fas fa-list"></i>
@@ -729,19 +729,19 @@
                             class="btn btn-outline-primary" title="Chart View">
                         <i class="fas fa-chart-bar"></i>
                     </button>
-                </div>
+                </div> --%>
 
-                <asp:DropDownList ID="ddlAsgSubject" runat="server"
+              <%--   <asp:DropDownList ID="ddlAsgSubject" runat="server"
                     CssClass="form-select form-select-sm"
                     Style="width:auto; min-width:160px;"
                     AutoPostBack="true"
                     OnSelectedIndexChanged="ddlAsgSubject_SelectedIndexChanged">
                 </asp:DropDownList>
-
+              --%>
             </div>
 
             <%-- LIST VIEW --%>
-            <asp:Panel ID="pnlAssignments" runat="server">
+            <asp:Panel ID="pnlAssignments" runat="server" Visible="false">
                 <asp:Repeater ID="rptAssignments" runat="server">
                     <ItemTemplate>
                         <div class="assignment-row">
@@ -770,7 +770,7 @@
             </asp:Panel>
 
             <%-- CHART VIEW --%>
-            <asp:Panel ID="pnlAsgChart" runat="server" Visible="false">
+            <asp:Panel ID="pnlAsgChart" runat="server">
                 <div style="position:relative; height:300px;">
                     <canvas id="asgChart"></canvas>
                 </div>
@@ -1136,8 +1136,7 @@
     <div class="col-md-5">
         <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,.06);">
             <div style="font-size:11px;font-weight:700;color:#1565c0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">
-                <i class="fas fa-chart-pie me-1"></i> Syllabus Completion by Subject
-            </div>
+<i class="fas fa-chart-pie me-1"></i> Video Coverage by Subject            </div>
             <div style="position:relative;height:220px;">
                 <canvas id="lpPieChart" role="img" aria-label="Pie chart of syllabus completion per subject"></canvas>
             </div>
@@ -1426,33 +1425,7 @@
 </div>
 
 </div>
-  <script>
-      // Initialize all charts when page loads
-      document.addEventListener('DOMContentLoaded', function () {
-          initTeacherDashboard(
-              {
-                  hfChartData: '<%= hfChartData.ClientID %>',
-                    hfDivisionData: '<%= hfDivisionData.ClientID %>',
-                    hfAvgMarksData: '<%= hfAvgMarksData.ClientID %>',
-                    hfAsgChartData: '<%= hfAsgChartData.ClientID %>',
-                    hfEngagementData: '<%= hfEngagementData.ClientID %>',
-                    hfActivityTrendData: '<%= hfActivityTrendData.ClientID %>',
-                    hfLpPieData: '<%= hfLpPieData.ClientID %>',
-                    hfSecCompareData: '<%= hfSecCompareData.ClientID %>',
-                    hfSubCompareData: '<%= hfSubCompareData.ClientID %>'
-                },
-                {
-                    pnlAssignments: '<%= pnlAssignments.ClientID %>',
-                    pnlAsgChart: '<%= pnlAsgChart.ClientID %>',
-                    pnlNoSecCompare: '<%= pnlNoSecCompare.ClientID %>',
-                    pnlNoSubCompare: '<%= pnlNoSubCompare.ClientID %>'
-                },
-                {
-                    ddlEngagementChartType: '<%= ddlEngagementChartType.ClientID %>'
-                }
-            );
-        });
-  </script>
+
     <%-- ══ SECTION STUDENTS MODAL ══ --%>
 <div class="modal fade" id="sectionStudentsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -1535,6 +1508,33 @@
         </div>
     </div>
 </div>
+  <script>
+      // Initialize all charts when page loads
+      document.addEventListener('DOMContentLoaded', function () {
+          initTeacherDashboard(
+              {
+                  hfChartData: '<%= hfChartData.ClientID %>',
+                  hfDivisionData: '<%= hfDivisionData.ClientID %>',
+                  hfAvgMarksData: '<%= hfAvgMarksData.ClientID %>',
+                  hfAsgChartData: '<%= hfAsgChartData.ClientID %>',
+                  hfEngagementData: '<%= hfEngagementData.ClientID %>',
+                  hfActivityTrendData: '<%= hfActivityTrendData.ClientID %>',
+                  hfLpPieData: '<%= hfLpPieData.ClientID %>',
+                    hfSecCompareData: '<%= hfSecCompareData.ClientID %>',
+                    hfSubCompareData: '<%= hfSubCompareData.ClientID %>'
+                },
+                {
+                    pnlAssignments: '<%= pnlAssignments.ClientID %>',
+                    pnlAsgChart: '<%= pnlAsgChart.ClientID %>',
+                    pnlNoSecCompare: '<%= pnlNoSecCompare.ClientID %>',
+                    pnlNoSubCompare: '<%= pnlNoSubCompare.ClientID %>'
+                },
+                {
+                    ddlEngagementChartType: '<%= ddlEngagementChartType.ClientID %>'
+              }
+          );
+      });
+  </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         setTimeout(function () {

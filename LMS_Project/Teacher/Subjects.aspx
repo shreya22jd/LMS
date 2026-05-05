@@ -214,7 +214,7 @@
 
 <%-- ══ STATS ══ --%>
 <div class="row g-3 mb-4">
-    <asp:Repeater ID="rptStats" runat="server">
+    <asp:Repeater ID="rptStats" runat="server" Visible="false">
         <ItemTemplate>
             <div class="col-6 col-md-2">
                 <div class="summary-card blue">

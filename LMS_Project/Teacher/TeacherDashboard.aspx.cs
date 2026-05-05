@@ -71,7 +71,7 @@ namespace LMS_Project.Teacher
                 LoadStatCards();
                 LoadSubjects();
                 LoadRecentStudents();
-                LoadAssignmentFilterDropdowns();
+                //LoadAssignmentFilterDropdowns();
                 LoadRecentAssignments();
                 LoadStudentPerformance();
                 LoadComparisonAnalytics();
@@ -150,8 +150,8 @@ namespace LMS_Project.Teacher
                           ? (int)Math.Round((double)totalStudents / totalSubjects)
                           : 0;
 
-                lblKpiTotalSubjects.Text = totalSubjects.ToString();
-                lblKpiTotalStudents.Text = totalStudents.ToString();
+                //lblKpiTotalSubjects.Text = totalSubjects.ToString();
+                //lblKpiTotalStudents.Text = totalStudents.ToString();
                 lblKpiAvgStudents.Text = avg.ToString();
                 lblKpiTopSubject.Text = topSubject;
 
@@ -242,15 +242,15 @@ namespace LMS_Project.Teacher
             pnlStudents.Visible = true;
             pnlNoStudents.Visible = false;
         }        // ── Assignment Dropdowns ────────────────────────────────────
-        private void LoadAssignmentFilterDropdowns()
-        {
-            ddlAsgSubject.Items.Clear();
-            ddlAsgSubject.Items.Add(new ListItem("All Subjects", "0"));
-            DataTable dt = bl.GetTeacherSubjectsForFilter(TeacherId, InstituteId, SelSessionId);
-            foreach (DataRow row in dt.Rows)
-                ddlAsgSubject.Items.Add(
-                    new ListItem(row["SubjectName"].ToString(), row["SubjectId"].ToString()));
-        }
+        //private void LoadAssignmentFilterDropdowns()
+        //{
+        //    ddlAsgSubject.Items.Clear();
+        //    ddlAsgSubject.Items.Add(new ListItem("All Subjects", "0"));
+        //    DataTable dt = bl.GetTeacherSubjectsForFilter(TeacherId, InstituteId, SelSessionId);
+        //    foreach (DataRow row in dt.Rows)
+        //        ddlAsgSubject.Items.Add(
+        //            new ListItem(row["SubjectName"].ToString(), row["SubjectId"].ToString()));
+        //}
 
         // ── Recent Assignments ──────────────────────────────────────
         private void LoadRecentAssignments()
@@ -268,17 +268,11 @@ namespace LMS_Project.Teacher
             rptAsgSummary.DataSource = dtSummary;
             rptAsgSummary.DataBind();
 
-            pnlAssignments.Visible = hasData;
+            pnlAssignments.Visible = false;
             pnlAsgChart.Visible = hasData;
             pnlNoAssignments.Visible = !hasData;
             pnlAsgSummary.Visible = hasSummary;
             pnlNoAsgSummary.Visible = !hasSummary;
-
-            if (hasData)
-            {
-                pnlAssignments.Style["display"] = "";
-                pnlAsgChart.Style["display"] = "none";
-            }
         }
 
         // ── Student Performance ─────────────────────────────────────
@@ -723,11 +717,11 @@ namespace LMS_Project.Teacher
             SelStudentStreamId = Convert.ToInt32(ddlStudentStream.SelectedValue);
             LoadRecentStudents();
         }
-        protected void ddlAsgSubject_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            SelAsgSubjectId = Convert.ToInt32(ddlAsgSubject.SelectedValue);
-            LoadRecentAssignments();
-        }
+        //protected void ddlAsgSubject_SelectedIndexChanged(object sender, EventArgs e)
+        //{
+        //    SelAsgSubjectId = Convert.ToInt32(ddlAsgSubject.SelectedValue);
+        //    LoadRecentAssignments();
+        //}
         protected void ddlEngagementSubject_SelectedIndexChanged(object sender, EventArgs e)
         {
             SelEngagementSubjectId = Convert.ToInt32(ddlEngagementSubject.SelectedValue);

@@ -441,7 +441,7 @@
                 </div>
             </div>
             <div class="card-body-custom" style="overflow-y:auto;max-height:380px;">
-                <div id="tabVideos">
+                <div id="tabVideos" style="display:block;">
                     <asp:Repeater ID="rptVideos" runat="server">
                         <ItemTemplate>
                             <div class="activity-item">
@@ -493,37 +493,46 @@
 </div>
 
 <script>
-function switchTab(tab, btn) {
-    document.getElementById('tabVideos').style.display      = tab === 'videos'      ? '' : 'none';
-    document.getElementById('tabAssignments').style.display = tab === 'assignments' ? '' : 'none';
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-}
+    // ── Tab state ──────────────────────────────────────────────────
+    var _activeTab = 'videos';
 
-window.addEventListener('DOMContentLoaded', function () {
-
-    function parseHF(id) {
-        var el = document.getElementById(id);
-        if (!el || !el.value) return [];
-        try { return JSON.parse(el.value); } catch { return []; }
-    }
-    function makeManualLegend(containerId, items) {
-        var c = document.getElementById(containerId);
-        if (!c) return;
-        items.forEach(function(d) {
-            c.innerHTML += '<span style="font-size:.78rem;display:flex;align-items:center;gap:5px;">'
-                + '<span style="width:10px;height:10px;border-radius:50%;background:'+d[1]+';display:inline-block;"></span>'
-                + d[0] + ' (' + d[2] + ')</span>';
-        });
+    function switchTab(tab, btn) {
+        _activeTab = tab;
+        document.getElementById('tabVideos').style.display = tab === 'videos' ? '' : 'none';
+        document.getElementById('tabAssignments').style.display = tab === 'assignments' ? '' : 'none';
+        document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
     }
 
-    var present  = parseInt('<%= hfAttPresent.Value %>') || 0;
-    var absent   = parseInt('<%= hfAttAbsent.Value %>')  || 0;
-    var leave    = parseInt('<%= hfAttLeave.Value %>')   || 0;
+    window.addEventListener('DOMContentLoaded', function () {
+
+        // ── Apply initial tab state FIRST before charts render ────
+        document.getElementById('tabVideos').style.display = 'block';
+        document.getElementById('tabAssignments').style.display = 'none';
+
+        function parseHF(id) {
+            var el = document.getElementById(id);
+            if (!el || !el.value) return [];
+            try { return JSON.parse(el.value); } catch (e) { return []; }
+        }
+
+        function makeManualLegend(containerId, items) {
+            var c = document.getElementById(containerId);
+            if (!c) return;
+            items.forEach(function (d) {
+                c.innerHTML += '<span style="font-size:.78rem;display:flex;align-items:center;gap:5px;">'
+                    + '<span style="width:10px;height:10px;border-radius:50%;background:' + d[1] + ';display:inline-block;"></span>'
+                    + d[0] + ' (' + d[2] + ')</span>';
+            });
+        }
+
+        var present = parseInt('<%= hfAttPresent.Value %>') || 0;
+    var absent = parseInt('<%= hfAttAbsent.Value %>') || 0;
+    var leave = parseInt('<%= hfAttLeave.Value %>') || 0;
 
     var submitted = parseInt('<%= hfAsgnSubmitted.Value %>') || 0;
-    var overdue   = parseInt('<%= hfAsgnOverdue.Value %>')   || 0;
-    var pending   = parseInt('<%= hfAsgnPending.Value %>')   || 0;
+    var overdue = parseInt('<%= hfAsgnOverdue.Value %>') || 0;
+    var pending = parseInt('<%= hfAsgnPending.Value %>') || 0;
 
     var videoLabels = parseHF('<%= hfVideoLabels.ClientID %>');
     var videoData   = parseHF('<%= hfVideoData.ClientID %>');
@@ -594,7 +603,7 @@ window.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // 5. Attendance by subject (stacked bar)
+    // 5. Attendance by subject (horizontal stacked bar)
     new Chart(document.getElementById('chartAttSubject'), {
         type: 'bar',
         data: {
@@ -610,6 +619,14 @@ window.addEventListener('DOMContentLoaded', function () {
             scales: { x: { stacked: true, beginAtZero: true }, y: { stacked: true } }
         }
     });
+
+    // ── Re-apply tab state AFTER all charts render ─────────────
+    // This is the key fix — charts rendering can cause a brief
+    // DOM repaint that resets inline styles set before DOMContentLoaded
+    setTimeout(function () {
+        document.getElementById('tabVideos').style.display = _activeTab === 'videos' ? '' : 'none';
+        document.getElementById('tabAssignments').style.display = _activeTab === 'assignments' ? '' : 'none';
+    }, 50);
 });
 </script>
 

@@ -950,27 +950,25 @@ namespace LearningManagementSystem.BL
         {
             SqlCommand cmd = new SqlCommand(@"
         SELECT TOP 10
-            v.Title AS VideoName,
-            ISNULL(
-                CAST(ROUND(
-                    AVG(CAST(vwp.WatchedPercent AS FLOAT))
-                , 1) AS DECIMAL(5,1))
-            , 0) AS WatchPercent,
-            ISNULL(COUNT(DISTINCT vv.ViewId), 0) AS ViewCount
-        FROM Videos v
-        JOIN Chapters ch ON ch.ChapterId = v.ChapterId
-        LEFT JOIN VideoViews vv ON vv.VideoId = v.VideoId
-            AND vv.InstituteId = @InstituteId
-            AND vv.SessionId = @SessionId
-        LEFT JOIN VideoWatchProgress vwp ON vwp.VideoId = v.VideoId
-            AND vwp.InstituteId = @InstituteId
-            AND vwp.SessionId = @SessionId
-        WHERE v.InstituteId = @InstituteId
-          AND v.SessionId = @SessionId
-          AND v.IsActive = 1
-          AND (@SubjectId = 0 OR ch.SubjectId = @SubjectId)
-        GROUP BY v.Title, v.VideoId
-        ORDER BY AVG(CAST(vwp.WatchedPercent AS FLOAT)) DESC");
+            C.ChapterName,
+            V.Title                                               AS VideoName,
+            ISNULL(COUNT(DISTINCT CASE WHEN U.RoleId = 4 THEN VV.UserId END), 0)
+                                                                  AS UniqueViewers,
+            ISNULL(COUNT(CASE WHEN U.RoleId = 4 THEN VV.ViewId END), 0)
+                                                                  AS TotalViews
+        FROM Videos V
+        JOIN Chapters C ON C.ChapterId = V.ChapterId
+        LEFT JOIN VideoViews VV ON VV.VideoId     = V.VideoId
+                                AND VV.InstituteId = @InstituteId
+                                AND VV.SessionId   = @SessionId
+LEFT JOIN Users U ON U.UserId = VV.UserId
+        WHERE V.InstituteId = @InstituteId
+          AND V.SessionId   = @SessionId
+          AND V.IsActive    = 1
+          AND (@SubjectId = 0 OR C.SubjectId = @SubjectId)
+        GROUP BY C.ChapterId, C.ChapterName, C.OrderNo,
+                 V.VideoId,  V.Title,        V.UploadedOn
+        ORDER BY C.OrderNo, V.UploadedOn");
 
             cmd.Parameters.AddWithValue("@TeacherId", teacherId);
             cmd.Parameters.AddWithValue("@InstituteId", instituteId);
@@ -978,7 +976,6 @@ namespace LearningManagementSystem.BL
             cmd.Parameters.AddWithValue("@SubjectId", subjectId);
             return dl.GetDataTable(cmd);
         }
-
         public string GetEngagementChartJson(DataTable dt)
         {
             var list = new List<object>();
@@ -986,14 +983,14 @@ namespace LearningManagementSystem.BL
             {
                 list.Add(new
                 {
+                    ChapterName = row["ChapterName"].ToString(),
                     VideoName = row["VideoName"].ToString(),
-                    WatchPercent = Convert.ToDouble(row["WatchPercent"]),
-                    ViewCount = Convert.ToInt32(row["ViewCount"])
+                    UniqueViewers = Convert.ToInt32(row["UniqueViewers"]),
+                    TotalViews = Convert.ToInt32(row["TotalViews"])
                 });
             }
             return new JavaScriptSerializer().Serialize(list);
         }
-
         public DataTable GetTopVideos(int teacherId, int instituteId, int sessionId, int subjectId)
         {
             SqlCommand cmd = new SqlCommand(@"
@@ -1126,13 +1123,13 @@ SELECT
     , 0) AS AvgWatchPercent,
 
     ISNULL(
-        CASE
-            WHEN COUNT(DISTINCT ch.ChapterId) = 0 THEN 0
-            ELSE CAST(ROUND(100.0 *
-                SUM(CASE WHEN chapter_views.ViewCount > 0 THEN 1 ELSE 0 END)
-                / COUNT(DISTINCT ch.ChapterId), 1) AS DECIMAL(5,1))
-        END
-    , 0) AS SyllabusCompletionPct,
+    CASE
+        WHEN COUNT(DISTINCT v.VideoId) = 0 THEN 0
+        ELSE CAST(ROUND(100.0 *
+            SUM(CASE WHEN video_views.ViewCount > 0 THEN 1 ELSE 0 END)
+            / COUNT(DISTINCT v.VideoId), 1) AS DECIMAL(5,1))
+    END
+, 0) AS SyllabusCompletionPct,
 
     ISNULL((
         SELECT COUNT(DISTINCT ass2.UserId)

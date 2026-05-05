@@ -939,6 +939,7 @@ function initTeacherDashboard(chartIds, panelIds, dropdownIds) {
     renderDivisionChart();
     renderSubjectChart();
     renderAvgMarksChart();
+    renderAsgChart();
     initCompareData();
     renderCmpChart();
     renderEngagementChart();
@@ -1020,53 +1021,60 @@ function setAsgView(v) {
 }
 
 function renderAsgChart() {
-    var hf = document.getElementById(elementIds.hfAsgChartData);
-    if (!hf || !hf.value) return;
-    var data;
-    try { data = JSON.parse(hf.value); } catch (e) { return; }
-    var ctx = document.getElementById('asgChart');
-    if (!ctx) return;
-    if (asgChartInstance) { asgChartInstance.destroy(); asgChartInstance = null; }
+    setTimeout(function () {
+        var hf = document.getElementById(elementIds.hfAsgChartData); // ← moved inside
+        if (!hf || !hf.value) return;
+        var data;
+        try { data = JSON.parse(hf.value); } catch (e) { return; }
 
-    asgChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: data.map(function (d) { return d.Title; }),
-            datasets: [
-                {
-                    label: 'Submitted',
-                    data: data.map(function (d) { return d.SubmissionCount; }),
-                    backgroundColor: '#1565c0cc',
-                    borderColor: '#1565c0',
-                    borderWidth: 2,
-                    borderRadius: 6
-                },
-                {
-                    label: 'Pending',
-                    data: data.map(function (d) { return d.Pending; }),
-                    backgroundColor: '#ef6c00cc',
-                    borderColor: '#ef6c00',
-                    borderWidth: 2,
-                    borderRadius: 6
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: true, position: 'top', labels: { font: { size: 11 } } },
-                tooltip: { callbacks: { label: function (c) { return ' ' + c.dataset.label + ': ' + c.parsed.y + ' students'; } } }
+        var ctx = document.getElementById('asgChart');
+        if (!ctx) return;
+        if (asgChartInstance) { asgChartInstance.destroy(); asgChartInstance = null; }
+
+        asgChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(function (d) { return d.Title; }),
+                datasets: [
+                    {
+                        label: 'Submitted',
+                        data: data.map(function (d) { return d.SubmissionCount; }),
+                        backgroundColor: '#1565c0cc',
+                        borderColor: '#1565c0',
+                        borderWidth: 2,
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Pending',
+                        data: data.map(function (d) { return d.Pending; }),
+                        backgroundColor: '#ef6c00cc',
+                        borderColor: '#ef6c00',
+                        borderWidth: 2,
+                        borderRadius: 6
+                    }
+                ]
             },
-            scales: {
-                x: { ticks: { font: { size: 10 }, maxRotation: 30 }, grid: { display: false } },
-                y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: '#e3f2fd' } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'top', labels: { font: { size: 11 } } },
+                    tooltip: {
+                        callbacks: {
+                            label: function (c) {
+                                return ' ' + c.dataset.label + ': ' + c.parsed.y + ' students';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { font: { size: 10 }, maxRotation: 30 }, grid: { display: false } },
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: '#e3f2fd' } }
+                }
             }
-        }
-    });
-}
-
-// ========== 3. DIVISION CHART ==========
+        });
+    }, 300);
+}// ========== 3. DIVISION CHART ==========
 function renderDivisionChart() {
     var hf = document.getElementById(elementIds.hfDivisionData);
     if (!hf || !hf.value) return;
@@ -1156,6 +1164,11 @@ function renderAvgMarksChart() {
 
 // ========== 5. STUDENT MARKS MODAL ==========
 function openStudentModal(studentId, studentName, subjectName) {
+    console.log('Navigating with studentId:', studentId); // check this value
+    window.location.href = 'MyStudentDetails.aspx?UserId=' + studentId;
+    return;
+
+    //the below code is unused
     document.getElementById('modalStudentName').textContent = studentName;
     document.getElementById('modalStudentMeta').textContent = subjectName;
 
@@ -1673,37 +1686,212 @@ function renderEngagementChart() {
     try { data = JSON.parse(hf.value); } catch (e) { return; }
     var ctx = document.getElementById('engagementChart');
     if (!ctx) return;
-    if (engagementChart) engagementChart.destroy();
+    if (engagementChart) { engagementChart.destroy(); engagementChart = null; }
+    if (!data || data.length === 0) return;
+
     var chartTypeEl = document.getElementById(elementIds.ddlEngagementChartType);
     var chartType = chartTypeEl ? chartTypeEl.value : 'bar';
-    var colors = ['#1565c0', '#2e7d32', '#ef6c00', '#5e35b1', '#00838f', '#c62828', '#4527a0'];
-    var chartData = {
-        labels: data.map(d => d.VideoName),
-        datasets: [{ label: 'Avg Watch %', data: data.map(d => d.WatchPercent), backgroundColor: data.map((_, i) => colors[i % colors.length] + 'cc'), borderColor: data.map((_, i) => colors[i % colors.length]), borderWidth: 2, borderRadius: chartType !== 'pie' ? 8 : 0 }]
-    };
-    var scalesConfig = chartType !== 'pie' ? { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%', font: { size: 11 } }, grid: { color: '#e3f2fd' } }, x: { ticks: { font: { size: 10 }, maxRotation: 35 }, grid: { display: false } } } : {};
-    var options = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: chartType === 'pie', position: 'top', labels: { font: { size: 11 } } }, tooltip: { callbacks: { label: c => { if (chartType === 'pie') { let total = c.dataset.data.reduce((a, v) => a + v, 0); let pct = ((c.parsed / total) * 100).toFixed(1); return ' ' + c.label + ': ' + c.parsed + '% (' + pct + '% of total)'; } return ' ' + c.dataset.label + ': ' + c.parsed.y + '%'; } } } }, scales: scalesConfig };
-    if (chartType === 'pie') engagementChart = new Chart(ctx, { type: 'pie', data: chartData, options: options });
-    else if (chartType === 'horizontalBar') engagementChart = new Chart(ctx, { type: 'bar', data: chartData, options: Object.assign({}, options, { indexAxis: 'y' }) });
-    else engagementChart = new Chart(ctx, { type: 'bar', data: chartData, options: options });
-}
 
-// ========== 9. LEARNING PATH PIE + MODAL ==========
-function renderLpPieChart() {
-    var hf = document.getElementById(elementIds.hfLpPieData);
-    if (!hf || !hf.value) return;
-    var data;
-    try { data = JSON.parse(hf.value); } catch (e) { return; }
-    var ctx = document.getElementById('lpPieChart');
-    if (!ctx) return;
-    if (lpPieChartInstance) lpPieChartInstance.destroy();
-    lpPieChartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: { labels: data.map(d => d.SubjectName), datasets: [{ data: data.map(d => d.SyllabusCompletionPct), backgroundColor: data.map(d => d.Color + 'cc'), borderColor: data.map(d => d.Color), borderWidth: 2, hoverOffset: 6 }] },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '55%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' ' + c.label + ': ' + c.parsed + '% done' } } } }
+    // ── Labels: "ChapterName – VideoTitle" ────────────────────────
+    var labels = data.map(function (d) { return d.ChapterName + ' – ' + d.VideoName; });
+    var chapterNames = data.map(function (d) { return d.ChapterName; });
+
+    // ── One color per chapter ─────────────────────────────────────
+    var palette = [
+        '#ef4444', '#3b82f6', '#f59e0b', '#22c55e',
+        '#a855f7', '#14b8a6', '#f97316', '#6366f1'
+    ];
+    var chapterColorMap = {};
+    var colorIdx = 0;
+    chapterNames.forEach(function (ch) {
+        if (!chapterColorMap[ch]) {
+            chapterColorMap[ch] = palette[colorIdx % palette.length];
+            colorIdx++;
+        }
     });
-}
 
+    var totalBg = chapterNames.map(function (ch) { return chapterColorMap[ch] + '99'; });
+    var uniqueBg = chapterNames.map(function (ch) { return chapterColorMap[ch] + 'dd'; });
+    var borders = chapterNames.map(function (ch) { return chapterColorMap[ch]; });
+
+    var totalViews = data.map(function (d) { return d.TotalViews; });
+    var uniqueViewers = data.map(function (d) { return d.UniqueViewers; });
+
+    // ── Short x-axis label (video title only) ─────────────────────
+    var shortLabels = labels.map(function (l) {
+        var parts = l.split(' – ');
+        return parts.length > 1 ? parts[1] : l;
+    });
+
+    // ── Shared tooltip title (full Chapter – Video) ───────────────
+    var tooltipTitle = function (items) { return labels[items[0].dataIndex]; };
+
+    // ══════════════════════════════════════════════════════════════
+    // PIE CHART — two doughnuts side by side via custom HTML overlay
+    // We render a single pie for Total Views; Unique is shown in legend
+    // ══════════════════════════════════════════════════════════════
+    if (chartType === 'pie') {
+        engagementChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: shortLabels,
+                datasets: [
+                    {
+                        label: 'Total Views',
+                        data: totalViews,
+                        backgroundColor: totalBg,
+                        borderColor: borders,
+                        borderWidth: 2,
+                        hoverOffset: 8
+                    },
+                    {
+                        label: 'Unique Viewers',
+                        data: uniqueViewers,
+                        backgroundColor: uniqueBg,
+                        borderColor: borders,
+                        borderWidth: 2,
+                        hoverOffset: 8
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        labels: { font: { size: 10 }, padding: 10 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: tooltipTitle,
+                            label: function (c) {
+                                return ' ' + c.dataset.label + ': ' + c.parsed;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        return;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // BAR or HORIZONTAL BAR — grouped, two datasets
+    // ══════════════════════════════════════════════════════════════
+    var isHorizontal = chartType === 'horizontalBar';
+
+    var scalesConfig = {
+        x: {
+            ticks: {
+                font: { size: 10 },
+                maxRotation: isHorizontal ? 0 : 45,
+                callback: isHorizontal
+                    ? undefined
+                    : function (val, idx) { return shortLabels[idx]; }
+            },
+            grid: { display: isHorizontal }
+        },
+        y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1, font: { size: 11 } },
+            grid: { color: isHorizontal ? 'transparent' : '#e3f2fd' }
+        }
+    };
+
+    // For horizontal bar Chart.js uses indexAxis:'y'
+    // Labels on y-axis should be short
+    var chartLabels = isHorizontal ? shortLabels : labels;
+
+    engagementChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartLabels,
+            datasets: [
+                {
+                    label: 'Total Views (Students)',
+                    data: totalViews,
+                    backgroundColor: totalBg,
+                    borderColor: borders,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false
+                },
+                {
+                    label: 'Unique Student Viewers',
+                    data: uniqueViewers,
+                    backgroundColor: uniqueBg,
+                    borderColor: borders,
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false
+                }
+            ]
+        },
+        options: {
+            indexAxis: isHorizontal ? 'y' : 'x',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { font: { size: 11 }, boxWidth: 14, padding: 14 }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: tooltipTitle,
+                        label: function (c) {
+                            return ' ' + c.dataset.label + ': ' + c.parsed.y;
+                        }
+                    }
+                }
+            },
+            scales: scalesConfig
+        }
+    });
+}// ========== 9. LEARNING PATH PIE + MODAL ==========
+function renderLpPieChart() {
+    setTimeout(function () {
+        var hf = document.getElementById(elementIds.hfLpPieData);
+        if (!hf || !hf.value) return;
+        var data;
+        try { data = JSON.parse(hf.value); } catch (e) { return; }
+        var ctx = document.getElementById('lpPieChart');
+        if (!ctx) return;
+        if (lpPieChartInstance) lpPieChartInstance.destroy();
+
+        lpPieChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.map(function (d) { return d.SubjectName; }),
+                datasets: [{
+                    data: data.map(function (d) { return d.SyllabusCompletionPct; }),
+                    backgroundColor: data.map(function (d) { return d.Color + 'cc'; }),
+                    borderColor: data.map(function (d) { return d.Color; }),
+                    borderWidth: 2,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '55%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (c) {
+                                return ' ' + c.label + ': ' + c.parsed + '% done';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }, 300);
+}
 function initLpFullData() {
     var hf = document.getElementById(elementIds.hfLpPieData);
     if (!hf || !hf.value) return;

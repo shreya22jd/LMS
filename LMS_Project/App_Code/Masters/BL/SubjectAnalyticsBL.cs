@@ -92,19 +92,31 @@ public class SubjectAnalyticsBL
     public DataTable GetVideoViewsPerChapter(int subjectId, int sessionId)
     {
         var cmd = new SqlCommand(@"
-            SELECT
-                C.ChapterName,
-                ISNULL(SUM(V.ViewCount),0) AS TotalViews
-            FROM Chapters C
-            LEFT JOIN Videos V ON V.ChapterId=C.ChapterId AND V.SessionId=@SessionId
-            WHERE C.SubjectId=@SubjectId AND C.SessionId=@SessionId
-            GROUP BY C.ChapterId, C.ChapterName, C.OrderNo
-            ORDER BY C.OrderNo");
+        SELECT
+            C.ChapterName,
+            V.Title AS VideoTitle,
+            COUNT(VV.ViewId)                          AS TotalViews,
+            COUNT(DISTINCT VV.UserId)                 AS UniqueViewers
+        FROM Chapters C
+        INNER JOIN Videos V  ON V.ChapterId  = C.ChapterId
+                             AND V.SessionId  = @SessionId
+        LEFT JOIN  VideoViews VV ON VV.VideoId   = V.VideoId
+                                AND VV.SessionId  = @SessionId
+                                AND VV.UserId IN (
+                                    SELECT UserId FROM Users
+                                    WHERE  RoleId = 4          -- Students only
+                                      AND  SessionId = @SessionId
+                                )
+        WHERE C.SubjectId  = @SubjectId
+          AND C.SessionId  = @SessionId
+        GROUP BY C.ChapterId, C.ChapterName, C.OrderNo,
+                 V.VideoId,  V.Title,        V.UploadedOn
+        ORDER BY C.OrderNo, V.UploadedOn");
+
         cmd.Parameters.AddWithValue("@SubjectId", subjectId);
         cmd.Parameters.AddWithValue("@SessionId", sessionId);
         return dl.GetDataTable(cmd);
     }
-
     // ── Assignment submission count per assignment ────────────────
     public DataTable GetAssignmentStats(int subjectId, int sessionId)
     {

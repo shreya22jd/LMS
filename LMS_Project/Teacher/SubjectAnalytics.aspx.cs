@@ -51,8 +51,8 @@ namespace LMS_Project.Teacher
                 litTotalMaterials.Text = k["TotalMaterials"].ToString();
                 litTotalAssignments.Text = k["TotalAssignments"].ToString();
                 litTotalSubmissions.Text = k["TotalSubmissions"].ToString();
-                litAvgMarks.Text = k["AvgMarks"].ToString();
-                litAvgAttendance.Text = k["AvgAttendancePct"].ToString() + "%";
+                litAvgMarks.Text = string.Format("{0:F2}", Convert.ToDecimal(k["AvgMarks"]));
+                litAvgAttendance.Text = string.Format("{0:F2}", Convert.ToDecimal(k["AvgAttendancePct"])) + "%";
             }
 
             // ── Attendance chart data ──
@@ -82,18 +82,27 @@ namespace LMS_Project.Teacher
             hfAbsentTotal.Value = aTotal.ToString();
             hfLeaveTotal.Value = lTotal.ToString();
 
-            // ── Video views per chapter ──
+            // ── Video views per chapter (student viewers only) ──
             DataTable dtVid = bl.GetVideoViewsPerChapter(subjectId, SessionId);
-            var vChapters = new System.Collections.Generic.List<string>();
-            var vViews = new System.Collections.Generic.List<int>();
+            var vLabels = new System.Collections.Generic.List<string>();
+            var vChapterNames = new System.Collections.Generic.List<string>();
+            var vTotalViews = new System.Collections.Generic.List<int>();
+            var vUniqueViewers = new System.Collections.Generic.List<int>();
+
             if (dtVid != null)
                 foreach (DataRow r in dtVid.Rows)
                 {
-                    vChapters.Add(r["ChapterName"].ToString());
-                    vViews.Add(Convert.ToInt32(r["TotalViews"]));
+                    // Label = "ChapterName – VideoTitle" for x-axis
+                    vLabels.Add(r["ChapterName"] + " – " + r["VideoTitle"]);
+                    vChapterNames.Add(r["ChapterName"].ToString());
+                    vTotalViews.Add(Convert.ToInt32(r["TotalViews"]));
+                    vUniqueViewers.Add(Convert.ToInt32(r["UniqueViewers"]));
                 }
-            hfVideoChapters.Value = ToJson(vChapters);
-            hfVideoViews.Value = ToJson(vViews);
+
+            hfVideoLabels.Value = ToJson(vLabels);
+            hfVideoChapterNames.Value = ToJson(vChapterNames);
+            hfVideoTotalViews.Value = ToJson(vTotalViews);
+            hfVideoUniqueViewers.Value = ToJson(vUniqueViewers);
 
             // ── Assignment chart data ──
             DataTable dtAsg = bl.GetAssignmentStats(subjectId, SessionId);
@@ -110,19 +119,6 @@ namespace LMS_Project.Teacher
             // total enrolled students for the bar baseline
             hfAssignmentTotal.Value = dtKpi?.Rows.Count > 0
                 ? dtKpi.Rows[0]["TotalStudents"].ToString() : "0";
-
-            // ── Quiz chart data ──
-            DataTable dtQuiz = bl.GetQuizAvgScores(subjectId, SessionId);
-            var qTitles = new System.Collections.Generic.List<string>();
-            var qAvg = new System.Collections.Generic.List<decimal>();
-            if (dtQuiz != null)
-                foreach (DataRow r in dtQuiz.Rows)
-                {
-                    qTitles.Add(r["Title"].ToString());
-                    qAvg.Add(Convert.ToDecimal(r["AvgPct"]));
-                }
-            hfQuizTitles.Value = ToJson(qTitles);
-            hfQuizAvgPct.Value = ToJson(qAvg);
 
             // ── Chapter content summary repeater ──
             DataTable dtChCon = bl.GetChapterContentSummary(subjectId, SessionId);
