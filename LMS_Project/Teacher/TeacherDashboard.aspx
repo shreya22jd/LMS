@@ -28,14 +28,13 @@
 </div>
 
 <%-- ══ STAT CARDS + QUICK ACTIONS (side by side) ══ --%>
-<div class="row g-3 mb-4">
 
     <%-- LEFT: Stat Cards (col-md-5) --%>
-    <div class="col-md-5">
+    <div class="row g-3 mb-4">
         <div class="panel-card h-100">
             <div class="row g-2">
 
-                <div class="col-6">
+               <div class="col-md-3 col-6">
                     <div class="stat-card-sm card-green">
                         <div class="icon-box-sm icon-green">
                             <i class="fas fa-book-open"></i>
@@ -48,7 +47,7 @@
                     </div>
                 </div>
 
-                <div class="col-6">
+               <div class="col-md-3 col-6">
                     <div class="stat-card-sm card-teal">
                         <div class="icon-box-sm icon-teal">
                             <i class="fas fa-users"></i>
@@ -61,7 +60,7 @@
                     </div>
                 </div>
 
-                <div class="col-6">
+                <div class="col-md-3 col-6">
                     <div class="stat-card-sm card-orange">
                         <div class="icon-box-sm icon-orange">
                             <i class="fas fa-tasks"></i>
@@ -74,7 +73,7 @@
                     </div>
                 </div>
 
-                <div class="col-6">
+               <div class="col-md-3 col-6">
                     <div class="stat-card-sm card-lime">
                         <div class="icon-box-sm icon-lime">
                             <i class="fas fa-video"></i>
@@ -92,7 +91,7 @@
     </div>
 
     <%-- RIGHT: Quick Actions (col-md-7) --%>
-    <div class="col-md-7">
+    <%-- <div class="col-md-7">
         <div class="panel-card h-100">
             <div class="section-header">
                 <h6><i class="fas fa-bolt me-2"></i>Quick Actions</h6>
@@ -131,8 +130,8 @@
             </div>
         </div>
     </div>
+--%>
 
-</div>
 
 <%-- ══ SUBJECTS + RECENT STUDENTS ══ --%>
 <div class="row g-3 mb-4">
